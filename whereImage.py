@@ -29,7 +29,7 @@ rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)*Geo['pixelSize']/Geo['wa
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'): os.mkdir(args.o + '/rawImage')
 
-mask = makeMask()
+mask = user_get_mask()
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 
 
