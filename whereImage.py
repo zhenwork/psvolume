@@ -63,5 +63,5 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	zf.h5modify(fsave, 'rotation', matrix)
 	zf.h5modify(fsave, 'scale', user_get_scalingFactor(idx))
 
-	print '## Finished image:'+str(idx).rjust(5)+'/'+str(num)
+	print '## Finished image:'+str(idx).rjust(5)+'/'+str(args.num)
 	if idx>4000: break
