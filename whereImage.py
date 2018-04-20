@@ -8,7 +8,7 @@ zf = iFile()
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-o","--o", help="save folder", default="", type=str)
+parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
 ## folder = '/reg/data/ana04/users/zhensu/xpptut/volume/rawImage'
@@ -28,12 +28,9 @@ rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)*Geo['pixelSize']/Geo['wa
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'): 
 		print 'making the folder ... '
-		if args.o!="": os.mkdir(args.o + '/rawImage')
-		else: os.mkdir('rawImage')
-
+		os.mkdir(args.o + '/rawImage')
 else:
-	while not os.path.exists(args.o + '/rawImage'): 
-		pass
+	while not os.path.exists(args.o + '/rawImage'): pass
 
 mask = user_get_mask()
 Mask = expand_mask(mask, cwin=(2,2), value=0)
