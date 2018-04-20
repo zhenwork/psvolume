@@ -45,8 +45,10 @@ def user_get_orientation(idx):
 
 # How to get the scale factor, return a number (if not using, return None)
 def user_get_scalingFactor(idx):
-	scale = zf.h5reader('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
+	f = h5py.File('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
+	scale = f[f.keys()[0]].value
 	scale = 1./scale
+	f.close()
 	return scale[idx]
 	return None
 
