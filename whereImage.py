@@ -41,7 +41,7 @@ if comm_rank == 0:
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
 
-sep = np.linspace(0, num, comm_size+1).astype('int')
+sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = user_get_image(idx)
 	quaternion = user_get_orientation(idx)

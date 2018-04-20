@@ -5,7 +5,6 @@ import cbf
 import os
 
 ## basic parameters
-num = 2000
 Geo = {}
 Geo['pixelSize'] = 172.0
 Geo['detDistance'] = 200147.4
