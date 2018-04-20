@@ -1,6 +1,5 @@
 from userScript import *
 from fileManager import *
-from imageMergeClient import *
 from imageProcessClient import *
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
