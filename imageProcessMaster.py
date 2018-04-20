@@ -1,5 +1,5 @@
-from ImageProcessClient import *
-from FileManager import *
+from imageProcessClient import *
+from fileManager import *
 from mpi4py import MPI
 import argparse
 comm_rank = MPI.COMM_WORLD.Get_rank()
