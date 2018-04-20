@@ -75,3 +75,4 @@ def remove_peak_alg2(img, mask=None, thr=(None, None), cwin=(11,11)):
 		index = np.where(submedian>thr[1])
 		image[index] = -1
 	return image
+
