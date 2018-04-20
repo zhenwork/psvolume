@@ -2,7 +2,6 @@ from userScript import *
 from FileManager import *
 from ImageMergeClient import *
 from ImageProcessClient import *
-from mpidata import *
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
 zf = iFile()
@@ -26,12 +25,14 @@ simb = lsimb * np.array([0., 1., 0.])
 simc = lsimc * np.array([0., 0., 1.])
 rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)*Geo['pixelSize']/Geo['wavelength']/Geo['detDistance']
 
+if comm_rank == 0:
+	if not os.path.exists(args.o + '/rawImage'): os.mkdir(args.o + '/rawImage')
+
 mask = makeMask()
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 
 
 if comm_rank == 0:
-	if not os.path.exists(args.o + '/rawImage'): os.mkdir(args.o + '/rawImage')
 	Filename = args.o+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
@@ -44,7 +45,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	matrix = rot_three.dot(rot_three.dot(rot_one))
 
 	fsave = args.o + '/rawImage' + '/rawImage_'+str(idx).zfill(5)+'.slice'
-	zf.h5writer(fsave, 'readout', 'image') 
+	zf.h5writer(fsave, 'readout', 'image')
 	zf.h5modify(fsave, 'image', image*mask)
 	zf.h5modify(fsave, 'center', user_get_center(idx))
 	zf.h5modify(fsave, 'exp', False)
