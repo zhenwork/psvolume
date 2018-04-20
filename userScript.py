@@ -1,6 +1,7 @@
 import numpy as np 
 import h5py
 import cbf
+import os
 
 ## basic parameters
 num = 2000
