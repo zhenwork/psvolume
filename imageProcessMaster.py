@@ -50,7 +50,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	#image *= Geo['scale']
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
-	fsave = args.o + '/mergeImage_'+str(idx).zfill(5)+'.slice'
+	fsave = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 
 	zf.h5writer(fsave, 'readout', 'image') #image, event
 	zf.h5modify(fsave, 'image', image)
