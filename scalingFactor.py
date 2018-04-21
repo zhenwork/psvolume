@@ -1,5 +1,4 @@
 from mpidata import *
-from userScript import *
 from fileManager import *
 from imageProcessClient import *
 from mpi4py import MPI
@@ -63,6 +62,7 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(2)
+	zf.h5modify(args.o+'/image.process', 'Smatrix', Smatrix)
 
 else:
 	md=mpidata()
