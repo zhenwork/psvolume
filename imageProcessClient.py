@@ -8,6 +8,8 @@ def circle_region(image=None, center=(0,0), rmax=10, rmin=0, size=(100,100)):
 	x = np.arange(nx) - center[0]
 	y = np.arange(ny) - center[1]
 	[xaxis, yaxis] = np.meshgrid(x,y)
+	xaxis = xaxis.T
+	yaxis = yaxis.T
 	r = xaxis**2+yaxis**2
 	index = np.where(r < rmin**2)
 	image[index] = 0.
