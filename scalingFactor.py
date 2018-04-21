@@ -20,7 +20,7 @@ Smatrix = np.zeros((num, num))
 Tmp = zf.h5reader(args.o + '/mergeImage/mergeImage_00000.slice', 'image')
 Geo = zf.get_image_info(args.o + '/mergeImage/mergeImage_00000.slice')
 (nx,ny) = Tmp.shape
-mask = circle_region(image=None, center=Geo['center'], rmax=500, rmin=200, size=(nx,ny))
+mask = circle_region(image=None, center=Geo['center'], rmax=450, rmin=100, size=(nx,ny))
 
 if sep[1]-sep[0]<200: 
 	imgMatrix = np.zeros((sep[comm_rank+1]-sep[comm_rank], nx,ny))
