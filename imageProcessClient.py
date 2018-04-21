@@ -2,6 +2,19 @@ import numpy as np
 import h5py
 from scipy.ndimage.filters import median_filter
 
+def circle_region(image=None, center=(0,0), rmax=10, rmin=0, size=(100,100)):
+	if image is None: image = np.ones(size)
+	(nx,ny) = image.shape
+	x = np.arange(nx) - center[0]
+	y = np.arange(ny) - center[1]
+	[xaxis, yaxis] = np.meshgrid(x,y)
+	r = xaxis**2+yaxis**2
+	index = np.where(r < rmin**2)
+	image[index] = 0.
+	index = np.where(r > rmax**2)
+	image[index] = 0.
+	return image
+
 def solid_angle_correction(image, Geo):
 	detDistance = Geo['detDistance']
 	pixelSize   = Geo['pixelSize']
