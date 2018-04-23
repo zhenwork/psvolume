@@ -15,58 +15,33 @@ if args.num==-1:
 	num = zf.counterFile(args.o+'/rawImage', title='.slice')
 else: num = int(args.num)
 sep = np.linspace(0, num, comm_size+1).astype('int')
-Smatrix = np.zeros((num, num))
+scaleMatrix = np.zeros(num)
 
-Tmp = zf.h5reader(args.o + '/mergeImage/mergeImage_00000.slice', 'image')
-Geo = zf.get_image_info(args.o + '/mergeImage/mergeImage_00000.slice')
-(nx,ny) = Tmp.shape
-mask = circle_region(image=None, center=Geo['center'], rmax=450, rmin=100, size=(nx,ny))
-
-if sep[1]-sep[0]<200: 
-	imgMatrix = np.zeros((sep[comm_rank+1]-sep[comm_rank], nx,ny))
-	for idx in range(sep[comm_rank], sep[comm_rank+1]): 
-		filename = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
-		image = zf.h5reader(filename, 'image')
-		image[np.where(image<0.)] = 0.
-		imgMatrix[idx-sep[comm_rank],:,:] = image*mask
-		image = None
-	for jdx in range(num):
-		filename = args.o + '/mergeImage/mergeImage_'+str(jdx).zfill(5)+'.slice'
-		image = zf.h5reader(filename, 'image')
-		cirImage_2 = image*mask
-		cirImage_2[np.where(cirImage_2<0)] = 0.
-		for idx in range(len(imgMatrix)):
-			cirImage_1 = imgMatrix[idx]
-			Smatrix[idx+sep[comm_rank], jdx] = np.sum(cirImage_1*cirImage_2)/np.sum(cirImage_2**2)
-		cirImage_2 = None
-
-else:
-	for jdx in range(num):
-		filename = args.o + '/mergeImage/mergeImage_'+str(jdx).zfill(5)+'.slice'
-		image = zf.h5reader(filename, 'image')
-		cirImage_2 = image*mask
-		cirImage_2[np.where(cirImage_2<0)] = 0.
-		for idx in range(sep[comm_rank], sep[comm_rank+1]):
-			filename = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
-			image = zf.h5reader(filename, 'image')
-			image[np.where(image<0.)] = 0.
-			cirImage_1 = image*mask
-			Smatrix[idx+sep[comm_rank], jdx] = np.sum(cirImage_1*cirImage_2)/np.sum(cirImage_2**2)
-		cirImage_2 = None
+for idx in range(sep[comm_rank], sep[comm_rank+1]):
+	filename = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
+	image = zf.h5reader(filename, 'image')
+	image[np.where(image<0.)] = 0.
+	if idx == sep[comm_rank]: 
+		(nx,ny) = image.shape
+		(cx,cy) = Geo['center']
+		print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
+		mask = circle_region(image=None, center=(cx,cy), rmax=450, rmin=100, size=(nx,ny))
+	maskImage = image*mask
+	scaleMatrix[idx] = np.sum(maskImage)
 
 if comm_rank == 0:
 	for i in range(comm_size-1):
 		md=mpidata()
 		md.recv()
-		Smatrix += md.Smatrix
+		scaleMatrix += md.scaleMatrix
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(2)
-	zf.h5modify(args.o+'/image.process', 'Smatrix', Smatrix)
+	zf.h5modify(args.o+'/image.process', 'scale', scaleMatrix)
 
 else:
 	md=mpidata()
-	md.addarray('Smatrix', Smatrix)
+	md.addarray('scaleMatrix', scaleMatrix)
 	md.small.rank = comm_rank
 	md.send()
 	md = None
