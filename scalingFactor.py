@@ -26,7 +26,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 		(nx,ny) = image.shape
 		(cx,cy) = Geo['center']
 		print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
-		mask = circle_region(image=None, center=(cx,cy), rmax=450, rmin=100, size=(nx,ny))
+		mask = circle_region(image=None, center=(cx,cy), rmax=400, rmin=200, size=(nx,ny))
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
 	print '### rank ' + str(comm_rank).rjust(2) + ' is processing: ' + str(idx)+'/'+str(num)
@@ -39,7 +39,7 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(2)
-	zf.h5modify(args.o+'/image.process', 'scale', scaleMatrix)
+	zf.h5modify(args.o+'/image.process', 'OveScale', scaleMatrix)
 
 else:
 	md=mpidata()
