@@ -85,13 +85,12 @@ def ImageMerge(model3d, weight, image, Geo, Volume):
 	voxel = Geometry(image, Geo)
 
 	Image = image.ravel()
-	if Geo['rot']=='matrix': 
-		Rot = Geo['rotation']
+	if Geo['rot']=='matrix': Rot = Geo['rotation']
 	HKL = Vsample*(Rot.dot(voxel)).T
 
 	for t in range(len(HKL)):
 
-		if (Image[t] < -512): continue
+		if (Image[t] < 0): continue
 		
 		hkl = HKL[t] + Vcenter
 		
