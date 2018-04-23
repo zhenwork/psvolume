@@ -22,6 +22,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = zf.h5reader(filename, 'image')
 	image[np.where(image<0.)] = 0.
 	if idx == sep[comm_rank]: 
+		Geo = zf.get_image_info(filename)
 		(nx,ny) = image.shape
 		(cx,cy) = Geo['center']
 		print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
