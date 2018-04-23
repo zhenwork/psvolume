@@ -29,6 +29,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 		mask = circle_region(image=None, center=(cx,cy), rmax=450, rmin=100, size=(nx,ny))
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
+	print '### rank ' + str(comm_rank).rjust(2) + ' is processing: ' + str(idx)+'/'+str(num)
 
 if comm_rank == 0:
 	for i in range(comm_size-1):
