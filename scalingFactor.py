@@ -18,7 +18,7 @@ sep = np.linspace(0, num, comm_size+1).astype('int')
 scaleMatrix = np.zeros(num)
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
+	filename = args.o + '/rawImage/rawImage_'+str(idx).zfill(5)+'.slice'
 	image = zf.h5reader(filename, 'image')
 	image[np.where(image<0.)] = 0.
 	if idx == sep[comm_rank]: 
