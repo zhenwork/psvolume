@@ -7,7 +7,7 @@ comm_size = comm.Get_size()
 
 #from mpidata import mpidata, small
 from fileManager import *
-from imageMergeClient import *
+from imageMergeClient import ImageMerge
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
@@ -62,7 +62,7 @@ class mpidata(object):
 				comm.Recv(arr,source=recvRank,tag=MPI.ANY_TAG)
 
 
-				
+
 zf = iFile()
 if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
 else: num = int(args.num)
@@ -98,7 +98,7 @@ else:
 		Geo = zf.get_image_info(fname)
 		image /= Geo['scale']
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
-		#[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
+		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
 
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()
