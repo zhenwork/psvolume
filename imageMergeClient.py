@@ -1,3 +1,4 @@
+import numpy as np
 from numba import jit
 
 def Crystfel2Rotation(abc_star):
