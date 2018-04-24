@@ -24,14 +24,14 @@ Vol['volumeSampling'] = 1
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
-
+small = 0
 
 
 if comm_rank == 0:
 	fsave = zf.makeFolder(args.o, title='sp')
 	print "Folder: ", fsave
 	for nrank in range(comm_size-1):
-		small = 0
+		
 		dataRecv = np.empty_like(model3d)
 		status = MPI.Status()
 		small = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status = status)
@@ -64,7 +64,7 @@ else:
 
 
 	comm.send(None, dest = 0)
-	comm.recv(comm_process, source=0)
+	comm.recv(small, source=0)
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending model3d ... '
 	comm.Send(model3d, dest = 0, tag = 1)
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending weight ... '
