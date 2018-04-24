@@ -62,11 +62,11 @@ else:
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
 		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
 
-	
-    comm.send(None, dest = 0)
-    #comm.recv(comm_process, source=0)
-    print '### rank ' + str(comm_rank).rjust(2) + ' is sending model3d ... '
-    comm.Send(model3d, dest = 0, tag = 1)
-    print '### rank ' + str(comm_rank).rjust(2) + ' is sending weight ... '
-    comm.Send(weight, dest = 0, tag = 0)    
-    #comm.send(None, dest = 0)
+
+	comm.send(None, dest = 0)
+	#comm.recv(comm_process, source=0)
+	print '### rank ' + str(comm_rank).rjust(2) + ' is sending model3d ... '
+	comm.Send(model3d, dest = 0, tag = 1)
+	print '### rank ' + str(comm_rank).rjust(2) + ' is sending weight ... '
+	comm.Send(weight, dest = 0, tag = 0)    
+	#comm.send(None, dest = 0)
