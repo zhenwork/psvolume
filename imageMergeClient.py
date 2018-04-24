@@ -1,5 +1,5 @@
 import numpy as np
-#from numba import jit
+from numba import jit
 
 def Crystfel2Rotation(abc_star):
 	astar = abc_star[0:3]
@@ -73,7 +73,7 @@ def Geometry(image, Geo):
 	voxel = (np.array([xaxis,yaxis,zaxis])/norm - np.array([[0.],[0.],[1.]]))/waveLength
 	return voxel
 
-#@jit
+@jit
 def ImageMerge(model3d, weight, image, Geo, Volume):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
