@@ -77,6 +77,18 @@ weight  = np.ones([Vol['volumeSize']]*3)*9.0e10
 model3d[:,:,:] = 0.
 weight[:,:,:] = 0.
 
+
+
+sep = np.linspace(0, num, comm_size+1).astype('int')
+for idx in range(sep[comm_rank], sep[comm_rank+1]):
+	fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
+	image = zf.h5reader(fname, 'image')
+	Geo = zf.get_image_info(fname)
+	image /= Geo['scale']
+	print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
+	[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
+
+
 if comm_rank == 0:
 	fsave = zf.makeFolder(args.o, title='sp')
 	print "Folder: ", fsave
@@ -88,19 +100,9 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		print '### received file from ' + str(recvRank).rjust(2)+'/'+str(comm_size-1)
 		print np.amax(md.model3d), model3d.shape, md.model3d.shape
-
 	print "### start saving files ... "
 
 else:
-	sep = np.linspace(0, num, comm_size).astype('int')
-	for idx in range(sep[comm_rank-1], sep[comm_rank]):
-		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
-		image = zf.h5reader(fname, 'image')
-		Geo = zf.get_image_info(fname)
-		image /= Geo['scale']
-		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
-		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
-
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()
 	md.addarray('model3d', model3d)
