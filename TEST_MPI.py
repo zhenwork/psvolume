@@ -1,7 +1,7 @@
 import os
 import numpy as np 
 from mpidata import *
-from numba import jit
+#from numba import jit
 from fileManager import *
 from imageMergeClient import *
 import argparse
