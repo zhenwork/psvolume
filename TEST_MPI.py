@@ -1,6 +1,6 @@
 import os
 import numpy as np 
-from mpidata import *
+from mpidata import mpidata, small
 from fileManager import *
 from imageMergeClient import *
 import argparse
