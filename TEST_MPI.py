@@ -1,5 +1,5 @@
 from mpidata import *
-from fileManager import *
+from fileManager import iFile
 from imageMergeClient import *
 import argparse
 from mpi4py import MPI
