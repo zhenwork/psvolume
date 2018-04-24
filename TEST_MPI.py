@@ -86,7 +86,7 @@ if comm_rank == 0:
 		weight += md.weight
 		recvRank = md.small.rank
 		print '### received file from ' + str(recvRank).rjust(2)+'/'+str(comm_size-1)
-		print np.amax(md.model3d)
+		print np.amax(md.model3d), model3d.shape, md.model3d.shape
 
 	print "### start saving files ... "
 
