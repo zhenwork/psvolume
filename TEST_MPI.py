@@ -1,7 +1,6 @@
 import os
 import numpy as np 
 from mpidata import *
-#from numba import jit
 from fileManager import *
 from imageMergeClient import *
 import argparse
@@ -34,13 +33,13 @@ if comm_rank == 0:
 		weight += md.weight
 		recvRank = md.small.rank
 		md = None
-		print '### received file from ' + str(recvRank).rjust(2)
+		print '### received file from ' + str(recvRank).rjust(2)+'/'+str(comm_size-1)
 
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
-	ThisFile = zf.readtxt(os.path.realpath(__file__))
-	zf.h5writer(pathIntens, 'execute', ThisFile)
-	zf.h5modify(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
+	#ThisFile = zf.readtxt(os.path.realpath(__file__))
+	#zf.h5writer(pathIntens, 'execute', ThisFile)
+	zf.h5writer(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 	zf.h5modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 
 else:
