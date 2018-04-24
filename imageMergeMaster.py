@@ -2,8 +2,9 @@ from mpidata import *
 import numpy as np
 import h5py
 import os
+from numba import jit
 #from fileManager import *
-from imageMergeClient import *
+# from imageMergeClient import *
 import argparse
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
@@ -69,7 +70,67 @@ class iFile:
 		content = f.readlines()
 		f.close()
 		return content
+
+def Geometry(image, Geo):
+	"""
+	The unit of wavelength is nm
+	"""
+	waveLength = Geo['waveLength']
+	center = Geo['center']
+
+	(nx, ny) = image.shape
+	x = np.arange(nx) - center[0]
+	y = np.arange(ny) - center[1]
+	[xaxis, yaxis] = np.meshgrid(x, y)
+	xaxis = xaxis.T.ravel()
+	yaxis = yaxis.T.ravel()
+	zaxis = np.ones(nx*ny)*Geo['detDistance']/Geo['pixelSize']
+	norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+	## The first axis is negative
+	voxel = (np.array([xaxis,yaxis,zaxis])/norm - np.array([[0.],[0.],[1.]]))/waveLength
+	return voxel
+	
+@jit
+def ImageMerge(model3d, weight, image, Geo, Volume):
+	Vsize = Volume['volumeSize']
+	Vcenter = Volume['volumeCenter']
+	Vsample = Volume['volumeSampling']
+	center = Geo['center']
+	orientation = Geo['rotation']
+
+	voxel = Geometry(image, Geo)
+
+	Image = image.ravel()
+	if Geo['rot']=='matrix': Rot = Geo['rotation']
+	HKL = Vsample*(Rot.dot(voxel)).T
+
+	for t in range(len(HKL)):
+
+		if (Image[t] < 0): continue
 		
+		hkl = HKL[t] + Vcenter
+		
+		h = hkl[0] 
+		k = hkl[1] 
+		l = hkl[2] 
+		
+		inth = int(round(h)) 
+		intk = int(round(k)) 
+		intl = int(round(l)) 
+
+		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
+		
+		hshift = abs(h/Vsample-round(h/Vsample))
+		kshift = abs(k/Vsample-round(k/Vsample))
+		lshift = abs(l/Vsample-round(l/Vsample))
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): continue
+		
+		weight[ inth,intk,intl] += 1.
+		model3d[inth,intk,intl] += Image[t] 
+
+	return [model3d, weight]
+
+
 
 zf = iFile()
 #if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
