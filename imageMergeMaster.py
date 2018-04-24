@@ -21,8 +21,8 @@ model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
 if comm_rank == 0:
-	print "Folder: ", fsave
 	fsave = zf.makeFolder(args.o, title='sp')
+	print "Folder: ", fsave
 	for nrank in range(comm_size-1):
 		md=mpidata()
 		md.recv()

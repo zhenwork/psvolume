@@ -80,7 +80,7 @@ def ImageMerge(model3d, weight, image, Geo, Volume):
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
 	center = Geo['center']
-	orientation = Geo['orientation']
+	orientation = Geo['rotation']
 
 	voxel = Geometry(image, Geo)
 
