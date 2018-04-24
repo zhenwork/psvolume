@@ -36,14 +36,14 @@ if comm_rank == 0:
 		status = MPI.Status()
 		small = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status = status)
 		recvRank = status.Get_source()
-		#comm.send(None, dest = source)
+		comm.send(None, dest = recvRank)
 		
 		comm.Recv(dataRecv, source = recvRank, tag = 1, status = status)
 		model3d += dataRecv
 		comm.Recv(dataRecv, source = recvRank, tag = 0, status = status)
 		weight  += dataRecv
 		print '### received file from ' + str(recvRank).rjust(2)
-		#comm.recv(comm_process, source=source)
+		comm.recv(small, source=recvRank)
 
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
@@ -64,9 +64,9 @@ else:
 
 
 	comm.send(None, dest = 0)
-	#comm.recv(comm_process, source=0)
+	comm.recv(comm_process, source=0)
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending model3d ... '
 	comm.Send(model3d, dest = 0, tag = 1)
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending weight ... '
 	comm.Send(weight, dest = 0, tag = 0)    
-	#comm.send(None, dest = 0)
+	comm.send(None, dest = 0)
