@@ -1,7 +1,8 @@
 import os
 import numpy as np 
 from mpidata import *
-from fileManager import iFile
+from numba import jit
+from fileManager import *
 from imageMergeClient import *
 import argparse
 parser = argparse.ArgumentParser()
