@@ -2,7 +2,7 @@ import os
 import numpy as np 
 from mpidata import *
 from fileManager import iFile
-from imageMergeClient import ImageMerge
+from imageMergeClient import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
