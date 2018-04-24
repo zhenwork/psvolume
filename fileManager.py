@@ -70,3 +70,9 @@ class iFile:
 		Info['scale'] = f['scale'].value
 		f.close()
 		return Info
+
+	def readtxt(self, path):
+		f = open(path)
+		content = f.readlines()
+		f.close()
+		return content
