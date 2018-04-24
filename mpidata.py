@@ -1,8 +1,8 @@
 import numpy as np
 from mpi4py import MPI
 comm = MPI.COMM_WORLD
-rank = comm.Get_rank()
-size = comm.Get_size()
+comm_rank = comm.Get_rank()
+comm_size = comm.Get_size()
 
 class arrayinfo(object):
 	def __init__(self,name,array):
@@ -25,21 +25,21 @@ class mpidata(object):
 
 	def endrun(self):
 		self.small.endrun = True
-		comm.send(self.small,dest=0,tag=rank)
+		comm.send(self.small,dest=0,tag=comm_rank)
 
 	def addarray(self,name,array):
 		self.arraylist.append(array)
 		self.small.addarray(name,array)
 
 	def send(self):
-		assert rank!=0
-		comm.send(self.small,dest=0,tag=rank)
+		assert comm_rank!=0
+		comm.send(self.small,dest=0,tag=comm_rank)
 		for arr in self.arraylist:
 			assert arr.flags['C_CONTIGUOUS']
-			comm.Send(arr,dest=0,tag=rank)
+			comm.Send(arr,dest=0,tag=comm_rank)
 
 	def recv(self):
-		assert rank==0
+		assert comm_rank==0
 		status=MPI.Status()	   
 		self.small=comm.recv(source=MPI.ANY_SOURCE,tag=MPI.ANY_TAG,status=status)
 		recvRank = status.Get_source()
