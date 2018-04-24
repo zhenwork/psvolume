@@ -2,15 +2,11 @@ from mpidata import *
 from fileManager import iFile
 from imageMergeClient import *
 import argparse
-from mpi4py import MPI
-comm_rank = MPI.COMM_WORLD.Get_rank()
-comm_size = MPI.COMM_WORLD.Get_size()
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
 args.o = '/reg/data/ana04/users/zhensu/xpptut/volume'
-
 
 zf = iFile()
 if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
@@ -51,7 +47,7 @@ else:
 		Geo = zf.get_image_info(fname)
 		image /= Geo['scale']
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
-		#[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
+		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
 
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()
