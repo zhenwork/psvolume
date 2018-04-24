@@ -35,6 +35,7 @@ if comm_rank == 0:
 		md = None
 		print '### received file from ' + str(recvRank).rjust(2)+'/'+str(comm_size-1)
 
+	print "### start saving files ... "
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
 	#ThisFile = zf.readtxt(os.path.realpath(__file__))
