@@ -72,9 +72,10 @@ Vol = {}
 Vol['volumeCenter'] = 60
 Vol['volumeSampling'] = 1
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
-model3d = np.zeros([Vol['volumeSize']]*3)
-weight  = np.zeros([Vol['volumeSize']]*3)
-
+model3d = np.ones([Vol['volumeSize']]*3)*9.0e10
+weight  = np.ones([Vol['volumeSize']]*3)*9.0e10
+model3d[:,:,:] = 0.
+weight[:,:,:] = 0.
 
 if comm_rank == 0:
 	fsave = zf.makeFolder(args.o, title='sp')
