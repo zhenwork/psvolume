@@ -41,7 +41,7 @@ if comm_rank == 0:
 else:
 	sep = np.linspace(0, num, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
-		fname = os.path.join(args.o, '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice')
+		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
 		image /= Geo['scale']
