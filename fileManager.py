@@ -1,6 +1,6 @@
 import numpy as np
 import h5py
-import os, sys
+import os
 
 class iFile:
 	def h5writer(self, fname, keys, data, chunks=None, opts=7):
