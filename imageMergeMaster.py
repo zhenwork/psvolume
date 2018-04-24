@@ -10,7 +10,7 @@ parser.add_argument("-num","--num", help="num of images to process", default=-1,
 args = parser.parse_args()
 
 zf = iFile()
-if num==-1:	num = zf.counterFile(args.o+'/mergeImage', title='.slice')
+if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
 else: num = int(args.num)
 fsave = zf.newfolder(args.o, title='sp')
 
