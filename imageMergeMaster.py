@@ -34,8 +34,8 @@ if comm_rank == 0:
 
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
-	zf.writer(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opt=7)
-	zf.modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opt=7)
+	zf.h5writer(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opt=7)
+	zf.h5modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opt=7)
 
 else:
 	sep = np.linspace(0, num, comm_size).astype('int')
@@ -44,7 +44,9 @@ else:
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
 		image /= Geo['scale']
+		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
 		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
+		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
 
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()
