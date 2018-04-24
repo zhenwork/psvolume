@@ -15,8 +15,9 @@ args = parser.parse_args()
 args.o = '/reg/data/ana04/users/zhensu/xpptut/volume'
 
 zf = iFile()
-if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
-else: num = int(args.num)
+#if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
+#else: num = int(args.num)
+num = int(args.num)
 
 Vol = {}
 Vol['volumeCenter'] = 60
@@ -39,8 +40,8 @@ if comm_rank == 0:
 
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
-	ThisFile = zf.readtxt(os.path.realpath(__file__))
-	zf.h5writer(pathIntens, 'execute', ThisFile)
+	#ThisFile = zf.readtxt(os.path.realpath(__file__))
+	#zf.h5writer(pathIntens, 'execute', ThisFile)
 	zf.h5modify(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 	zf.h5modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 
@@ -97,27 +98,7 @@ class iFile:
 		idatawr[...] = np.array(data)
 		f.close()
 
-	def makeFolder(self, path, title='sp'):
-		allFile = os.listdir(path)
-		fileNumber = [0]
-		for each in allFile:
-			if each[:2] == title and each[-4:].isdigit():
-				fileNumber.append(int(each[-4:]))
-		newNumber = np.amax(fileNumber) + 1
-		fnew = os.path.join(path, 'sp'+str(newNumber).zfill(4))
-		if not os.path.exists(fnew): os.mkdir(fnew)
-		return fnew
 
-	def counterFile(self, path, title='.slice'):
-		allFile = os.listdir(path)
-		counter = 0
-		for each in allFile:
-			if title in each:
-				counter += 1
-		return counter
-
-		# file_name = os.path.realpath(__file__)
-		# if (os.path.isfile(file_name)): shutil.copy(file_name, folder_new)
 
 	def get_image_info(self, path):
 		f = h5py.File(path, 'r')
