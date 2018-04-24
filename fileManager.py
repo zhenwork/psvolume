@@ -31,14 +31,14 @@ class iFile:
 		idatawr[...] = np.array(data)
 		f.close()
 
-	def newfolder(self, path, title='sp'):
+	def makeFolder(self, path, title='sp'):
 		allFile = os.listdir(path)
 		fileNumber = [0]
 		for each in allFile:
 			if each[:2] == title and each[-4:].isdigit():
 				fileNumber.append(int(each[-4:]))
 		newNumber = np.amax(fileNumber) + 1
-		fnew = os.path.join(path, title+str(newNumber).zfill(4))
+		fnew = os.path.join(path, 'sp'+str(newNumber).zfill(4))
 		if not os.path.exists(fnew): os.mkdir(fnew)
 		return fnew
 

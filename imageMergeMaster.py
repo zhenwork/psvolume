@@ -12,7 +12,6 @@ args = parser.parse_args()
 zf = iFile()
 if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
 else: num = int(args.num)
-fsave = zf.newfolder(args.o, title='sp')
 
 Vol = {}
 Vol['volumeCenter'] = 60
@@ -23,7 +22,7 @@ weight  = np.zeros([Vol['volumeSize']]*3)
 
 if comm_rank == 0:
 	print "Folder: ", fsave
-	if not os.path.exists(fsave): os.mkdir(fsave)
+	fsave = zf.makeFolder(args.o, title='sp')
 	for nrank in range(comm_size-1):
 		md=mpidata()
 		md.recv()
