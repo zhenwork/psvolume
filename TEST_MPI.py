@@ -32,8 +32,8 @@ if comm_rank == 0:
 		model3d += md.model3d
 		weight += md.weight
 		recvRank = md.small.rank
-		md = None
 		print '### received file from ' + str(recvRank).rjust(2)+'/'+str(comm_size-1)
+		print np.amax(md.model3d)
 
 	print "### start saving files ... "
 
@@ -53,4 +53,3 @@ else:
 	md.addarray('weight', weight)
 	md.small.rank = comm_rank
 	md.send()
-	md = None
