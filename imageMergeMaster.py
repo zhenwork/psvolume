@@ -22,6 +22,8 @@ model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
 if comm_rank == 0:
+	print "Folder: ", fsave
+	if not os.path.exists(fsave): os.mkdir(fsave)
 	for nrank in range(comm_size-1):
 		md=mpidata()
 		md.recv()
