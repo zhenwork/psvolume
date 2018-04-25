@@ -38,7 +38,6 @@ if comm_rank == 0:
 		md.recv()
 		model3d += md.model3d
 		weight += md.weight
-		Umatrix = md.Umatrix
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(2) + '/' + str(comm_size)
@@ -46,6 +45,7 @@ if comm_rank == 0:
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
 	if args.U == 'xyz': Umatrix = np.eye(3)
+	else: Umatrix = ZF.h5reader(args.o+'/mergeImage/mergeImage_'+str(0).zfill(5)+'.slice', 'Umatrix')
 
 	print "### saving File: ", pathIntens
 	ThisFile = zf.readtxt(os.path.realpath(__file__))
@@ -60,7 +60,6 @@ else:
 		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
-		Geo['Umatrix'] = zf.h5reader(fname, 'Umatrix')
 		moniter='none'
 		if args.U=='xyz':
 			moniter = 'xyz'
@@ -74,7 +73,6 @@ else:
 	md=mpidata()
 	md.addarray('model3d', model3d)
 	md.addarray('weight', weight)
-	md.addarray('Umatrix', Geo['Umatrix'])
 	md.small.rank = comm_rank
 	md.send()
 	md = None

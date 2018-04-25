@@ -68,6 +68,7 @@ class iFile:
 		Info['rotation'] = f['rotation'].value
 		Info['rot'] = f['rot'].value
 		Info['scale'] = f['scale'].value
+		Info['Umatrix'] = f['Umatrix'].value
 		f.close()
 		return Info
 
