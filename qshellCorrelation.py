@@ -49,12 +49,12 @@ def make_3d_radius(nx, ny, nz, cx, cy, cz):
 ## remove bad pixels
 def data_remove(list1, list2, ilim=ilim, jlim=jlim):
 	if ilim is not None:
-		index = np.where((list1>=ilim[0]) and (list1<=ilim[1]))
+		index = np.where(((list1>=ilim[0]) and (list1<=ilim[1]))==True)
 		list1 = list1[index].copy()
 		list2 = list2[index].copy()
 		if len(list1)==0: return (list1, list2)
 	if jlim is not None:
-		index = np.where((list2>=jlim[0]) and (list2<=jlim[1]))
+		index = np.where(((list2>=jlim[0]) and (list2<=jlim[1]))==True)
 		list1 = list1[index].copy()
 		list2 = list2[index].copy()
 	return (list1, list2)
