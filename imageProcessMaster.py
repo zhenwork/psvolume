@@ -74,5 +74,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	zf.h5modify(fsave, 'rotation', Geo['rotation'])
 	zf.h5modify(fsave, 'scale', Geo['scale'])
 	zf.h5modify(fsave, 'Umatrix', Geo['Umatrix'])
-	print '### Rank: '+str(comm_rank)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1]) + '  sumIntens: '+str(sumIntens).ljust(10)
+	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1]) + '  sumIntens: '+str(sumIntens).ljust(10)
 	if idx>5000: break
+	

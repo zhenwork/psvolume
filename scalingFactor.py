@@ -7,8 +7,8 @@ comm_size = MPI.COMM_WORLD.Get_size()
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
-parser.add_argument("-rmin","--rmin", help="min radius", default=-1, type=int)
-parser.add_argument("-rmax","--rmax", help="max radius", default=4000, type=int)
+parser.add_argument("-rmin","--rmin", help="min radius", default=0, type=int)
+parser.add_argument("-rmax","--rmax", help="max radius", default=2000, type=int)
 parser.add_argument("-wr","--wr", help="write the scaling factor", default=-1, type=int)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
@@ -39,7 +39,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
 	if args.wr != -1: zf.h5modify(filename, 'scale', imgFirst/1.0/scaleMatrix[idx])
-	print '### rank ' + str(comm_rank).rjust(2) + ' is processing: ' + str(idx)+'/'+str(num)
+	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 
 if comm_rank == 0:
 	for i in range(comm_size-1):
@@ -48,7 +48,7 @@ if comm_rank == 0:
 		scaleMatrix += md.scaleMatrix
 		recvRank = md.small.rank
 		md = None
-		print '### received file from ' + str(recvRank).rjust(2)
+		print '### received file from ' + str(recvRank).rjust(3)
 	zf.h5modify(args.o+'/image.process', 'OveScale', scaleMatrix)
 
 else:
@@ -57,4 +57,4 @@ else:
 	md.small.rank = comm_rank
 	md.send()
 	md = None
-	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
+	print '### Rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
