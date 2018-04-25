@@ -80,6 +80,7 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 		if len(list_i)<8:
 			print 'corrlection = ', 0.0
 			qCorr[r] = 0.0
+			continue
 		qCorr[r] = cal_correlation(list_i, list_j);
 		print 'corrlection = ', qCorr[r]
 	return qCorr
@@ -94,7 +95,7 @@ assert data_i.shape == data_j.shape
 
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=args.expand, ilim=ilim, jlim=jlim)
 
-fsave = os.path.join(args.o, '/corr-sep-list.h5'+tag)
+fsave = os.path.join(args.o, '/corr-sep-list.h5'+args.tag)
 ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
