@@ -1,6 +1,6 @@
 1. Input userScript.py
 2. Run whereImage.py
-	bsub -q psfehq -x -n 20 -R "span[ptile=4]" -o %J.out mpirun python psvolume/whereImage.py --num 2000 --o .
+	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/whereImage.py --num 2000 --o .
 	This process will save images to h5py format and also save users' information to each image in rawImage folder
 3. Run imageProcessMaster.py
 	bsub -q psfehq -x -n 50 -R "span[ptile=5]" -o %J.out mpirun python psvolume/imageProcessMaster.py --num 2000 --o .
@@ -14,6 +14,8 @@
 	python psvolume/qshellCorrelation.py --i ./sr0008/merge.volume -j /reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist_121.h5 --rmax 50 --mode ball
 
 If you don't have scalingFactor, use scale factor as 1 and then run 1-2-3 -7- 1-2-3-4-5-6
-
 7. Run scalingFactor.py
 	
+Sometimes you need to modify the image files:
+8. Run imageModify.py
+	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/imageModify.py --o ./mergeImage
