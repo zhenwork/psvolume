@@ -1,7 +1,7 @@
 """
 start point of the merging process
  
-All unit should be Angstrom (A) 
+All unit should be Angstrom (A): wavelength, crystal lattice 
 """
 
 import numpy as np 
