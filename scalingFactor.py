@@ -49,7 +49,7 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(3)
-	zf.h5modify(args.o+'/image.process', 'OveScale', scaleMatrix)
+	zf.h5modify(args.o+'/image.process', 'OveScale', scaleMatrix[0]*1.0/scaleMatrix)
 
 else:
 	md=mpidata()
