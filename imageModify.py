@@ -21,7 +21,9 @@ if args.num==-1:
 	num = zf.counterFile(args.o, title='.slice')
 else: num = int(args.num)
 sep = np.linspace(0, num, comm_size+1).astype('int')
-
+if comm_rank == 0:
+	print "### Folder: ", args.o
+	print "### Images: ", num
 
 ## computation
 lsima = np.sqrt(np.sum(sima**2))
