@@ -145,7 +145,7 @@ def hkl2volume(idata, astar, bstar, cstar, ithreshold=(-100,1000)):
 	index = np.where(weight>0)
 	model3d[index] /= weight[index]
 	index = np.where(weight<=0)
-	model3d[index] = -32768
+	model3d[index] = -1024
 	return model3d
 
 @jit

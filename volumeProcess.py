@@ -46,8 +46,14 @@ for i in range(nnxx):
 			subData[i,j,k] -= backg[intr]
 print '### max/min: ', np.amin(subData), np.amax(subData)
 
+if args.U == 'hkl':
+	print "### converting hkl to xyz coordinate"
+	anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
+	print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
+else: anisoData = subData
 
 print ('### start saving files... ')  
 zf.h5modify(args.i, args.name+'symData', symData)
-zf.h5modify(args.i, args.name+'anisoData', subData)
+zf.h5modify(args.i, args.name+'subData', subData)
+zf.h5modify(args.i, args.name+'anisoData', anisoData)
 zf.h5modify(args.i, args.name+'backg', backg)
