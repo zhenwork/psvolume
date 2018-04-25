@@ -15,7 +15,7 @@ parser.add_argument("-num","--num", help="num of images to process", default=-1,
 args = parser.parse_args()
 
 zf = iFile()
-if args.num==-1:	
+if args.num==-1:
 	num = zf.counterFile(args.o+'/rawImage', title='.slice')
 else: num = int(args.num)
 sep = np.linspace(0, num, comm_size+1).astype('int')

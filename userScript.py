@@ -52,7 +52,6 @@ def user_get_orientation(idx):
 def user_get_scalingFactor(idx):
 	f = h5py.File('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
 	scale = f[f.keys()[0]].value
-	scale = 1./scale
 	f.close()
 	return scale[idx]
 	return None
