@@ -28,8 +28,8 @@ if comm_rank == 0:
 	print "### Folder: ", fsave
 	print "### Images: ", num
 	print "### Volume: ", model3d.shape
-	print "### Center: ", volumeCenter
-	print "### Sampling: ", volumeSampling
+	print "### Center: ", Vol['volumeCenter']
+	print "### Sampling: ", Vol['volumeSampling']
 
 	for nrank in range(comm_size-1):
 		md=mpidata()
