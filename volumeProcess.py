@@ -10,6 +10,7 @@ parser.add_argument("-thrmax","--thrmax", help="max value", default=1000, type=i
 parser.add_argument("-name","--name", help="name", default=".", type=str)
 args = parser.parse_args()
 thr = (args.thrmin, args.thrmax)
+zf = iFile()
 
 # read volume geometry
 Umatrix = zf.h5reader(args.i, 'Umatrix')
