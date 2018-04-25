@@ -7,6 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="file 1", default=".", type=str)
 parser.add_argument("-j","--j", help="file 2", default=".", type=str)
 parser.add_argument("-tag","--tag", help="tag", default="", type=str)
+parser.add_argument("-mode","--mode", help="mode can be 'shell' or 'ball'", default="shell", type=str)
 parser.add_argument("-o","--o", help="save path", default=".", type=str)
 parser.add_argument("-expand","--expand", help="expand", default=1.0, type=float)
 parser.add_argument("-rmin","--rmin", help="min radius", default=0, type=int)
@@ -60,7 +61,7 @@ def data_remove(list1, list2, ilim=ilim, jlim=jlim):
 	return (list1, list2)
 
 ## correlation calculation
-def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, ilim=None, jlim=None):
+def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, ilim=None, jlim=None, mode='shell'):
 	(nx,ny,nz) = data_i.shape;
 	(cx,cy,cz) = center;
 	if cx==-1: cx=(nx-1.)/2.
@@ -71,7 +72,8 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 	if rmax==-1: rmax=int(np.amax(rMatrix))+1
 	qCorr = np.zeros(rmax)
 	for r in range(rmin, rmax):
-		index = np.where(rMatrix==r)
+		if mode=='ball': index = np.where(rMatrix<=r)
+		else: index = np.where(rMatrix==r)
 		list_i = data_i[index].ravel()
 		list_j = data_j[index].ravel()
 		(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
@@ -89,7 +91,7 @@ print ('### reading dataset two ...')
 data_j = zf.h5reader(args.j, 'anisoData')
 assert data_i.shape == data_j.shape
 
-qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim)
+qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 
 fsave = args.o+'/corr-sep-list.h5'+args.tag
 print '### saving file: ', fsave
