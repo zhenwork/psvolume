@@ -55,6 +55,7 @@ else:
 		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
+		Geo['Umatrix'] = zf.h5reader(fname, 'Umatrix')
 		#image /= Geo['scale']
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank])
 		[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)

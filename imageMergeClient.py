@@ -81,7 +81,7 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume):
 	voxel = Geometry(image, Geo)
 
 	Image = image.ravel()
-	if Geo['rot']=='matrix': Rot = Geo['rotation']
+	Rot = Geo['rotation']
 	HKL = Vsample*(Rot.dot(voxel)).T
 
 	for t in range(len(HKL)):
@@ -115,36 +115,40 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
-
 	voxel = Geometry(image, Geo)
 
 	Image = image.ravel()
-	if Geo['rot']=='matrix': Rot = Geo['rotation']
-	HKL = Vsample*(Rot.dot(voxel)).T
+	Rot = Geo['rotation']
+	Umatrix = Geo['Umatrix']
+	HKL = (Rot.dot(voxel)).T
+	XYZ = Vsample*HKL.dot(Umatrix)
 
-	for t in range(len(HKL)):
+	for t in range(len(XYZ)):
 
 		if (Image[t] < 0): continue
 		
-		hkl = HKL[t] + Vcenter
+		xyz = XYZ[t] + Vcenter
 		
-		h = hkl[0] 
-		k = hkl[1] 
-		l = hkl[2] 
+		x = XYZ[t,0] 
+		y = XYZ[t,1] 
+		z = XYZ[t,2] 
 		
-		inth = int(round(h)) 
-		intk = int(round(k)) 
-		intl = int(round(l)) 
+		intx = int(round(x)) 
+		inty = int(round(y)) 
+		intz = int(round(z)) 
 
-		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
-		
-		hshift = abs(h/Vsample-round(h/Vsample))
-		kshift = abs(k/Vsample-round(k/Vsample))
-		lshift = abs(l/Vsample-round(l/Vsample))
+		if (intx<0) or intx>(Vsize-1) or (inty<0) or inty>(Vsize-1) or (intz<0) or intz>(Vsize-1): continue
+
+		h = HKL[t,0] 
+		k = HKL[t,1] 
+		l = HKL[t,2] 		
+		hshift = abs(h-round(h))
+		kshift = abs(k-round(k))
+		lshift = abs(l-round(l))
 		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): continue
 		
-		weight[ inth,intk,intl] += 1.
-		model3d[inth,intk,intl] += Image[t] 
+		weight[ intx,inty,intz] += 1.
+		model3d[intx,inty,intz] += Image[t] 
 
 	return [model3d, weight]
 
