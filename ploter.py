@@ -2,6 +2,7 @@ import numpy as np
 from PyQt4 import QtGui
 import pyqtgraph as pg
 import matplotlib.pyplot as plt
+import sys
 
 class iPloter:
 	def pgplot(self, idata, clim=None):
