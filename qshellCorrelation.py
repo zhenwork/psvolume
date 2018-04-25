@@ -9,6 +9,8 @@ parser.add_argument("-j","--j", help="file 2", default=".", type=str)
 parser.add_argument("-tag","--tag", help="tag", default="", type=str)
 parser.add_argument("-o","--o", help="save path", default=".", type=str)
 parser.add_argument("-expand","--expand", help="expand", default=1.0, type=float)
+parser.add_argument("-rmin","--rmin", help="min radius", default=0, type=int)
+parser.add_argument("-rmax","--rmax", help="max radius", default=-1, type=int)
 parser.add_argument("-i1","--i1", help="ilim[0]", default="-100", type=str)
 parser.add_argument("-i2","--i2", help="ilim[1]", default="100", type=str)
 parser.add_argument("-j1","--j1", help="jlim[0]", default="-100", type=str)
@@ -18,8 +20,6 @@ if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
 if args.j1 == "." or args.j2 == ".": jlim=None
 else: jlim=(float(args.j1), float(args.j2))
-#path_exp = 'result-scale-test-0005'
-#path_sim = '/reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist.h5'
 
 
 
@@ -93,7 +93,7 @@ print ('reading dataset two ...')
 data_j = zf.h5reader(args.j, 'anisoData')
 assert data_i.shape == data_j.shape
 
-qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=args.expand, ilim=ilim, jlim=jlim)
+qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim)
 
 fsave = os.path.join(args.o, '/corr-sep-list.h5'+args.tag)
 ThisFile = zf.readtxt(os.path.realpath(__file__))
