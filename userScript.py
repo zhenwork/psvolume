@@ -1,3 +1,9 @@
+"""
+start point of the merging process
+ 
+All unit should be Angstrom (A) 
+"""
+
 import numpy as np 
 from imageMergeClient import *
 import h5py
@@ -10,7 +16,7 @@ Geo['pixelSize'] = 172.0
 Geo['detDistance'] = 200147.4
 Geo['beamStop'] = 50
 Geo['polarization'] = 'y'
-Geo['wavelength'] = 0.082653
+Geo['wavelength'] = 0.82653    ## in the unit of A
 
 ## rotation matrix of the first image
 rot_two = np.array([[-0.2438,  0.9655,  -0.0919],
@@ -18,7 +24,7 @@ rot_two = np.array([[-0.2438,  0.9655,  -0.0919],
                     [-0.4468, -0.0277,   0.8942]])
 
 
-## crystal lattice
+## crystal lattice in the unit of A-1
 sima = np.array([ 0.007369 ,   0.017496 ,   -0.000000])
 simb = np.array([-0.000000 ,   0.000000 ,    0.017263])
 simc = np.array([ 0.015730 ,   0.000000,     0.000000])
