@@ -56,7 +56,7 @@ def make_radius(size, center=None):
 
 def Geometry(image, Geo):
 	"""
-	The unit of wavelength is nm
+	The unit of wavelength is A
 	"""
 	waveLength = Geo['waveLength']
 	center = Geo['center']
@@ -78,9 +78,6 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
-	center = Geo['center']
-	orientation = Geo['rotation']
-
 	voxel = Geometry(image, Geo)
 
 	Image = image.ravel()
