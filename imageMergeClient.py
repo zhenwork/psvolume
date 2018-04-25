@@ -129,9 +129,9 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume):
 		
 		xyz = XYZ[t] + Vcenter
 		
-		x = XYZ[t,0] 
-		y = XYZ[t,1] 
-		z = XYZ[t,2] 
+		x = xyz[0] 
+		y = xyz[1] 
+		z = xyz[2] 
 		
 		intx = int(round(x)) 
 		inty = int(round(y)) 
