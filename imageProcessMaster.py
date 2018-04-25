@@ -26,7 +26,7 @@ sep = np.linspace(0, num, comm_size+1).astype('int')
 
 ## get image information from sample pattern
 Geo = zf.get_image_info(args.o+'/rawImage/rawImage_00000.slice')
-image = zf.h5reader(fname, 'image')
+image = zf.h5reader(args.o+'/rawImage/rawImage_00000.slice', 'image')
 
 ascale = solid_angle_correction(image, Geo)
 pscale = polarization_correction(image, Geo)
