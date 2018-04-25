@@ -48,6 +48,6 @@ print '### max/min: ', np.amin(subData), np.amax(subData)
 
 
 print ('### start saving files... ')  
-zf.h5modify(args.i, name+'symData', symData)
-zf.h5modify(args.i, name+'anisoData', subData)
-zf.h5modify(args.i, name+'backg', backg)
+zf.h5modify(args.i, args.name+'symData', symData)
+zf.h5modify(args.i, args.name+'anisoData', subData)
+zf.h5modify(args.i, args.name+'backg', backg)

@@ -157,7 +157,7 @@ def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow
 	num_samp = idata.shape[0]
 	center = (num_samp - 1.)/2.
 	ir = (int(center*np.sqrt(3.)*max(la/lb, lc/lb))+20)*iscale
-	print 'ir='+str(ir)
+	#print 'ir='+str(ir)
 	distri = np.zeros(ir)
 	weight = np.zeros(ir)
 	Rmodel = np.zeros((num_samp, num_samp, num_samp)).astype(int)
