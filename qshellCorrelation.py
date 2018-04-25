@@ -71,31 +71,28 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 	if rmax==-1: rmax=int(np.amax(rMatrix))+1
 	qCorr = np.zeros(rmax)
 	for r in range(rmin, rmax):
-		print 'radius is --------------- ', r
 		index = np.where(rMatrix==r)
 		list_i = data_i[index].ravel()
 		list_j = data_j[index].ravel()
 		(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
-		print 'data size = ', len(list_i)
-		if len(list_i)<8:
-			print 'corrlection = ', 0.0
-			qCorr[r] = 0.0
-			continue
-		qCorr[r] = cal_correlation(list_i, list_j);
-		print 'corrlection = ', qCorr[r]
+		commLength = len(list_i)
+		if len(list_i)<8: qCorr[r] = 0.0
+		else: qCorr[r] = cal_correlation(list_i, list_j);
+		print '### R:'+str(r).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[r],5)).ljust(8)
 	return qCorr
 
 
 zf = iFile()
-print ('reading dataset one ...')
+print ('### reading dataset one ...')
 data_i = zf.h5reader(args.i, 'anisoData')
-print ('reading dataset two ...')
+print ('### reading dataset two ...')
 data_j = zf.h5reader(args.j, 'anisoData')
 assert data_i.shape == data_j.shape
 
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim)
 
 fsave = args.o+'/corr-sep-list.h5'+args.tag
+print '### saving file: ', fsave
 ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
