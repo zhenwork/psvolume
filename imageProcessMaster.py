@@ -1,6 +1,9 @@
 """
 Preprocess of the images
 submit jobs: mpirun -n 10 python imageProcessMaster.py --o /reg/neh/home/zhensu --num 2000
+
+--o: the former folder path. the path "before" rawImage folder
+--num: The number of images to process. If no input, then it will search how many files in the rawImage folder
 """
 
 from imageProcessClient import *
@@ -21,9 +24,8 @@ else: num = int(args.num)
 sep = np.linspace(0, num, comm_size+1).astype('int')
 
 
-fname = args.o+'/rawImage/rawImage_00000.slice'
-Geo = zf.get_image_info(fname)
-assert Geo['readout']=='image'
+## get image information from sample pattern
+Geo = zf.get_image_info(args.o+'/rawImage/rawImage_00000.slice')
 image = zf.h5reader(fname, 'image')
 
 ascale = solid_angle_correction(image, Geo)
@@ -53,6 +55,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	image *= apscale
 	image *= Geo['scale']
+	sumIntens = round(np.sum(image),8)
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
 	fsave = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
@@ -70,5 +73,5 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	zf.h5modify(fsave, 'rot', 'matrix')
 	zf.h5modify(fsave, 'rotation', Geo['rotation'])
 	zf.h5modify(fsave, 'scale', Geo['scale'])
-	print '## Finished image:'+str(idx).rjust(5)+'/'+str(num)
+	print '## Finished image:'+str(idx).rjust(5)+'/'+str(num) + '  sumIntens: '+str(sumIntens).ljust(10)
 	if idx>5000: break

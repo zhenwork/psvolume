@@ -2,11 +2,17 @@ import numpy as np
 import h5py
 from scipy.ndimage.filters import median_filter
 
-def circle_region(image=None, center=(0,0), rmax=10, rmin=0, size=(100,100)):
+def circle_region(image=None, center=(-1,-1), rmax=10, rmin=0, size=(100,100)):
+	"""
+	input an image, throw away any value out of [rmin, rmax]: set those values to zero
+	"""
 	if image is None: image = np.ones(size)
 	(nx,ny) = image.shape
-	x = np.arange(nx) - center[0]
-	y = np.arange(ny) - center[1]
+	(cx,cy) = (center[0], center[1])
+	if center[0]==-1: cx=(nx-1.)/2.
+	if center[1]==-1: cy=(ny-1.)/2.
+	x = np.arange(nx) - cx
+	y = np.arange(ny) - cy
 	[xaxis, yaxis] = np.meshgrid(x,y)
 	xaxis = xaxis.T
 	yaxis = yaxis.T
@@ -59,7 +65,7 @@ def polarization_correction(image, Geo):
 
 def remove_peak_alg1(img, mask=None, sigma=15, cwin=(11,11)):
 	"""
-	First throw away \pm sigma*std. Second throw away \pm 1*std
+	First throw away \pm sigma*std. Second throw away \pm sigma*std
 	"""
 	if mask is None: mask=np.ones(img.shape)
 	image = img*mask
