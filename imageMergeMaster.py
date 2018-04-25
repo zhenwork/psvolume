@@ -1,7 +1,6 @@
 import os
 import numpy as np 
 from mpidata import *
-#from numba import jit
 from fileManager import *
 from imageMergeClient import *
 import argparse
@@ -50,7 +49,7 @@ else:
 		Geo = zf.get_image_info(fname)
 		image /= Geo['scale']
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(idx)+'/'+str(num)
-		[model3d, weight] = ImageMerge(model3d, weight, image, Geo, Vol)
+		[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)
 
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()

@@ -11,7 +11,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
-## folder = '/reg/data/ana04/users/zhensu/xpptut/volume/rawImage'
 
 # computation
 lsima = np.sqrt(np.sum(sima**2))
