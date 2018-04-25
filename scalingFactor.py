@@ -22,7 +22,7 @@ scaleMatrix = np.zeros(num)
 
 
 ## read the first image
-filename = args.o + '/rawImage/rawImage_'+str(0).zfill(5)+'.slice'
+filename = args.o + '/mergeImage/mergeImage_'+str(0).zfill(5)+'.slice'
 image = zf.h5reader(filename, 'image')
 image[np.where(image<0.)] = 0.
 Geo = zf.get_image_info(filename)
