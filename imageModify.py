@@ -5,6 +5,7 @@ The --o must be a folder name including the "mergeImage/" for example
 
 mpirun -n 10 python imageModify --o ./mergeImage --num 100
 """
+
 from userScript import *
 from fileManager import *
 from mpi4py import MPI
@@ -15,7 +16,6 @@ parser.add_argument("-num","--num", help="num of images to process", default=-1,
 args = parser.parse_args()
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
-
 
 
 
@@ -41,6 +41,7 @@ sima = lsima/lsimb * np.array([np.sin(Kac), 0., np.cos(Kac)])
 simb = lsimb/lsimb * np.array([0., 1., 0.])
 simc = lsimc/lsimb * np.array([0., 0., 1.])
 Umatrix = np.array([sima,simb,simc]).T
+
 
 
 ## modify image
