@@ -85,13 +85,11 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 	return qCorr
 
 
-
-
 zf = iFile()
 print ('reading dataset one ...')
-data_i = zf.h5reader(args.i, 'volume')
+data_i = zf.h5reader(args.i, 'anisoData')
 print ('reading dataset two ...')
-data_j = zf.h5reader(args.j, 'volume')
+data_j = zf.h5reader(args.j, 'anisoData')
 assert data_i.shape == data_j.shape
 
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=args.expand, ilim=ilim, jlim=jlim)
