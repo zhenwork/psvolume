@@ -38,7 +38,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[np.where(image<0.)] = 0.
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
-	if args.wr != -1: zf.h5modify(filename, 'scale', imgFirst/1.0/scaleMatrix[idx])
+	if args.wr != -1: zf.h5modify(filename, 'scale', imgFirst*1.0/scaleMatrix[idx])
 	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 
 if comm_rank == 0:
