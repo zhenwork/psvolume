@@ -5,7 +5,6 @@ from fileManager import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="save folder", default=".", type=str)
-parser.add_argument("-U","--U", help="matrix", default="hkl", type=str)
 parser.add_argument("-thrmin","--thrmin", help="min value", default=-100, type=int)
 parser.add_argument("-thrmax","--thrmax", help="max value", default=1000, type=int)
 parser.add_argument("-name","--name", help="name", default="", type=str)
@@ -47,11 +46,13 @@ for i in range(nnxx):
 			subData[i,j,k] -= backg[intr]
 print '### max/min: ', np.amin(subData), np.amax(subData)
 
-if args.U == 'hkl':
+if np.amax( np.abs( Umatrix-np.eye(3) ) )>1e-3:
 	print "### converting hkl to xyz coordinate"
 	anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
 	print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
-else: anisoData = subData
+else: 
+	print "### This is already the best coordinate ... "
+	anisoData = subData.copy()
 
 print ('### start saving files... ')  
 zf.h5modify(args.i, args.name+'symData', symData)
