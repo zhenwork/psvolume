@@ -14,7 +14,7 @@ args = parser.parse_args()
 zf = iFile()
 if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
 else: num = int(args.num)
-num = int(args.num)
+#num = int(args.num)
 
 Vol = {}
 Vol['volumeCenter'] = int(args.volumeCenter)
