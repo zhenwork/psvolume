@@ -28,7 +28,7 @@ Kab = np.arccos(np.dot(sima, simb)/lsima/lsimb)
 sima = lsima * np.array([np.sin(Kac), 0., np.cos(Kac)])
 simb = lsimb * np.array([0., 1., 0.])
 simc = lsimc * np.array([0., 0., 1.])
-rot_three = np.linalg.inv(np.array([sima,simb,simc]).T) #*Geo['pixelSize']/Geo['wavelength']/Geo['detDistance']
+rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):

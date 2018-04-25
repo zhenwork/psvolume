@@ -16,6 +16,9 @@ args = parser.parse_args()
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
 
+
+
+
 zf = iFile()
 if args.num==-1:
 	num = zf.counterFile(args.o, title='.slice')
@@ -24,6 +27,8 @@ sep = np.linspace(0, num, comm_size+1).astype('int')
 if comm_rank == 0:
 	print "### Folder: ", args.o
 	print "### Images: ", num
+
+
 
 ## computation
 lsima = np.sqrt(np.sum(sima**2))
