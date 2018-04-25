@@ -1,3 +1,9 @@
+"""
+run this script: mpirun -n 10 python whereImage.py --o /reg/neh/home/zhensu --num 1000
+
+If the output "--o" folder is not specified, then it will save to the current path
+"""
+
 from userScript import *
 from fileManager import *
 from imageProcessClient import *
@@ -45,7 +51,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = user_get_image(idx)
 	quaternion = user_get_orientation(idx)
 	rot_one = Quat2Rotation(quaternion)
-	matrix = rot_three.dot(rot_three.dot(rot_one))
+	matrix = rot_three.dot(rot_two.dot(rot_one))
 
 	fsave = args.o + '/rawImage' + '/rawImage_'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
