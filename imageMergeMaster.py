@@ -58,7 +58,7 @@ else:
 		Geo['Umatrix'] = zf.h5reader(fname, 'Umatrix')
 		#image /= Geo['scale']
 		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank])
-		[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)
+		[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol)
 
 	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
 	md=mpidata()
