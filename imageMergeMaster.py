@@ -60,10 +60,10 @@ else:
 		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
+		Geo['Umatrix'] = zf.h5reader(fname, 'Umatrix')
 		moniter='none'
 		if args.U=='xyz':
 			moniter = 'xyz'
-			Geo['Umatrix'] = zf.h5reader(fname, 'Umatrix')
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol)
 		else:
 			moniter = 'hkl'
