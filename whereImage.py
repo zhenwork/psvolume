@@ -29,6 +29,7 @@ sima = lsima * np.array([np.sin(Kac), 0., np.cos(Kac)])
 simb = lsimb * np.array([0., 1., 0.])
 simc = lsimc * np.array([0., 0., 1.])
 rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)
+Umatrix = 1.0/lsimb*np.array([sima,simb,simc]).T
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):
@@ -67,6 +68,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	zf.h5modify(fsave, 'rot', 'matrix')
 	zf.h5modify(fsave, 'rotation', matrix)
 	zf.h5modify(fsave, 'scale', user_get_scalingFactor(idx))
-
+	zf.h5modify(fsave, 'Umatrix', Umatrix)
 	print '## Finished image:'+str(idx).rjust(5)+'/'+str(args.num)
 	if idx>4000: break

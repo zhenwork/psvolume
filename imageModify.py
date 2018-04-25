@@ -30,17 +30,6 @@ if comm_rank == 0:
 
 
 
-## computation
-lsima = np.sqrt(np.sum(sima**2))
-lsimb = np.sqrt(np.sum(simb**2))
-lsimc = np.sqrt(np.sum(simc**2))
-Kac = np.arccos(np.dot(sima, simc)/lsima/lsimc)
-Kbc = np.arccos(np.dot(simb, simc)/lsimb/lsimc)
-Kab = np.arccos(np.dot(sima, simb)/lsima/lsimb)
-sima = lsima/lsimb * np.array([np.sin(Kac), 0., np.cos(Kac)])
-simb = lsimb/lsimb * np.array([0., 1., 0.])
-simc = lsimc/lsimb * np.array([0., 0., 1.])
-Umatrix = np.array([sima,simb,simc]).T
 
 
 
