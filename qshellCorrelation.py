@@ -95,7 +95,7 @@ assert data_i.shape == data_j.shape
 
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim)
 
-fsave = os.path.join(args.o, '/corr-sep-list.h5'+args.tag)
+fsave = args.o+'/corr-sep-list.h5'+args.tag
 ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
