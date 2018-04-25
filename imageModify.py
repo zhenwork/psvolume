@@ -32,10 +32,10 @@ lsimc = np.sqrt(np.sum(simc**2))
 Kac = np.arccos(np.dot(sima, simc)/lsima/lsimc)
 Kbc = np.arccos(np.dot(simb, simc)/lsimb/lsimc)
 Kab = np.arccos(np.dot(sima, simb)/lsima/lsimb)
-sima = np.array([np.sin(Kac), 0., np.cos(Kac)])
-simb = np.array([0., 1., 0.])
-simc = np.array([0., 0., 1.])
-Umatrix = np.array([sima,simb,simc])
+sima = lsima/lsimb * np.array([np.sin(Kac), 0., np.cos(Kac)])
+simb = lsimb/lsimb * np.array([0., 1., 0.])
+simc = lsimc/lsimb * np.array([0., 0., 1.])
+Umatrix = np.array([sima,simb,simc]).T
 
 
 ## modify image

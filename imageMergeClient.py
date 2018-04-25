@@ -121,7 +121,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume):
 	Rot = Geo['rotation']
 	Umatrix = Geo['Umatrix']
 	HKL = (Rot.dot(voxel)).T
-	XYZ = Vsample*HKL.dot(Umatrix)
+	XYZ = Vsample*HKL.dot(Umatrix.T)
 
 	for t in range(len(XYZ)):
 

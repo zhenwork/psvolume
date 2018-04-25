@@ -1,5 +1,4 @@
 from numba import jit
-import os, sys
 import numpy as np 
 from scipy.signal import medfilt
 import scipy.ndimage
@@ -11,7 +10,7 @@ def medianf (data, scale):
 	return scipy.ndimage.median_filter(data, scale)
 
 @jit
-def hklExtraction(idata, astar, bstar, cstar, icen=60, ithreshold=(-100,1000), iradius=(0,1e5), outer=(5,5,5), inner=None ):
+def hklExtraction(idata, astar, bstar, cstar, icen=60, ithreshold=(-100,1000), iradius=(0,1e5), outer=(5,5,5), inner=None):
 	
 	num_samp = idata.shape[0]
 	center = (num_samp -1.)/2.
