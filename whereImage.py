@@ -7,7 +7,7 @@ If the output "--o" folder is not specified, then it will save to the current pa
 """
 
 from userScript import *
-from userScript_xds import *
+from xdsIndexingFile import *
 from fileManager import *
 from imageProcessClient import *
 from mpi4py import MPI
