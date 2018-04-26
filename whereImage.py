@@ -36,7 +36,7 @@ else:
 
 
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
-mask = user_get_mask()
+mask = user_get_mask(Geo)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 
 
