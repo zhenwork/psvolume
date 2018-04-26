@@ -29,7 +29,7 @@ class iPloter:
 		if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
 			pg.QtGui.QApplication.exec_()
 
-	def pltRing(arr, r = None; center=(None,None), spacing=None, clim=None, color=None):
+	def pltRing(arr, r = None, center=(None,None), spacing=None, clim=None, color=None):
 		(nx, ny) = arr.shape
 		cx = center[0];
 		cy = center[1];
