@@ -11,61 +11,8 @@ import cbf
 import os
 
 
-
-## basic parameters
-Geo = {}
-Geo['pixelSize'] = 172.0
-Geo['detDistance'] = 200147.4
-Geo['beamStop'] = 50
-Geo['polarization'] = 'y'
-Geo['wavelength'] = 0.82653
-
-
-
-## inverse U matrix is usually unknown in cctbx result
-# invUmat = np.array([[-0.2438,  0.9655,  -0.0919],
-# 					[-0.8608, -0.2591,  -0.4381],
-# 					[-0.4468, -0.0277,   0.8942]])
-
-
-
-
-## inverse A matrix is known like in Henry's dataset
-invAmat = np.array([[ 55.183735,   -13.993278,   -5.303885],
-					[ 15.072303,    49.848553,   25.439920],
-					[-27.579229,   -21.907124,   59.332664]])
-#invAmat = None
-if invAmat is not None:
-	invAmat[1,:] = -invAmat[1,:].copy()
-	tmp = invAmat[:,0].copy()
-	invAmat[:,0] = invAmat[:,1].copy()
-	invAmat[:,1] = tmp.copy()
-
-
-
-
-## B matrix (crystal lattice) in the unit of A-1
-Bmat = np.array([[ 0.007369 ,   0.017496 ,   -0.000000],
-				 [ 0.000000 ,   0.000000 ,    0.017263],
-				 [ 0.015730 ,   0.000000,     0.000000]]).T
-sima = Bmat[:,0].copy()
-simb = Bmat[:,1].copy()
-simc = Bmat[:,2].copy()
-lsima = np.sqrt(np.sum(sima**2))
-lsimb = np.sqrt(np.sum(simb**2))
-lsimc = np.sqrt(np.sum(simc**2))
-Kac = np.arccos(np.dot(sima, simc)/lsima/lsimc)
-Kbc = np.arccos(np.dot(simb, simc)/lsimb/lsimc)
-Kab = np.arccos(np.dot(sima, simb)/lsima/lsimb)
-sima = lsima * np.array([np.sin(Kac), 0., np.cos(Kac)])
-simb = lsimb * np.array([0., 1., 0.])
-simc = lsimc * np.array([0., 0., 1.])
-Bmat = np.array([sima,simb,simc]).T
-invBmat = np.linalg.inv(Bmat)
-
-
-
-
+## read the xds indexing file
+user_get_xds(filename)
 
 
 # How to read the idx image, return a 2d matrix
@@ -80,7 +27,7 @@ def user_get_image(idx):
 
 # How to get the idx center, return a turple (cx,cy)
 def user_get_center(idx):
-	return (1265.33488372, 1228.00813953)
+	return (1265.838623, 1228.777588)  
 
 
 
@@ -117,3 +64,41 @@ def user_get_mask():
 	index = np.where(radius<25)
 	mask[index] = 0
 	return mask
+
+
+
+## Tools:
+def user_get_xds(filename):
+	f = open(filename)
+	content = f.readlines()
+	f.close()
+
+	Geo = {}
+	Geo['pixelSize'] = float(content[7].split()[3])
+	Geo['detDistance'] = float(content[8].split()[2])
+	Geo['polarization'] = 'y' if float(content[1].split()[3])>0.9 else 'x'
+	Geo['wavelength'] = float(content[2].split()[0])
+
+	## calculate the invAmat matrix
+	invAmat = np.zeros((3,3));
+	for i in range(4,7):
+	    for j in range(3):
+	        invAmat[i-4,j] = float(content[i].split()[j])
+	if invAmat is not None:
+	    invAmat[1,:] = -invAmat[1,:].copy()
+	    tmp = invAmat[:,0].copy()
+	    invAmat[:,0] = invAmat[:,1].copy()
+	    invAmat[:,1] = tmp.copy()
+
+	## calculate B matrix from lattice constants
+	Bmat = np.zeros((3,3));
+	a = float(content[3].split()[1]); 
+	b = float(content[3].split()[2]); 
+	c = float(content[3].split()[3]); 
+	alpha = float(content[3].split()[4]); 
+	beta  = float(content[3].split()[5]); 
+	gamma = float(content[3].split()[6]); 
+	(vecx, vecy, vecz, recH, recK, recL) = Lattice2vector(a,b,c,ag1,ag2,ag3)
+	Bmat = np.array([recH, recK, recL]).T 
+	invBmat = np.linalg.inv(Bmat)
+	return [Bmat, invBmat]

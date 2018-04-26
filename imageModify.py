@@ -6,7 +6,7 @@ The --o must be a folder name including the "mergeImage/" for example
 mpirun -n 10 python imageModify --o ./mergeImage --num 100
 """
 
-from userScript import *
+
 from fileManager import *
 from mpi4py import MPI
 import argparse
