@@ -2,9 +2,12 @@
 run this script: mpirun -n 10 python whereImage.py --o /reg/neh/home/zhensu --num 1000
 
 If the output "--o" folder is not specified, then it will save to the current path
+
+--xds should be a file path 
 """
 
 from userScript import *
+from userScript_xds import *
 from fileManager import *
 from imageProcessClient import *
 from mpi4py import MPI
@@ -15,19 +18,23 @@ zf = iFile()
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
+parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
 
 # computation
-Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
+if args.xds != ".":
+	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
+	[Geo, Bmat, invBmat] = user_get_xds(args.xds)
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):
-		print 'making the folder ... '
 		os.mkdir(args.o + '/rawImage')
 else:
 	while not os.path.exists(args.o + '/rawImage'): pass
 
+
+Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 mask = user_get_mask()
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 
@@ -36,6 +43,7 @@ if comm_rank == 0:
 	Filename = args.o+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
+
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
@@ -48,7 +56,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fsave = args.o + '/rawImage' + '/rawImage_'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
 	zf.h5modify(fsave, 'image', image*mask)
-	zf.h5modify(fsave, 'center', user_get_center(idx))
+	zf.h5modify(fsave, 'center', Geo['center'])
 	zf.h5modify(fsave, 'exp', False)
 	zf.h5modify(fsave, 'run', False)
 	zf.h5modify(fsave, 'event', False)
