@@ -1,12 +1,12 @@
 1. Input userScript.py
 2. Run whereImage.py
-	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/whereImage.py --num 2000 --o .
+	bsub -q psfehq -x -n 32 -R "span[ptile=8]" -o %J.out mpirun python psvolume/whereImage.py --num 2000
 	This process will save images to h5py format and also save users' information to each image in rawImage folder
 3. Run imageProcessMaster.py
-	bsub -q psfehq -x -n 50 -R "span[ptile=5]" -o %J.out mpirun python psvolume/imageProcessMaster.py --num 2000 --o .
+	bsub -q psfehq -x -n 100 -R "span[ptile=10]" -o %J.out mpirun python psvolume/imageProcessMaster.py
 	This script preprocesses raw images and save them to mergeImage folder, this part is slow
 4. Run imageMergeMaster.py
-	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --num 2000 --o . --mode hkl --volumeSampling 1 --volumeCenter 60
+	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --mode hkl
 	This is the main script for image merging. It's actually not very slow.
 5. Run volumeProcess.py
 	python psvolume/volumeProcess.py --i ./sr0008/merge.volume

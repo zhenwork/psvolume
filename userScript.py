@@ -34,7 +34,7 @@ invUmat = np.array([[-0.2438,  0.9655,  -0.0919],
 invAmat = np.array([[ 55.183735,   -13.993278,   -5.303885],
 					[ 15.072303,    49.848553,   25.439920],
 					[-27.579229,   -21.907124,   59.332664]])
-invAmat = None
+#invAmat = None
 if invAmat is not None:
 	invAmat[1,:] = -invAmat[1,:].copy()
 	tmp = invAmat[:,0].copy()
