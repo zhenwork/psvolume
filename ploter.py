@@ -28,3 +28,4 @@ class iPloter:
 		pg.image(dataff, title="crystal rotation series",levels=(minmin, maxmax))
 		if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
 			pg.QtGui.QApplication.exec_()
+	def pltCenter(center=(None,None), )
