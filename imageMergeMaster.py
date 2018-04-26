@@ -28,7 +28,7 @@ if comm_rank == 0:
 	fsave = zf.makeFolder(args.o, title='sr')
 	print "### Folder: ", fsave
 	print "### Images: ", num
-	print "### Mode: ", args.U
+	print "### Mode: ", args.mode
 	print "### Volume: ", model3d.shape
 	print "### Center: ", Vol['volumeCenter']
 	print "### Sampling: ", Vol['volumeSampling']
@@ -61,7 +61,7 @@ else:
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
 		moniter='none'
-		if args.U=='xyz':
+		if args.mode=='xyz':
 			moniter = 'xyz'
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol)
 		else:
