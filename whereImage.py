@@ -19,17 +19,7 @@ parser.add_argument("-num","--num", help="num of images to process", default=-1,
 args = parser.parse_args()
 
 # computation
-lsima = np.sqrt(np.sum(sima**2))
-lsimb = np.sqrt(np.sum(simb**2))
-lsimc = np.sqrt(np.sum(simc**2))
-Kac = np.arccos(np.dot(sima, simc)/lsima/lsimc)
-Kbc = np.arccos(np.dot(simb, simc)/lsimb/lsimc)
-Kab = np.arccos(np.dot(sima, simb)/lsima/lsimb)
-sima = lsima * np.array([np.sin(Kac), 0., np.cos(Kac)])
-simb = lsimb * np.array([0., 1., 0.])
-simc = lsimc * np.array([0., 0., 1.])
-rot_three = np.linalg.inv(np.array([sima,simb,simc]).T)
-Umatrix = 1.0/lsimb*np.array([sima,simb,simc]).T
+Smat = Bmat*1.0/lsimb
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):
@@ -51,8 +41,9 @@ sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = user_get_image(idx)
 	quaternion = user_get_orientation(idx)
-	rot_one = Quat2Rotation(quaternion)
-	matrix = rot_three.dot(rot_two.dot(rot_one))
+	R1 = Quat2Rotation(quaternion)
+	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
+	else: matrix = invAmat.dot(R1)
 
 	fsave = args.o + '/rawImage' + '/rawImage_'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
@@ -68,6 +59,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	zf.h5modify(fsave, 'rot', 'matrix')
 	zf.h5modify(fsave, 'rotation', matrix)
 	zf.h5modify(fsave, 'scale', user_get_scalingFactor(idx))
-	zf.h5modify(fsave, 'Umatrix', Umatrix)
+	zf.h5modify(fsave, 'Smat', Smat)
 	print '### Rank: '+str(comm_rank)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 	if idx>4000: break

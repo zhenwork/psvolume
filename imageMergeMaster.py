@@ -6,7 +6,7 @@ from imageMergeClient import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
-parser.add_argument("-U","--U", help="matrix", default="hkl", type=str)
+parser.add_argument("-mode","--mode", help="matrix", default="hkl", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 parser.add_argument("-volumeSampling","--volumeSampling", help="num of images to process", default=1, type=int)
 parser.add_argument("-volumeCenter","--volumeCenter", help="num of images to process", default=60, type=int)
@@ -44,15 +44,15 @@ if comm_rank == 0:
 
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
-	if args.U == 'xyz': Umatrix = np.eye(3)
-	else: Umatrix = ZF.h5reader(args.o+'/mergeImage/mergeImage_'+str(0).zfill(5)+'.slice', 'Umatrix')
+	if args.mode == 'xyz': Smat = np.eye(3)
+	else: Smat = zf.h5reader(args.o+'/mergeImage/mergeImage_'+str(0).zfill(5)+'.slice', 'Smat')
 
 	print "### saving File: ", pathIntens
 	ThisFile = zf.readtxt(os.path.realpath(__file__))
 	zf.h5writer(pathIntens, 'execute', ThisFile)
 	zf.h5modify(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 	zf.h5modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
-	zf.h5modify(pathIntens, 'Umatrix', Umatrix)
+	zf.h5modify(pathIntens, 'Smat', Smat)
 
 else:
 	sep = np.linspace(0, num, comm_size).astype('int')

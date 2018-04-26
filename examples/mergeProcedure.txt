@@ -6,16 +6,16 @@
 	bsub -q psfehq -x -n 50 -R "span[ptile=5]" -o %J.out mpirun python psvolume/imageProcessMaster.py --num 2000 --o .
 	This script preprocesses raw images and save them to mergeImage folder, this part is slow
 4. Run imageMergeMaster.py
-	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --num 2000 --o . --U hkl --volumeSampling 1 --volumeCenter 60
+	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --num 2000 --o . --mode hkl --volumeSampling 1 --volumeCenter 60
 	This is the main script for image merging. It's actually not very slow.
 5. Run volumeProcess.py
 	python psvolume/volumeProcess.py --i ./sr0008/merge.volume
 6. Run qshellCorrelation.py
 	python psvolume/qshellCorrelation.py --i ./sr0008/merge.volume -j /reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist_121.h5 --rmax 50 --mode ball
 
-If you don't have scalingFactor, use scale factor as 1 and then run 1-2-3 -7- 1-2-3-4-5-6
+If you don't have scalingFactor, use scale factor as 1 and then run 1-2-3 -7(wr=True) -3-4-5-6
 7. Run scalingFactor.py
-	bsub -q psfehq -x -n 40 -R "span[ptile=8]" -o %J.out mpirun python psvolume/scalingFactor.py --rmin 100 --rmax 600
+	bsub -q psfehq -x -n 40 -R "span[ptile=8]" -o %J.out mpirun python psvolume/scalingFactor.py --rmin 100 --rmax 600 --wr 1
 Sometimes you need to modify the image files:
 8. Run imageModify.py
 	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/imageModify.py --o ./mergeImage
