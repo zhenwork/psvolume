@@ -55,12 +55,14 @@ class iPloter:
 					y = np.append(y, yaxis);					
 		else:
 			rad = np.linspace(0,2*np.pi, 1000)
-			x = r*np.sin(rad)+cx
-			y = r*np.cos(rad)+cy
+			spacing = r
+			x = spacing*np.sin(rad)+cx
+			y = spacing*np.cos(rad)+cy
 
 		plt.figure(figsize=(8,8));
 		plt.imshow(arr.T, clim=clim)
 		plt.plot(x, y, '--', linewidth=2,color='black')
+		plt.title('spacing r='+str(round(spacing, 2)))
 		plt.tight_layout()
 		plt.show()
 
