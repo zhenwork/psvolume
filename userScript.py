@@ -18,7 +18,7 @@ Geo['pixelSize'] = 172.0
 Geo['detDistance'] = 200147.4
 Geo['beamStop'] = 50
 Geo['polarization'] = 'y'
-Geo['wavelength'] = 0.82653    
+Geo['wavelength'] = 0.82653
 
 
 
