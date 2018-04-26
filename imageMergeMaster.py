@@ -68,7 +68,7 @@ else:
 		else:
 			moniter = 'hkl'
 			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)
-		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +' //mode::'+moniter
+		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank])
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
 	md=mpidata()
