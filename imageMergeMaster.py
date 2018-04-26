@@ -24,6 +24,7 @@ Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
+
 if comm_rank == 0:
 	fsave = zf.makeFolder(args.o, title='sr')
 	print "### Folder: ", fsave
@@ -67,9 +68,9 @@ else:
 		else:
 			moniter = 'hkl'
 			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)
-		print '### rank ' + str(comm_rank).rjust(2) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +' //mode::'+moniter
+		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +' //mode::'+moniter
 
-	print '### rank ' + str(comm_rank).rjust(2) + ' is sending file ... '
+	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
 	md=mpidata()
 	md.addarray('model3d', model3d)
 	md.addarray('weight', weight)
