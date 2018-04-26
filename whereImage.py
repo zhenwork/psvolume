@@ -19,7 +19,7 @@ parser.add_argument("-num","--num", help="num of images to process", default=-1,
 args = parser.parse_args()
 
 # computation
-Smat = Bmat*1.0/lsimb
+Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):

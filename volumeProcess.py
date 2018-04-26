@@ -13,10 +13,10 @@ thr = (args.thrmin, args.thrmax)
 zf = iFile()
 
 # read volume geometry
-Umatrix = zf.h5reader(args.i, 'Umatrix')
-astar = Umatrix[:,0].copy()
-bstar = Umatrix[:,1].copy()
-cstar = Umatrix[:,2].copy()
+Smat = zf.h5reader(args.i, 'Smat')
+astar = Smat[:,0].copy()
+bstar = Smat[:,1].copy()
+cstar = Smat[:,2].copy()
 print '### astar = ', astar
 print '### bstar = ', bstar
 print '### cstar = ', cstar
@@ -46,7 +46,7 @@ for i in range(nnxx):
 			subData[i,j,k] -= backg[intr]
 print '### max/min: ', np.amin(subData), np.amax(subData)
 
-if np.amax( np.abs( Umatrix-np.eye(3) ) )>1e-3:
+if np.amax( np.abs( Smat-np.eye(3) ) )>1e-3:
 	print "### converting hkl to xyz coordinate"
 	anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
 	print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
