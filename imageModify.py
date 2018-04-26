@@ -31,7 +31,7 @@ if comm_rank == 0:
 
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = args.o + '/rawImage_'+str(idx).zfill(5)+'.slice'
+	filename = args.o + '/mergeImage_'+str(idx).zfill(5)+'.slice'
 	data = zf.h5reader(filename, 'Umatrix')
 	zf.h5modify(filename, 'Smat', data)
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
