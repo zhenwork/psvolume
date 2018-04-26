@@ -24,6 +24,7 @@ args = parser.parse_args()
 
 # computation
 if args.xds != ".":
+	print "### xds file imported: ", args.xds
 	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
 	[Geo, Bmat, invBmat, invAmat] = user_get_xds(args.xds)
 
