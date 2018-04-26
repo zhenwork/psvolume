@@ -25,7 +25,7 @@ args = parser.parse_args()
 # computation
 if args.xds != ".":
 	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
-	[Geo, Bmat, invBmat] = user_get_xds(args.xds)
+	[Geo, Bmat, invBmat, invAmat] = user_get_xds(args.xds)
 
 if comm_rank == 0:
 	if not os.path.exists(args.o + '/rawImage'):
