@@ -17,7 +17,6 @@ while True:
 	f = open(args.i)
 	content = f.readlines();
 	f.close()
-	content = content.split('\n');
 
 	Ready = False;
 	for each in content:
