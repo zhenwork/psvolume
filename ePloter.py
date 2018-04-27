@@ -66,3 +66,20 @@ class iPloter:
 		plt.tight_layout()
 		plt.show()
 
+	def angularDistri(self, arr, spacing=10, center=(None,None)):
+		"""
+		spacing = 10 degree
+		"""
+		assert len(arr.shape)==2
+		(nx, ny) = arr.shape
+		cx = center[0];
+		cy = center[1];
+		if cx is None: cx = (nx-1.)/2.
+		if cy is None: cy = (ny-1.)/2.
+
+		xaxis = np.arrange(nx)-cx 
+		yaxis = bp.arrange(ny)-cy;
+		[x,y] = np.meshgrid(xaxis, yaxis, indexing='ij')
+		r = np.sqrt(x**2+y**2)
+		sinTheta = x/r;
+		cosTheta = 
