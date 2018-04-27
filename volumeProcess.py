@@ -8,9 +8,9 @@ parser.add_argument("-i","--i", help="save folder", default=".", type=str)
 parser.add_argument("-thrmin","--thrmin", help="min value", default=-100, type=int)
 parser.add_argument("-thrmax","--thrmax", help="max value", default=1000, type=int)
 parser.add_argument("-name","--name", help="name", default="", type=str)
-parser.add_argument("-sym","--sym", help="process", default=True, type=bool)
-parser.add_argument("-sub","--sub", help="process", default=True, type=bool)
-parser.add_argument("-hkl2xyz","--hkl2xyz", help="process", default=True, type=bool)
+parser.add_argument("-sym","--sym", help="process", default=1, type=int)
+parser.add_argument("-sub","--sub", help="process", default=1, type=int)
+parser.add_argument("-hkl2xyz","--hkl2xyz", help="process", default=1, type=int)
 args = parser.parse_args()
 thr = (args.thrmin, args.thrmax)
 zf = iFile()
@@ -24,16 +24,18 @@ print '### astar = ', astar
 print '### bstar = ', bstar
 print '### cstar = ', cstar
 print '### threshold: ', thr
+print '### symmetrize: ', bool(args.sym)
+print '### background: ', bool(args.sub)
+print '### hkl2xyz   : ', bool(args.hkl2xyz)
 
 
-
-if args.sym or args.sub or args.hkl2xyz:
+if args.sym==1 or args.sub==1 or args.hkl2xyz==1:
 	print '### reading volume ... '
 	rawData = zf.h5reader(args.i, 'intens')
 	print '### max/min: ', np.amin(rawData), np.amax(rawData)
 
 
-if args.sym:
+if args.sym==1:
 	print '### symmetrizing data ...'
 	symData = lauesym(rawData, ithreshold=thr)
 	print '### max/min: ', np.amin(symData), np.amax(symData)
@@ -42,7 +44,7 @@ else:
 	symData = rawData.copy()
 
 
-if args.sub:
+if args.sub==1:
 	print '### background calculation ... '
 	[backg, radius] = distri_alg2(symData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
 	print '### bgd max/min: ', np.amin(backg), np.amax(backg)
@@ -64,7 +66,7 @@ else:
 	subData = symData.copy()
 
 
-if args.hkl2xyz:
+if args.hkl2xyz==1:
 	if np.amax( np.abs( Smat-np.eye(3) ) )>1e-3:
 		print "### converting hkl to xyz coordinate"
 		anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
