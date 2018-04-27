@@ -211,8 +211,8 @@ def distri_alg2(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iw
 
 	for i in range(ir):
 		indexMark = (Rmodel>=i-isize)*(Rmodel<=i+isize);
-		distri[i] += idata*indexMark;
-		weight[i] += mark*indexMark;
+		distri[i] += np.sum(idata*indexMark);
+		weight[i] += np.sum(mark*indexMark);
 
 	index = np.where(weight>0)
 	distri[index] = distri[index]/weight[index]
