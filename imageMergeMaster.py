@@ -74,10 +74,10 @@ else:
 		sumIntens = round(np.sum(image), 8)
 		if args.mode=='xyz':
 			moniter = 'xyz'
-			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=arsg.peak)
+			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
 		else:
 			moniter = 'hkl'
-			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=arsg.peak)
+			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
 		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10)
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
