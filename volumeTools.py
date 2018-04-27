@@ -184,6 +184,41 @@ def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow
 	distri[index] = distri[index]/weight[index]
 	return [distri, Rmodel]
 
+def distri_alg2(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow=5):
+
+	la = lens(astar)
+	lb = lens(bstar)
+	lc = lens(cstar)
+	num_samp = idata.shape[0]
+	center = (num_samp - 1.)/2.
+	ir = (int(center*np.sqrt(3.)*max(la/lb, lc/lb))+20)*iscale
+
+	distri = np.zeros(ir)
+	weight = np.zeros(ir)
+	Rmodel = np.zeros((num_samp, num_samp, num_samp)).astype(int)
+	xaxis = np.arange(num_samp)-center;
+	yaxis = np.arange(num_samp)-center;
+	zaxis = np.arange(num_samp)-center;
+	[x,y,z] = np.meshgrid(xaxis, yaxis, zaxis, indexing='ij');
+	rx = x*astar[0]+y*bstar[0]+z*cstar[0];
+	ry = x*astar[1]+y*bstar[1]+z*cstar[1];
+	rz = x*astar[2]+y*bstar[2]+z*cstar[2];
+
+	Rmodel = np.sqrt(np.sum(rx**2+ry**2+rz**2))*float(iscale);
+	Rmodel = np.around(Rmodel).astype(int);
+	isize = (iwindow-1)/2;
+	mark = (idata>=ithreshold[0])*(idata<=ithreshold[1])
+
+	for i in range(ir):
+		indexMark = (Rmodel>=i-isize)*(Rmodel<=i+isize);
+		distri[i] += idata*indexMark;
+		weight[i] += mark*indexMark;
+
+	index = np.where(weight>0)
+	distri[index] = distri[index]/weight[index]
+	return [distri, Rmodel]
+
+
 @jit
 def meanf(idata, _scale = 3, clim=(0,50)):
 	delta = (_scale - 1)/2
