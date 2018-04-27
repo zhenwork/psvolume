@@ -8,7 +8,24 @@ args = parser.parse_args()
 tic = time.time()
 print args.i
 if args.i == '.' or not os.path.isfile(args.i):
-	toc = time.time()
-	print "###"+str(toc-tic).rjust(5)+"   "+ "### no such file"
-	raise Exception('no such file')
-print "hahaha"
+	toc = round(time.time()-tic, 3)
+	print "###"+str(toc).rjust(5)+" ### "+ "no such file"
+	raise Exception('Exit')
+
+PreContent = ['']
+while True:
+	f = open(args.i)
+	content = f.readlines();
+	f.close()
+	content = content.split('\n');
+
+	Ready = False;
+	for each in content:
+		if each not in PreContent:
+			toc = round(time.time()-tic, 3)
+			print "###"+str(toc).rjust(5)+" ### "+ each
+		if 'Turnaround' in each:
+			Ready = True
+	PreContent = content[:]
+	if Ready: break
+	time.sleep(1)
