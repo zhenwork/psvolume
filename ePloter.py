@@ -109,3 +109,31 @@ class iPloter:
 		    aveAngle[i] = (rad[i]+rad[i+1])/2.
 		return [aveAngle, aveIntens]
 
+
+	def sliceCut(data, axis='x', window=5, center=None, clim=None):
+		"""
+		input a 3d volume, then it will output the average slice within certain range and angle
+		"""
+		(nx,ny,nz) = data.shape
+		if center is None:
+			cx = (nx-1.)/2.;
+			cy = (ny-1.)/2.;
+			cz = (nz-1.)/2.;
+		else:
+			(cx,cy,cz) = center;
+		if clim is None: 
+			(vmin, vmax) = (-100, 1000);
+		else:
+			(vmin, vmax) = clim;
+			
+		nhalf = (window-1)/2
+		Vindex = ((data>=vmin)*(data<=vmax)).astype(float);
+
+		if axis == 'x':
+			return np.sum(data[cx-nhalf:cx+nhalf+1,:,:]*Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)/np.sum(Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)
+		elif axis == 'y':
+			return np.sum(data[:,cx-nhalf:cx+nhalf+1,:]*Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)/np.sum(Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)        
+		elif axis == 'z':
+			return np.sum(data[:,:,cx-nhalf:cx+nhalf+1]*Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)/np.sum(Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)
+		else: 
+			return 0

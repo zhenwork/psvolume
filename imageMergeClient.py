@@ -64,12 +64,9 @@ def make_radius(size, center=None):
 		center = (cx,cy)
 	x = np.arange(nx) - center[0]
 	y = np.arange(ny) - center[1]
-	[xaxis, yaxis] = np.meshgrid(x, y)
-	xaxis = xaxis.T.ravel()
-	yaxis = yaxis.T.ravel()
-	image = np.sqrt(xaxis**2 + yaxis**2)
-	image.shape=(nx,ny)
-	return image
+	[xaxis, yaxis] = np.meshgrid(x, y, indexing='ij')
+	radius = np.sqrt(xaxis**2 + yaxis**2)
+	return radius
 
 def Geometry(image, Geo):
 	"""

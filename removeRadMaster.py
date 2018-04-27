@@ -27,8 +27,10 @@ else:
 
 imgFirst = zf.h5reader(prefix+str(0).zfill(5)+'.slice', 'image')
 imgFirst = np.sum(imgFirst*(imgFirst>0))
+print '### Rank'+str(comm_rank).rjust(3)+' sumIntens of imgFirst: '+str(round(imgFirst, 2))
 
-radius = None
+
+Rindex = None
 sep = np.linspace(0, num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = prefix+str(idx).zfill(5)+'.slice'
@@ -42,12 +44,17 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	Geo['scale'] = 1.
 	
 	sumIntens = round(sumIntens, 8)
-	image = remove_bragg_peak(image, mask=mask, sigma=15, cwin=(11,11));
 
-	if radius is None:
-		[image, radius] = remove_peak_alg3(image, center=Geo['center'], depth=2)
+	image = remove_bragg_peak(image, Geo);
+
+	if Rindex is None:
+		Rindex = get_Rindex(image.shape, center=Geo['center'], depth=3)
+		image = remove_peak_alg3(image, Rindex=Rindex)
 	else:
-		[image, radius] = remove_peak_alg3(image, radius=radius)
+		image = remove_peak_alg3(image, Rindex=Rindex)
+
+	image = image + 100.
+	image[np.where(image<0)] = -1.;
 
 	fsave = path + '/subImage/subImage_'+str(idx).zfill(5)+'.slice'
 
