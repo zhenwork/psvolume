@@ -45,10 +45,12 @@ class iFile:
 	def counterFile(self, path, title='.slice'):
 		allFile = os.listdir(path)
 		counter = 0
+		selectFile = []
 		for each in allFile:
 			if title in each:
 				counter += 1
-		return counter
+				selectFile.append(path+'/'+each)
+		return [counter, selectFile]
 
 		# file_name = os.path.realpath(__file__)
 		# if (os.path.isfile(file_name)): shutil.copy(file_name, folder_new)

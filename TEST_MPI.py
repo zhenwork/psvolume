@@ -14,7 +14,7 @@ args = parser.parse_args()
 args.o = '/reg/data/ana04/users/zhensu/xpptut/volume'
 
 zf = iFile()
-if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
+if args.num==-1: [num, allFile] = zf.counterFile(args.o+'/mergeImage', title='.slice')
 else: num = int(args.num)
 num = int(args.num)
 

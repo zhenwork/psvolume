@@ -14,9 +14,13 @@ parser.add_argument("-volumeCenter","--volumeCenter", help="num of images to pro
 args = parser.parse_args()
 
 zf = iFile()
-if args.num==-1: num = zf.counterFile(args.o+'/mergeImage', title='.slice')
-else: num = int(args.num)
-
+if not (args.o).endswith('/'): args.o = args.o+'/'
+[num, allFile] = zf.counterFile(args.o, title='.slice')
+folder1 = args.o[0:(len(args.o)-args.o[::-1].find('/',1))];
+folder2 = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
+if args.num != -1: num = int(args.num)
+print 'folder1= ', folder1
+print 'folder2= ', folder2
 
 Vol = {}
 Vol['volumeCenter'] = int(args.volumeCenter)
@@ -27,7 +31,7 @@ weight  = np.zeros([Vol['volumeSize']]*3)
 
 
 if comm_rank == 0:
-	fsave = zf.makeFolder(args.o, title='sr')
+	fsave = zf.makeFolder(folder1, title='sr')
 	print "### Folder: ", fsave
 	print "### Images: ", num
 	print "### Mode: ", args.mode
@@ -47,7 +51,7 @@ if comm_rank == 0:
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
 	if args.mode == 'xyz': Smat = np.eye(3)
-	else: Smat = zf.h5reader(args.o+'/mergeImage/mergeImage_'+str(0).zfill(5)+'.slice', 'Smat')
+	else: Smat = zf.h5reader(folder2+str(0).zfill(5)+'.slice', 'Smat')
 
 	print "### saving File: ", pathIntens
 	ThisFile = zf.readtxt(os.path.realpath(__file__))
@@ -59,7 +63,7 @@ if comm_rank == 0:
 else:
 	sep = np.linspace(0, num, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
-		fname = args.o+'/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
+		fname = folder2+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
 		if args.rescale != 'no':

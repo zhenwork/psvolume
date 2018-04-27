@@ -21,7 +21,7 @@ comm_size = MPI.COMM_WORLD.Get_size()
 
 zf = iFile()
 if args.num==-1:
-	num = zf.counterFile(args.o, title='.slice')
+	[num, allFile] = zf.counterFile(args.o, title='.slice')
 else: num = int(args.num)
 sep = np.linspace(0, num, comm_size+1).astype('int')
 if comm_rank == 0:
