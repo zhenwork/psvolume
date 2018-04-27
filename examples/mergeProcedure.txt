@@ -6,7 +6,7 @@
 	bsub -q psfehq -x -n 100 -R "span[ptile=10]" -o %J.out mpirun python psvolume/imageProcessMaster.py
 	This script preprocesses raw images and save them to mergeImage folder, this part is slow
 4. Run imageMergeMaster.py
-	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --mode hkl
+	bsub -q psfehq -x -n 6 -R "span[ptile=6]" -o %J.out mpirun python psvolume/imageMergeMaster.py --mode hkl --o ./mergeImage
 	This is the main script for image merging. It's actually not very slow.
 5. Run volumeProcess.py
 	python psvolume/volumeProcess.py --i ./sr0008/merge.volume

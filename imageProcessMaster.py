@@ -56,6 +56,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image *= apscale
 	image *= Geo['scale']
 	Geo['scale'] = 1.
+	
 	sumIntens = round(np.sum(image), 8)
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
