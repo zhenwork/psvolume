@@ -91,7 +91,7 @@ def Geometry(image, Geo):
 	return voxel
 
 @jit
-def ImageMerge_HKL(model3d, weight, image, Geo, Volume):
+def ImageMerge_HKL(model3d, weight, image, Geo, Volume, Kpeak=False):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
@@ -120,7 +120,7 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume):
 		hshift = abs(h/Vsample-round(h/Vsample))
 		kshift = abs(k/Vsample-round(k/Vsample))
 		lshift = abs(l/Vsample-round(l/Vsample))
-		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): continue
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not Kpeak: continue
 		
 		weight[ inth,intk,intl] += 1.
 		model3d[inth,intk,intl] += Image[t] 
@@ -128,7 +128,7 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume):
 	return [model3d, weight]
 
 @jit
-def ImageMerge_XYZ(model3d, weight, image, Geo, Volume):
+def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
@@ -162,7 +162,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume):
 		hshift = abs(h-round(h))
 		kshift = abs(k-round(k))
 		lshift = abs(l-round(l))
-		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): continue
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not Kpeak: continue
 		
 		weight[ intx,inty,intz] += 1.
 		model3d[intx,inty,intz] += Image[t] 

@@ -8,8 +8,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-mode","--mode", help="matrix", default="hkl", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
-parser.add_argument("-volumeSampling","--volumeSampling", help="num of images to process", default=1, type=int)
-parser.add_argument("-volumeCenter","--volumeCenter", help="num of images to process", default=60, type=int)
+parser.add_argument("-peak","--peak", help="keep the bragg peak or not", default=False, type=bool)
+parser.add_argument("-vSampling","--vSampling", help="num of images to process", default=1, type=int)
+parser.add_argument("-vCenter","--vCenter", help="num of images to process", default=60, type=int)
 args = parser.parse_args()
 
 
@@ -21,8 +22,8 @@ prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
 if args.num != -1: num = int(args.num)
 
 Vol = {}
-Vol['volumeCenter'] = int(args.volumeCenter)
-Vol['volumeSampling'] = int(args.volumeSampling)
+Vol['volumeCenter'] = int(args.vCenter)
+Vol['volumeSampling'] = int(args.vSampling)
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
@@ -73,10 +74,10 @@ else:
 		sumIntens = round(np.sum(image), 8)
 		if args.mode=='xyz':
 			moniter = 'xyz'
-			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol)
+			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=arsg.peak)
 		else:
 			moniter = 'hkl'
-			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol)
+			[model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=arsg.peak)
 		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10)
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
