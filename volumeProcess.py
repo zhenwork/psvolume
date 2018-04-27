@@ -31,7 +31,7 @@ symData = lauesym(rawData, ithreshold=thr)
 print '### max/min: ', np.amin(symData), np.amax(symData)
 
 print '### background calculation ... '
-[backg, radius] = distri(symData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
+[backg, radius] = distri_alg2(symData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
 print '### bgd max/min: ', np.amin(backg), np.amax(backg)
 
 #backg = meanf(backg, _scale=5, clim=(0.1, 50))
