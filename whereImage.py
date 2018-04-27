@@ -5,7 +5,6 @@ If the output "--o" folder is not specified, then it will save to the current pa
 
 --xds should be a file path 
 """
-
 from userScript import *
 from xdsIndexingFile import *
 from fileManager import *

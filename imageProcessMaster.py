@@ -55,12 +55,13 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	image *= apscale
 	image *= Geo['scale']
+	Geo['scale'] = 1.
 	sumIntens = round(np.sum(image), 8)
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
 	fsave = args.o + '/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
 
-	zf.h5writer(fsave, 'readout', 'image') #image, event
+	zf.h5writer(fsave, 'readout', 'image') # image, event
 	zf.h5modify(fsave, 'image', image)
 	zf.h5modify(fsave, 'center', Geo['center'])
 	zf.h5modify(fsave, 'exp', Geo['exp'])
