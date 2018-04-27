@@ -12,6 +12,7 @@ parser.add_argument("-volumeSampling","--volumeSampling", help="num of images to
 parser.add_argument("-volumeCenter","--volumeCenter", help="num of images to process", default=60, type=int)
 args = parser.parse_args()
 
+
 zf = iFile()
 if not (args.o).endswith('/'): args.o = args.o+'/'
 [num, allFile] = zf.counterFile(args.o, title='.slice')
