@@ -7,7 +7,7 @@ args = parser.parse_args()
 
 tic = time.time()
 print args.i
-if args.i == '.' or not os.path.exists(args.i): 
+if args.i == '.' or not os.path.isfile(args.i):
 	toc = time.time()
 	print "###"+str(toc-tic).rjust(5)+"   "+ "### no such file"
 	raise Exception('no such file')
