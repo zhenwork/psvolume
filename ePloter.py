@@ -66,9 +66,9 @@ class iPloter:
 		plt.tight_layout()
 		plt.show()
 
-	def angularDistri(self, arr, spacing=10, center=(None,None)):
+	def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
 		"""
-		spacing = 10 degree
+		num denotes how many times you want to divide the angle
 		"""
 		assert len(arr.shape)==2
 		(nx, ny) = arr.shape
@@ -77,9 +77,35 @@ class iPloter:
 		if cx is None: cx = (nx-1.)/2.
 		if cy is None: cy = (ny-1.)/2.
 
-		xaxis = np.arrange(nx)-cx 
-		yaxis = bp.arrange(ny)-cy;
+		xaxis = np.arange(nx)-cx + 1.0e-5; 
+		yaxis = np.arange(ny)-cy + 1.0e-5; 
 		[x,y] = np.meshgrid(xaxis, yaxis, indexing='ij')
 		r = np.sqrt(x**2+y**2)
-		sinTheta = x/r;
-		cosTheta = 
+		sinTheta = y/r;
+		cosTheta = x/r; 
+		angle = np.arccos(cosTheta);
+		index = np.where(sinTheta<0);
+		angle[index] = 2*np.pi - angle[index]
+		if rmin is not None:
+		    index = np.where(r<rmin);
+		    angle[index] = -1
+		if rmax is not None:
+		    index = np.where(r>rmax);
+		    angle[index] = -1
+		if Arange is not None:
+		    index = np.where((angle>Arange[0]*np.pi/180.)*(angle<Arange[1]*np.pi/180.)==True);
+		    subData = arr[index].copy()
+		    aveIntens = np.mean(subData)
+		    aveAngle = (Arange[0]+Arange[1])/2.        
+		    return [aveAngle, aveIntens];
+
+		rad = np.linspace(0, 2*np.pi, num+1);
+		aveIntens = np.zeros(num)
+		aveAngle = np.zeros(num)
+		for i in range(num):
+		    index = np.where((angle>rad[i])*(angle<rad[i+1])==True);
+		    subData = arr[index].copy()
+		    aveIntens[i] = np.mean(subData)
+		    aveAngle[i] = (rad[i]+rad[i+1])/2.
+		return [aveAngle, aveIntens]
+
