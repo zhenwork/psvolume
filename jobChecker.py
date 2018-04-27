@@ -8,7 +8,7 @@ args = parser.parse_args()
 tic = time.time()
 print args.i
 if args.i == '.' or not os.path.isfile(args.i):
-	toc = round(time.time()-tic, 3)
+	toc = int(time.time()-tic)
 	print "###"+str(toc).rjust(5)+" ### "+ "no such file"
 	raise Exception('Exit')
 
@@ -21,7 +21,7 @@ while True:
 	Ready = False;
 	for each in content:
 		if each not in PreContent:
-			toc = round(time.time()-tic, 3)
+			toc = int(time.time()-tic)
 			print "###"+str(toc).rjust(5)+" ### "+ each
 		if 'Turnaround' in each:
 			Ready = True
