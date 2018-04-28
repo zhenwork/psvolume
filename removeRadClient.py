@@ -25,16 +25,18 @@ def remove_bragg_peak(image, Geo):
 
 	return Image
 
+@jit
 def get_Rindex(size, center=None, depth=3):
 
 	radius = make_radius(size, center=center)
 	radius = np.around(radius).astype(int)
 	half = (depth-1)/2;
-	Rindex = []
+	Rindex = [None]
 	rmax = np.amax(radius)
 	for r in range(rmax+1):
 		index = np.where((radius>=r-half)*(radius<=r+half)==True)
 		Rindex.append(index)
+	Rindex.pop(0)
 	return Rindex
 
 @jit
