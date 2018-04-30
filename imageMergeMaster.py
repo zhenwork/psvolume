@@ -76,6 +76,8 @@ else:
 		image = image * Geo['scale']
 
 		sumIntens = round(np.sum(image), 8)
+		image = image/sumIntens*1.0e8;
+		
 		if args.mode=='xyz':
 			moniter = 'xyz'
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
