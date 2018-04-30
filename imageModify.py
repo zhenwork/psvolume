@@ -9,6 +9,7 @@ mpirun -n 10 python imageModify --o ./mergeImage --num 100
 
 from fileManager import *
 from mpi4py import MPI
+from shutil import copyfile
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
@@ -31,7 +32,9 @@ if comm_rank == 0:
 
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = args.o + '/rawImage_'+str(idx).zfill(5)+'.slice'
-	data = zf.h5reader(filename, 'rotation')
-	zf.h5modify('./mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice', 'rotation', data)
+	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/wtich_blk/rawImage/rawImage_'+str(idx).zfill(5)+'.slice'
+	#data = zf.h5reader(filename, 'rotation')
+	#zf.h5modify('/reg/data/ana04/users/zhensu/xpptut/volume/wtich_blk/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice', 'rotation', data)
+	dst = '/reg/data/ana04/users/zhensu/xpptut/volume/wtich_blk/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
+	copy(filename, dst)
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
