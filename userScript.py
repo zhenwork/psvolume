@@ -24,7 +24,7 @@ def user_get_image(idx):
 
 # How to get the idx quaternion, return a quaternion (q1,q2,q3,q4)
 def user_get_orientation(idx):
-	return (np.cos(idx*0.1*np.pi/2./180.), 0., np.sin(idx*0.1*np.pi/2./180.), 0.)
+	return (np.cos(idx*0.15*np.pi/2./180.), 0., np.sin(idx*0.15*np.pi/2./180.), 0.)
 
 
 # How to get the scale factor, return a number (if not using, return None)
