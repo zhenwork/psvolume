@@ -36,5 +36,5 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	#data = zf.h5reader(filename, 'rotation')
 	#zf.h5modify('/reg/data/ana04/users/zhensu/xpptut/volume/wtich_blk/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice', 'rotation', data)
 	dst = '/reg/data/ana04/users/zhensu/xpptut/volume/wtich_blk/mergeImage/mergeImage_'+str(idx).zfill(5)+'.slice'
-	copy(filename, dst)
+	copyfile(filename, dst)
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
