@@ -63,7 +63,7 @@ class iPloter:
 
 
 		plt.figure(figsize=(8,8));
-		plt.imshow(arr.T, clim=clim)
+		plt.imshow(arr, clim=clim)
 		plt.plot(x, y, '--', linewidth=2,color='black')
 		plt.title('spacing r='+str(round(spacing, 2)))
 		plt.tight_layout()
@@ -113,7 +113,7 @@ class iPloter:
 		return [aveAngle, aveIntens]
 
 
-	def sliceCut(data, axis='x', window=5, center=None, clim=None):
+	def sliceCut(self, data, axis='x', window=5, center=None, clim=None):
 		"""
 		input a 3d volume, then it will output the average slice within certain range and angle
 		"""
