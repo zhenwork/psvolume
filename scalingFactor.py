@@ -36,6 +36,12 @@ print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
 mask = circle_region(image=None, center=(cx,cy), rmax=args.rmax, rmin=args.rmin, size=(nx,ny))
 imgFirst = np.sum(image*mask)
 
+if comm_rank == 0:
+	print '### Path  : ', path
+	print '### Folder: ', args.i
+	print '### Save  : ', path+'/image.process'
+
+
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	filename = args.i + '/'+str(idx).zfill(5)+'.slice'
 	image = zf.h5reader(filename, 'image')
@@ -47,10 +53,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 
 if comm_rank == 0:
-	print '### Path  : ', path
-	print '### Folder: ', args.i
-	print '### Save  : ', path+'/image.process'
-
 	for i in range(comm_size-1):
 		md=mpidata()
 		md.recv()
