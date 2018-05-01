@@ -17,6 +17,7 @@ zf = iFile()
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o","--o", help="save folder", default="./rawImage", type=str)
+parser.add_argument("-fname","--fname", help="input files", default=".", type=str)
 parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
@@ -32,6 +33,7 @@ if args.xds != ".":
 	print "### xds file imported: ", args.xds
 	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
 	[Geo, Bmat, invBmat, invAmat] = user_get_xds(args.xds)
+
 
 if comm_rank == 0:
 	if not os.path.exists(folder):
@@ -53,7 +55,9 @@ if comm_rank == 0:
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	image = user_get_image(idx)
+	if args.fname != '.': 
+		fname = args.fname.replace('*****', str(idx+1).zfill(5))
+	image = user_get_image(idx, fname = fname)
 	image[np.where(image>10000)] = -1
 	image[np.where(image<0)] = -1
 
