@@ -41,6 +41,9 @@ pscale  = 1./pscale
 
 if comm_rank == 0:
 	print '## Total number: '+str(num).rjust(5)
+	print '## Path: ', path
+	print '## Folder: ', args.i
+	
 	if not os.path.exists(args.o): 
 		os.mkdir(args.o)
 	zf.h5modify(path+'/image.process', 'ascale' , ascale)

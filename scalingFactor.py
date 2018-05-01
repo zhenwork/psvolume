@@ -17,13 +17,12 @@ args = parser.parse_args()
 zf = iFile()
 if not (args.i).endswith('/'): args.i = args.i+'/'
 [num, allFile] = zf.counterFile(args.i, title='.slice')
+print args.i
 path = args.i[0:(len(args.i)-args.i[::-1].find('/',1))];
-prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))]
-
 if args.num != -1: num = int(args.num)
+
 sep = np.linspace(0, num, comm_size+1).astype('int')
 scaleMatrix = np.zeros(num)
-
 
 ## read the first image
 filename = args.i + '/00000.slice'
@@ -60,7 +59,7 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(3)
-	zf.h5modify(path+'/image.process', args.name, scaleMatrix[0]*1.0/scaleMatrix)
+	zf.h5modify(path+'/image.process', args.name, scaleMatrix)
 
 else:
 	md=mpidata()
