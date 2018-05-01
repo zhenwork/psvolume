@@ -25,7 +25,14 @@ scaleMatrix = np.zeros(num)
 
 ## read the first image
 filename = args.i + '/00000.slice'
-image = zf.h5reader(filename, 'image')
+
+while True:
+	try: 
+		print '### Rank: '+str(comm_rank).rjust(3)+' is loading first file ...'
+		image = zf.h5reader(filename, 'image')
+		break
+	except: continue;
+
 image[np.where(image<0.)] = 0.
 Geo = zf.get_image_info(filename)
 (nx,ny) = image.shape
