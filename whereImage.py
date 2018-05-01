@@ -54,7 +54,7 @@ if comm_rank == 0:
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = user_get_image(idx)
-	image[np.where(image>100000)] = -1
+	image[np.where(image>10000)] = -1
 	image[np.where(image<0)] = -1
 
 	quaternion = user_get_orientation(idx)

@@ -42,7 +42,7 @@ def user_get_mask(Geo):
 	mask = np.ones(data.shape).astype(int)
 	index = np.where(data > 10000)
 	mask[index] = 0
-	#mask[1260:1300,1235:2463] = 0
+	mask[1260:1300,1235:2463] = 0
 	radius = make_radius(mask.shape, center=Geo['center'])
 	index = np.where(radius<25)
 	mask[index] = 0
