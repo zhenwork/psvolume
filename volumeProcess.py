@@ -35,15 +35,26 @@ if args.sym==1 or args.sub==1 or args.hkl2xyz==1:
 	print '### max/min: ', np.amin(rawData), np.amax(rawData)
 
 
+
+if args.sym==1:
+	print '### symmetrizing data ...'
+	symData = lauesym(rawData, ithreshold=thr)
+	print '### max/min: ', np.amin(symData), np.amax(symData)
+	zf.h5modify(args.i, args.name+'symData', symData)
+else:
+	symData = rawData.copy()
+
+
+
 if args.sub==1:
 	print '### background calculation ... '
-	[backg, radius] = distri(rawData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
+	[backg, radius] = distri(symData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
 	print '### bgd max/min: ', np.amin(backg), np.amax(backg)
 
 	#backg = meanf(backg, _scale=5, clim=(0.1, 50))
 
 	print '### subtracting background ... '
-	subData = rawData.copy()
+	subData = symData.copy()
 	[nnxx, nnyy, nnzz] = rawData.shape
 	for i in range(nnxx):
 		for j in range(nnyy):
@@ -54,28 +65,18 @@ if args.sub==1:
 	zf.h5modify(args.i, args.name+'subData', subData)
 	zf.h5modify(args.i, args.name+'backg', backg)
 else:
-	subData = rawData.copy()
-
-
-
-if args.sym==1:
-	print '### symmetrizing data ...'
-	symData = lauesym(subData, ithreshold=thr)
-	print '### max/min: ', np.amin(symData), np.amax(symData)
-	zf.h5modify(args.i, args.name+'symData', symData)
-else:
-	symData = subData.copy()
+	subData = symData.copy()
 
 
 
 if args.hkl2xyz==1:
 	if np.amax( np.abs( Smat-np.eye(3) ) )>1e-3:
 		print "### converting hkl to xyz coordinate"
-		anisoData = hkl2volume(symData, astar, bstar, cstar, ithreshold=thr)
+		anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
 		print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
 	else: 
 		print "### This is already the best coordinate ... "
-		anisoData = symData.copy()
+		anisoData = subData.copy()
 
 	print ('### start saving files... ')  
 
