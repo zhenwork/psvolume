@@ -19,6 +19,7 @@ def user_get_xds(filename):
 	Geo['polarization'] = 'y' if float(content[1].split()[3])>0.9 else 'x'
 	Geo['wavelength'] = float(content[2].split()[0])
 	Geo['center'] = (float(content[8].split()[1]), float(content[8].split()[0]))
+	Geo['Angle_increment'] = float(content[1].split()[2])
 
 	## calculate the invAmat matrix
 	invAmat = np.zeros((3,3));

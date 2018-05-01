@@ -24,8 +24,8 @@ def user_get_image(idx):
 
 
 # How to get the idx quaternion, return a quaternion (q1,q2,q3,q4)
-def user_get_orientation(idx):
-	return (np.cos(idx*0.15*np.pi/2./180.), 0., np.sin(idx*0.15*np.pi/2./180.), 0.)
+def user_get_orientation(idx, increment=0.1):
+	return (np.cos(idx*increment*np.pi/2./180.), 0., np.sin(idx*increment*np.pi/2./180.), 0.)
 
 
 # How to get the scale factor, return a number (if not using, return None)
@@ -58,6 +58,7 @@ Geo['detDistance'] = 200147.4
 Geo['polarization'] = 'y'
 Geo['wavelength'] = 0.82653
 Geo['center'] = (1265.33488372, 1228.00813953)
+Geo['Angle_increment'] = 0.1
 
 
 ## inverse U matrix is usually unknown in cctbx result
