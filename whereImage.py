@@ -55,7 +55,10 @@ if comm_rank == 0:
 	Filename = path+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
+	zf.h5modify(Filename, 'Bmat', Bmat)
+	zf.h5modify(Filename, 'invBmat', invBmat)
 
+break
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
