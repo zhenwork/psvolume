@@ -45,7 +45,7 @@ else:
 
 
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
-if args.fname != '.': fname = args.fname.replace('*****', str(1).zfill(5))
+if args.fname != '.': fname = args.fname.replace('#####', str(1).zfill(5))
 else: fname=None
 mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
@@ -60,7 +60,7 @@ if comm_rank == 0:
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if args.fname != '.': 
-		fname = args.fname.replace('*****', str(idx+1).zfill(5))
+		fname = args.fname.replace('#####', str(idx+1).zfill(5))
 	image = user_get_image(idx, fname = fname)
 	image[np.where(image>10000)] = -1
 	image[np.where(image<0)] = -1
