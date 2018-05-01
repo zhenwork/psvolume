@@ -16,6 +16,8 @@ parser.add_argument("-i1","--i1", help="ilim[0]", default="-100", type=str)
 parser.add_argument("-i2","--i2", help="ilim[1]", default="100", type=str)
 parser.add_argument("-j1","--j1", help="jlim[0]", default="-100", type=str)
 parser.add_argument("-j2","--j2", help="jlim[1]", default="100", type=str)
+parser.add_argument("-iname","--iname", help="ilim[0]", default="anisoData", type=str)
+parser.add_argument("-jname","--jname", help="ilim[1]", default="anisoData", type=str)
 args = parser.parse_args()
 if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
@@ -86,9 +88,9 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 
 zf = iFile()
 print ('### reading dataset one ...')
-data_i = zf.h5reader(args.i, 'anisoData')
+data_i = zf.h5reader(args.i, args.iname)
 print ('### reading dataset two ...')
-data_j = zf.h5reader(args.j, 'anisoData')
+data_j = zf.h5reader(args.j, args.jname)
 assert data_i.shape == data_j.shape
 
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"

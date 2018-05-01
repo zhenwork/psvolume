@@ -61,6 +61,7 @@ if args.sub==1:
 			for k in range(nnzz):
 				intr = radius[i,j,k]
 				subData[i,j,k] -= backg[intr]
+				rawData[i,j,k] -= backg[intr]
 	print '### max/min: ', np.amin(subData), np.amax(subData)
 	zf.h5modify(args.i, args.name+'subData', subData)
 	zf.h5modify(args.i, args.name+'backg', backg)
@@ -74,6 +75,7 @@ if args.hkl2xyz==1:
 		print "### converting hkl to xyz coordinate"
 		anisoData = hkl2volume(subData, astar, bstar, cstar, ithreshold=thr)
 		print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
+		threeDRaw = hkl2volume(rawData, astar, bstar, cstar, ithreshold=thr)
 	else: 
 		print "### This is already the best coordinate ... "
 		anisoData = subData.copy()
@@ -81,3 +83,4 @@ if args.hkl2xyz==1:
 	print ('### start saving files... ')  
 
 	zf.h5modify(args.i, args.name+'anisoData', anisoData)
+	zf.h5modify(args.i, args.name+'threeDRaw', threeDRaw)
