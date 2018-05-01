@@ -49,7 +49,13 @@ if comm_rank == 0:
 else:
 	while not os.path.exists(args.o): pass
 
-mask = zf.h5reader(path+'/image.process', 'mask')
+while True:
+	print '### Rank: '+str(comm_rank).rjust(3)+' is loading mask ...'
+	try: 
+		mask = zf.h5reader(path+'/image.process', 'mask');
+		break
+	except: continue;
+
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = args.i+'/'+str(idx).zfill(5)+'.slice'
 	Geo = zf.get_image_info(fname)
