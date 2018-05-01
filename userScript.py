@@ -17,7 +17,7 @@ def user_get_image(idx, fname=None):
 	#fname = '/reg/d/psdm/cxi/cxitut13/scratch/zhensu/wtich_274k_10/cbf'+'/wtich_274_10_1_'+str(idx+1).zfill(5)+'.cbf'
 	#fname = '/reg/data/ana13/xpp/xppk7915/res/vdbedem/ICHwt_cryo_2'+'/ICHwt_cryo_2_1_'+str(idx+1).zfill(5)+'.cbf'
 	#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/crystal/rawcbf/ICH_wt_cds4_1_'+str(idx+1).zfill(5)+'.cbf'   ## blank image
-	if fname is None: fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
+	if fname is None: raise Exception('no files')#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
 	content = cbf.read(fname)
 	image = np.array(content.data).astype(float)
 	return image
@@ -38,8 +38,8 @@ def user_get_scalingFactor(idx):
 
 
 # How to define a users mask
-def user_get_mask(Geo):
-	data = user_get_image(0)
+def user_get_mask(Geo, fname=None):
+	data = user_get_image(0, fname=fname)
 	mask = np.ones(data.shape).astype(int)
 	index = np.where(data > 10000)
 	mask[index] = 0
