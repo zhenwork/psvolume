@@ -101,3 +101,27 @@ def remove_peak_alg2(img, mask=None, thr=(None, None), cwin=(11,11)):
 		index = np.where(submedian>thr[1])
 		image[index] = -1
 	return image
+
+def medianf(image, mask=1., window=(5,5)):
+	median = median_filter(image, window)*mask
+
+def meanf(image, mask=None, window=(5,5)):
+	(nx,ny) = image.shape
+	if mask is None: mask = np.ones(image.shape)
+	ex = (window[0]-1)/2
+	ey = (window[1]-1)/2
+	sx = ex*2+1
+	sy = ey*2+1
+	Data = np.zeros((sx*sy, nx+ex*2, ny+ey*2));
+	Mask = np.zeros(data.shape);
+
+	for i in range(sx):
+		for j in range(sy):
+			Data[i*sy+j, i:(i+nx), j:(j+ny)] = image.copy()
+			Mask[i*sy+j, i:(i+nx), j:(j+ny)] = mask.copy()
+
+	Mask = np.sum(Mask, axis=0);
+	Data = np.sum(Data, axis=0);
+	index = np.where(Mask>0);
+	Data[index] /= Mask[index]
+	return Data
