@@ -36,6 +36,8 @@ if args.xds != ".":
 
 
 if comm_rank == 0:
+	print "### path: ", path
+	print "### folder: ", folder
 	if not os.path.exists(folder):
 		os.mkdir(folder)
 else:
