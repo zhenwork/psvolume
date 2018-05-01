@@ -58,7 +58,7 @@ if comm_rank == 0:
 	zf.h5modify(Filename, 'Bmat', Bmat)
 	zf.h5modify(Filename, 'invBmat', invBmat)
 
-raise Exception('error')
+#raise Exception('error')
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
