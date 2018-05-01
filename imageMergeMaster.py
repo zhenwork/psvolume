@@ -5,7 +5,7 @@ from fileManager import *
 from imageMergeClient import *
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-o","--o", help="save folder", default=".", type=str)
+parser.add_argument("-i","--i", help="save folder", default=".", type=str)
 parser.add_argument("-mode","--mode", help="matrix", default="hkl", type=str)
 parser.add_argument("-peak","--peak", help="keep the bragg peak or not", default=0, type=int)
 parser.add_argument("-vSampling","--vSampling", help="num of images to process", default=1, type=int)
@@ -16,10 +16,9 @@ args = parser.parse_args()
 
 
 zf = iFile()
-if not (args.o).endswith('/'): args.o = args.o+'/'
-[nmax, allFile] = zf.counterFile(args.o, title='.slice')
-path = args.o[0:(len(args.o)-args.o[::-1].find('/',1))];
-prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
+if not (args.i).endswith('/'): args.i = args.i+'/'
+[nmax, allFile] = zf.counterFile(args.i, title='.slice')
+path = args.i[0:(len(args.i)-args.i[::-1].find('/',1))];
 if args.nmax != -1: nmax = int(args.nmax)
 
 Vol = {}
@@ -34,8 +33,7 @@ if comm_rank == 0:
 	fsave = zf.makeFolder(path, title='sr')
 
 	print '### Path  : ', path
-	print '### Folder: ', args.o 
-	print '### Prefix: ', prefix 
+	print '### Folder: ', args.i 
 	print "### Fsave : ", fsave
 	print "### Images:  [", nmin, nmax, ')'
 	print "### Mode  : ", args.mode
@@ -57,7 +55,7 @@ if comm_rank == 0:
 	model3d = ModelScaling(model3d, weight)
 	pathIntens = fsave+'/merge.volume'
 	if args.mode == 'xyz': Smat = np.eye(3)
-	else: Smat = zf.h5reader(prefix+str(0).zfill(5)+'.slice', 'Smat')
+	else: Smat = zf.h5reader(args.i+'/00000.slice', 'Smat')
 
 	print "### processed image number: ", countImage
 	print "### saving File: ", pathIntens
@@ -70,7 +68,7 @@ if comm_rank == 0:
 else:
 	sep = np.linspace(nmin, nmax, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
-		fname = prefix+str(idx).zfill(5)+'.slice'
+		fname = args.i+'/'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
 		image = image * Geo['scale']
