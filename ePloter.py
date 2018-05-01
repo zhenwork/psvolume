@@ -29,7 +29,7 @@ class iPloter:
 		if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
 			pg.QtGui.QApplication.exec_()
 
-	def pltRing(self, arr, r = None, center=(None,None), spacing=None, clim=None):
+	def pltRing(self, arr, r = None, unit=None, center=(None,None), spacing=None, clim=None):
 		(nx, ny) = arr.shape
 		cx = center[0];
 		cy = center[1];
@@ -41,6 +41,8 @@ class iPloter:
 		else:
 			numRing = int( max(abs(nx-cx), abs(ny-cy), abs(cx), abs(cy))/spacing)
 
+		if r is not None and unit is not None:
+			r = r*1.0/unit
 
 		if r is None:
 			rad = np.linspace(0,2*np.pi, 1000)
@@ -58,6 +60,7 @@ class iPloter:
 			spacing = r
 			x = spacing*np.sin(rad)+cx
 			y = spacing*np.cos(rad)+cy
+
 
 		plt.figure(figsize=(8,8));
 		plt.imshow(arr.T, clim=clim)
@@ -130,10 +133,10 @@ class iPloter:
 		Vindex = ((data>=vmin)*(data<=vmax)).astype(float);
 
 		if axis == 'x':
-			return np.sum(data[cx-nhalf:cx+nhalf+1,:,:]*Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)/np.sum(Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)
+			return np.sum(data[cx-nhalf:cx+nhalf+1,:,:]*Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)/(np.sum(Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)+1.0e-5)
 		elif axis == 'y':
-			return np.sum(data[:,cx-nhalf:cx+nhalf+1,:]*Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)/np.sum(Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)        
+			return np.sum(data[:,cx-nhalf:cx+nhalf+1,:]*Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)/(np.sum(Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)+1.0e-5)        
 		elif axis == 'z':
-			return np.sum(data[:,:,cx-nhalf:cx+nhalf+1]*Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)/np.sum(Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)
+			return np.sum(data[:,:,cx-nhalf:cx+nhalf+1]*Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)/(np.sum(Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)+1.0e-5)
 		else: 
 			return 0
