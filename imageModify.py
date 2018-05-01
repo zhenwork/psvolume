@@ -43,6 +43,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	assert abs(check - RingIntens_index[0]/RingIntens_index[idx] )<0.001;
 	scale_blank = RingIntens_index[0]/RingIntens_blank[idx];
 
-	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale_blank);
+	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale_blank)
 	
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])

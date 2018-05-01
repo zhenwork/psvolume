@@ -29,6 +29,12 @@ model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 nmin = args.nmin; 
 
+
+f = h5py.File('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
+scaleMike = f[f.keys()[0]].value
+f.close()
+
+
 if comm_rank == 0:
 	fsave = zf.makeFolder(path, title='sr')
 
@@ -71,7 +77,7 @@ else:
 		fname = args.i+'/'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zf.get_image_info(fname)
-		image = image * Geo['scale']
+		image = image * scaleMike[idx] # Geo['scale']
 
 		sumIntens = round(np.sum(image), 8)
 		#image = image/sumIntens*1.0e8;
