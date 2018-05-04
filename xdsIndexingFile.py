@@ -42,7 +42,7 @@ def user_get_xds(filename):
 	gamma = float(content[3].split()[6]); 
 
 	if abs(alpha-90.)<0.8: alpha = 90.
-	if abs(beta-90.)<0.8: beta=90.
+	if abs(beta -90.)<0.8: beta=90.
 	if abs(gamma-90.)<0.8: gamma=90.
 	
 	(vecx, vecy, vecz, recH, recK, recL) = Lattice2vector(a,b,c,alpha,beta,gamma);
