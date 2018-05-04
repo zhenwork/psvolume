@@ -33,16 +33,15 @@ if comm_rank == 0:
 	print "### Images: ", num
 
 
-RingIntens_index = zf.h5reader('/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/crystal/image.process', 'RingScale');
-RingIntens_blank = zf.h5reader('/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/image.process', 'RingScale')
-
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/crystal/mergeImage/'+str(idx).zfill(5)+'.slice'
-	check = zf.h5reader(filename, 'scale')
-	assert abs(check - RingIntens_index[0]/RingIntens_index[idx] )<0.001;
-	scale_blank = RingIntens_index[0]/RingIntens_blank[idx];
+	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_g150t_cds5/crystal/rawImage/'+str(idx).zfill(5)+'.slice'
+	rot = zf.h5reader(filename, 'rotation')
+	Smat = zf.h5reader(filename, 'Smat')
 
-	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale_blank)
+
+	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'rotation', rot)
+	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'Smat', Smat)
+
 	
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
