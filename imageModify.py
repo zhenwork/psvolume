@@ -35,7 +35,7 @@ if comm_rank == 0:
 
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_g150t_cds5/crystal/rawImage/'+str(idx).zfill(5)+'.slice'
+	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/ICHg150t2/crystal/rawImage/'+str(idx).zfill(5)+'.slice'
 	rot = zf.h5reader(filename, 'rotation')
 	Smat = zf.h5reader(filename, 'Smat')
 
