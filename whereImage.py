@@ -16,7 +16,7 @@ zf = iFile()
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-o","--o", help="save folder", default="./rawImage", type=str)
+parser.add_argument("-o","--o", help="save folder", default="", type=str)
 parser.add_argument("-fname","--fname", help="input files", default=".", type=str)
 parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
@@ -36,8 +36,8 @@ if args.xds != ".":
 
 
 if comm_rank == 0:
-	print "### path: ", path
-	print "### folder: ", folder
+	print "### save to path: ", path
+	print "### save to folder: ", folder
 	if not os.path.exists(folder):
 		os.mkdir(folder)
 else:
