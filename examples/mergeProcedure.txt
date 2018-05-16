@@ -11,7 +11,7 @@
 	bsub -q psfehq -x -n 7 -R "span[ptile=7]" -o %J.out mpirun python ~/software/psvolume/imageMergeMaster.py --i ./mergeImage/
 	This is the main script for image merging. It's actually not very slow.
 5. Run volumeProcess.py
-	python psvolume/volumeProcess.py --i ./sr0008/merge.volume
+	python ~/software/psvolume/volumeProcess.py --i ./sr0001/merge.volume
 6. Run qshellCorrelation.py
 	python psvolume/qshellCorrelation.py --i ./sr0008/merge.volume -j /reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist_121.h5 --rmax 50 --mode ball
 
