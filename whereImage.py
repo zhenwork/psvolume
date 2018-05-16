@@ -13,19 +13,16 @@ from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
 zf = iFile()
+zio = IOsystem()
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-o","--o", help="save folder", default="", type=str)
+parser.add_argument("-o","--o", help="save folder", default="./", type=str)
 parser.add_argument("-fname","--fname", help="input files", default=".", type=str)
 parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
-
-
-if not (args.o).endswith('/'): args.o = args.o+'/'
-path = args.o[0:(len(args.o)-args.o[::-1].find('/',1))];
-folder = args.o
+[path, folder] = zio.get_path_folder(args.o)
 
 
 # computation
@@ -47,18 +44,18 @@ else:
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 if args.fname != '.': fname = args.fname.replace('#####', str(1).zfill(5))
 else: fname=None
+
+
 mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
-
-
 if comm_rank == 0:
 	Filename = path+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
 	zf.h5modify(Filename, 'Bmat', Bmat)
+	zf.h5modify(Filename, 'Smat', Smat)
 	zf.h5modify(Filename, 'invBmat', invBmat)
 
-#raise Exception('error')
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):

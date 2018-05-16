@@ -79,3 +79,10 @@ class iFile:
 		content = f.readlines()
 		f.close()
 		return content
+
+class IOsystem:
+	def get_path_folder(self, strFile):
+		if not (strFile).endswith('/'): strFile = strFile+'/'
+		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))];
+		folder = strFile
+		return [path, folder]
