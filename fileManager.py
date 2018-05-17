@@ -64,7 +64,11 @@ class iFile:
 
 		else: raise Exception('error')
 
-
+	def readtxt(self, path):
+		f = open(path)
+		content = f.readlines()
+		f.close()
+		return content
 
 class IOsystem:
 	def get_path_folder(self, strFile):
@@ -76,12 +80,6 @@ class IOsystem:
 	def get_suffix(self, strFile):
 		suffix = strFile[len(strFile)-strFile[::-1].find('.',1)-1:]
 		return suffix
-
-	def readtxt(self, path):
-		f = open(path)
-		content = f.readlines()
-		f.close()
-		return content
 
 	def makeFolder(self, path, title='sp'):
 		allFile = os.listdir(path)

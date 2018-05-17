@@ -16,10 +16,10 @@ args = parser.parse_args()
 
 
 zf = iFile()
-if not (args.i).endswith('/'): args.i = args.i+'/'
-[nmax, allFile] = zf.counterFile(args.i, title='.slice')
-path = args.i[0:(len(args.i)-args.i[::-1].find('/',1))];
-if args.nmax != -1: nmax = int(args.nmax)
+zio = IOsystem()
+[path_i, folder_i] = zio.get_path_folder(args.i)
+[nmax, allFile] = zio.counterFile(folder_i, title='.slice')
+if args.nmax == -1: args.nmax = int(nmax)
 
 Vol = {}
 Vol['volumeCenter'] = int(args.vCenter)
@@ -27,21 +27,15 @@ Vol['volumeSampling'] = int(args.vSampling)
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
-nmin = args.nmin; 
-
-
-# f = h5py.File('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
-# scaleMike = f[f.keys()[0]].value
-# f.close()
 
 
 if comm_rank == 0:
-	fsave = zf.makeFolder(path, title='sr')
+	folder_o = zio.makeFolder(path_i, title='sr')
 
-	print '### Path  : ', path
-	print '### Folder: ', args.i 
-	print "### Fsave : ", fsave
-	print "### Images:  [", nmin, nmax, ')'
+	print '### read from Path  : ', path_i
+	print '### read from Folder: ', folder_i
+	print "### save to Folder : ", folder_o
+	print "### Images:  [", args.nmin, args.nmax, ')'
 	print "### Mode  : ", args.mode
 	print "### Volume: ", model3d.shape
 	print "### Center: ", Vol['volumeCenter']
@@ -59,9 +53,9 @@ if comm_rank == 0:
 		print '### received file from ' + str(recvRank).rjust(2) + '/' + str(comm_size)
 
 	model3d = ModelScaling(model3d, weight)
-	pathIntens = fsave+'/merge.volume'
+	pathIntens = folder_o+'/merge.volume'
 	if args.mode == 'xyz': Smat = np.eye(3)
-	else: Smat = zf.h5reader(args.i+'/00000.slice', 'Smat')
+	else: Smat = zf.h5reader(folder_i+'/00000.slice', 'Smat')
 
 	print "### processed image number: ", countImage
 	print "### saving File: ", pathIntens
@@ -74,13 +68,12 @@ if comm_rank == 0:
 else:
 	sep = np.linspace(nmin, nmax, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
-		fname = args.i+'/'+str(idx).zfill(5)+'.slice'
+		fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
-		Geo = zf.get_image_info(fname)
+		Geo = zio.get_image_info(fname)
 		image = image * Geo['scale']
 
 		sumIntens = round(np.sum(image), 8)
-		#image = image/sumIntens*1.0e8;
 		
 		if args.mode=='xyz':
 			moniter = 'xyz'
