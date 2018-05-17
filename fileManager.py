@@ -1,8 +1,13 @@
 import numpy as np
 import h5py
 import os
+from shutil import copyfile
 
 class iFile:
+	def copyFile(src=None, dst=None):
+		if src is not None and dst is not None:
+			copyfile(src, dst)
+
 	def h5writer(self, fname, keys, data, chunks=None, opts=7):
 		f = h5py.File(fname, 'w')
 		if chunks is None:
@@ -30,6 +35,53 @@ class iFile:
 			idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression='gzip', compression_opts=opts)
 		idatawr[...] = np.array(data)
 		f.close()
+
+	def h5compare(self, src=None, dst=None, copy=None, keep=None):
+		if src is None or dst is None: raise Exception('error')
+
+		if isinstance(copy, str):
+			data = self.h5reader(src, copy)
+			self.h5modify(dst, copy, data)
+
+		elif isinstance(copy, list) and isinstance(copy[0], str): 
+			for i in range(len(copy)):
+				data = self.h5reader(src, copy[i])
+				self.h5modify(dst, copy[i], data)
+
+		elif copy is None:
+			if isinstance(keep, str):
+				data = self.h5reader(dst, keep)
+				self.copyFile(src=src, dst=dst)
+				self.h5modify(dst, keep, data)
+			elif isinstance(keep, list) and isinstance(keep[0], str):
+				num = len(keep)
+				dataList = []
+				for i in range(num):
+					dataList.append(self.h5reader(dst, keep[i]))
+				self.copyFile(src=src, dst=dst)
+				for i in range(num):
+					self.h5modify(dst, keep[i], dataList[i])
+			elif keep is None:
+				return
+				
+		else: raise Exception('error')
+
+
+
+
+
+class IOsystem:
+	def get_path_folder(self, strFile):
+		if not (strFile).endswith('/'): strFile = strFile+'/'
+		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))];
+		folder = strFile
+		return [path, folder]
+
+	def readtxt(self, path):
+		f = open(path)
+		content = f.readlines()
+		f.close()
+		return content
 
 	def makeFolder(self, path, title='sp'):
 		allFile = os.listdir(path)
@@ -74,15 +126,6 @@ class iFile:
 		f.close()
 		return Info
 
-	def readtxt(self, path):
-		f = open(path)
-		content = f.readlines()
-		f.close()
-		return content
-
-class IOsystem:
-	def get_path_folder(self, strFile):
-		if not (strFile).endswith('/'): strFile = strFile+'/'
-		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))];
-		folder = strFile
-		return [path, folder]
+	def copyFile(src=None, dst=None):
+		if src is not None and dst is not None:
+			copyfile(src, dst)
