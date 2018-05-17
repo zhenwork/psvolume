@@ -61,6 +61,7 @@ if comm_rank == 0:
 	print "### saving File: ", pathIntens
 	ThisFile = zf.readtxt(os.path.realpath(__file__))
 	zf.h5writer(pathIntens, 'execute', ThisFile)
+	zf.h5modify(pathIntens, 'sampling', Vol['volumeSampling'])
 	zf.h5modify(pathIntens, 'intens', model3d, chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 	zf.h5modify(pathIntens, 'weight', weight,  chunks=(1, Vol['volumeSize'], Vol['volumeSize']), opts=7)
 	zf.h5modify(pathIntens, 'Smat', Smat)
