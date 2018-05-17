@@ -1,6 +1,6 @@
 1. Input userScript.py
 2. Run whereImage.py
-	bsub -q psfehq -x -n 32 -R "span[ptile=16]" -o %J.out mpirun python ~/software/psvolume/whereImage.py --num 1067 --xds ./XPARM.XDS-ZHEN --o ./rawImage --fname /reg/data/ana04/users/zhensu/xpptut/volume/ICHg150t2/crystal/rawcbf/I4ichg150t2_13_#####.cbf
+	bsub -q psfehq -x -n 32 -R "span[ptile=16]" -o %J.out mpirun python ~/software/psvolume/whereImage.py --xds ./XPARM.XDS-ZHEN --o ./rawImage --fname /reg/data/ana04/users/zhensu/xpptut/volume/ICHg150t2/crystal/rawcbf/I4ichg150t2_13_#####.cbf
 	
 	This process will save images to h5py format and also save users' information to each image in rawImage folder
 3. Run imageProcessMaster.py
