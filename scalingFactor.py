@@ -17,7 +17,7 @@ args = parser.parse_args()
 zf = iFile()
 zio = IOsystem()
 [path_i, folder_i] = zio.get_path_folder(args.i)
-[num, allFile] = zf.counterFile(folder_i, title='.slice')
+[num, allFile] = zio.counterFile(folder_i, title='.slice')
 if args.num == -1: args.num = int(num)
 
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
