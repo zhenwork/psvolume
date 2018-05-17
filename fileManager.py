@@ -4,9 +4,6 @@ import os
 from shutil import copyfile
 
 class iFile:
-	def copyFile(src=None, dst=None):
-		if src is not None and dst is not None:
-			copyfile(src, dst)
 
 	def h5writer(self, fname, keys, data, chunks=None, opts=7):
 		f = h5py.File(fname, 'w')
@@ -49,21 +46,22 @@ class iFile:
 				self.h5modify(dst, copy[i], data)
 
 		elif copy is None:
+			self.zio = IOsystem()
 			if isinstance(keep, str):
 				data = self.h5reader(dst, keep)
-				self.copyFile(src=src, dst=dst)
+				self.zio.copyFile(src=src, dst=dst)
 				self.h5modify(dst, keep, data)
 			elif isinstance(keep, list) and isinstance(keep[0], str):
 				num = len(keep)
 				dataList = []
 				for i in range(num):
 					dataList.append(self.h5reader(dst, keep[i]))
-				self.copyFile(src=src, dst=dst)
+				self.zio.copyFile(src=src, dst=dst)
 				for i in range(num):
 					self.h5modify(dst, keep[i], dataList[i])
 			elif keep is None:
 				return
-				
+
 		else: raise Exception('error')
 
 
