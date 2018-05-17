@@ -126,6 +126,6 @@ class IOsystem:
 		f.close()
 		return Info
 
-	def copyFile(src=None, dst=None):
+	def copyFile(self, src=None, dst=None):
 		if src is not None and dst is not None:
 			copyfile(src, dst)
