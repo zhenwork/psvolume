@@ -22,12 +22,16 @@ parser.add_argument("-fname","--fname", help="input files", default=".", type=st
 parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
-[path, folder] = zio.get_path_folder(args.o)
+[path_o, folder_o] = zio.get_path_folder(args.o)
 if args.fname != '.':
 	[path_i, folder_i] = zio.get_path_folder(args.fname)
 	suffix_i = zio.get_suffix(args.fname)
 	[counter, selectFile] = zio.counterFile(path_i, title=suffix_i)
 	args.num = counter
+
+
+
+
 
 # computation
 if args.xds != ".":
@@ -37,12 +41,12 @@ if args.xds != ".":
 
 
 if comm_rank == 0:
-	print "### save to path: ", path
-	print "### save to folder: ", folder
-	if not os.path.exists(folder):
-		os.mkdir(folder)
+	print "### save to path: ", path_o
+	print "### save to folder: ", folder_o
+	if not os.path.exists(folder_o):
+		os.mkdir(folder_o)
 else:
-	while not os.path.exists(folder): pass
+	while not os.path.exists(folder_o): pass
 
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 
@@ -53,7 +57,7 @@ mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 if comm_rank == 0:
 	print "Total number of images: ", args.num
-	Filename = path+'/image.process'
+	Filename = path_o+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)
 	zf.h5modify(Filename, 'Bmat', Bmat)
@@ -74,7 +78,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
 	else: matrix = invAmat.dot(R1)
 
-	fsave = folder + '/'+str(idx).zfill(5)+'.slice'
+	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
 	zf.h5modify(fsave, 'image', image*mask)
 	zf.h5modify(fsave, 'center', Geo['center'])

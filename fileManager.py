@@ -60,7 +60,7 @@ class iFile:
 				for i in range(num):
 					self.h5modify(dst, keep[i], dataList[i])
 			elif keep is None:
-				return
+				self.zio.copyFile(src=src, dst=dst)
 
 		else: raise Exception('error')
 
