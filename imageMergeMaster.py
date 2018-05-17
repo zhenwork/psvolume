@@ -66,7 +66,7 @@ if comm_rank == 0:
 	zf.h5modify(pathIntens, 'Smat', Smat)
 
 else:
-	sep = np.linspace(nmin, nmax, comm_size).astype('int')
+	sep = np.linspace(args.nmin, args.nmax, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
 		fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
