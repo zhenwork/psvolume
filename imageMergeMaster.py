@@ -9,7 +9,7 @@ parser.add_argument("-i","--i", help="save folder", default=".", type=str)
 parser.add_argument("-mode","--mode", help="matrix", default="hkl", type=str)
 parser.add_argument("-peak","--peak", help="keep the bragg peak or not", default=0, type=int)
 parser.add_argument("-vSampling","--vSampling", help="num of images to process", default=1, type=int)
-parser.add_argument("-vCenter","--vCenter", help="num of images to process", default=60, type=int)
+# parser.add_argument("-vCenter","--vCenter", help="num of images to process", default=60, type=int)
 parser.add_argument("-nmin","--nmin", help="minimum image number", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, type=int)
 args = parser.parse_args()
@@ -22,8 +22,8 @@ zio = IOsystem()
 if args.nmax == -1: args.nmax = int(nmax)
 
 Vol = {}
-Vol['volumeCenter'] = int(args.vCenter)
 Vol['volumeSampling'] = int(args.vSampling)
+Vol['volumeCenter'] = int(args.vSampling)*60
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
