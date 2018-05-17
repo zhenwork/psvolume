@@ -23,7 +23,11 @@ parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 args = parser.parse_args()
 [path, folder] = zio.get_path_folder(args.o)
-
+if args.fname != '.':
+	[path_i, folder_i] = zio.get_path_folder(args.fname)
+	suffix_i = zio.get_suffix(args.fname)
+	[counter, selectFile] = zio.counterFile(path_i, title=suffix_i)
+	args.num = counter
 
 # computation
 if args.xds != ".":
@@ -49,6 +53,7 @@ else: fname=None
 mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 if comm_rank == 0:
+	print "Total number of images: ", args.num
 	Filename = path+'/image.process'
 	zf.h5writer(Filename, 'mask', mask)
 	zf.h5modify(Filename, 'Mask', Mask)

@@ -66,14 +66,15 @@ class iFile:
 
 
 
-
-
 class IOsystem:
 	def get_path_folder(self, strFile):
 		if not (strFile).endswith('/'): strFile = strFile+'/'
-		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))];
+		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))]
 		folder = strFile
 		return [path, folder]
+
+	def get_suffix(self, strFile):
+		suffix = strFile[len(strFile)-strFile[::-1].find('.',1)-1:]
 
 	def readtxt(self, path):
 		f = open(path)
