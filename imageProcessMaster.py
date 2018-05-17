@@ -65,7 +65,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
 
-	Geo = zf.get_image_info(fname)
+	Geo = zio.get_image_info(fname)
 	image = zf.h5reader(fname, 'image')
 	image *= apscale
 	sumIntens = round(np.sum(image), 8)
