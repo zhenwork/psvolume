@@ -44,12 +44,11 @@ if comm_rank == 0:
 else:
 	while not os.path.exists(folder): pass
 
-
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
+
+
 if args.fname != '.': fname = args.fname.replace('#####', str(1).zfill(5))
 else: fname=None
-
-
 mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
 if comm_rank == 0:

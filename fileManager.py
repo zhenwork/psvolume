@@ -75,6 +75,7 @@ class IOsystem:
 
 	def get_suffix(self, strFile):
 		suffix = strFile[len(strFile)-strFile[::-1].find('.',1)-1:]
+		return suffix
 
 	def readtxt(self, path):
 		f = open(path)
