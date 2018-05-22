@@ -145,12 +145,13 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
 	voxel = Geometry(image, Geo)
-
 	Image = image.ravel()
+
 	Rot = Geo['rotation']
-	Umatrix = Geo['Umatrix']
+	Smat = Geo['Smat'].dot(Rot)
+	
 	HKL = (Rot.dot(voxel)).T
-	XYZ = Vsample*HKL.dot(Umatrix.T)
+	XYZ = Vsample*(Smat.dot(voxel)).T
 
 	for t in range(len(XYZ)):
 
@@ -170,7 +171,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 		h = HKL[t,0] 
 		k = HKL[t,1] 
-		l = HKL[t,2] 		
+		l = HKL[t,2] 	
 		hshift = abs(h-round(h))
 		kshift = abs(k-round(k))
 		lshift = abs(l-round(l))

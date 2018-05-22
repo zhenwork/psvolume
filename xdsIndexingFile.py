@@ -24,13 +24,13 @@ def user_get_xds(filename):
 	## calculate the invAmat matrix
 	invAmat = np.zeros((3,3));
 	for i in range(4,7):
-	    for j in range(3):
-	        invAmat[i-4,j] = float(content[i].split()[j])
+		for j in range(3):
+			invAmat[i-4,j] = float(content[i].split()[j])
 	if invAmat is not None:
-	    # invAmat[1,:] = -invAmat[1,:].copy()
-	    tmp = invAmat[:,0].copy()
-	    invAmat[:,0] = invAmat[:,1].copy()
-	    invAmat[:,1] = tmp.copy()
+		# invAmat[1,:] = -invAmat[1,:].copy()
+		tmp = invAmat[:,0].copy()
+		invAmat[:,0] = invAmat[:,1].copy()
+		invAmat[:,1] = tmp.copy()
 
 	## calculate B matrix from lattice constants
 	Bmat = np.zeros((3,3));
@@ -44,7 +44,7 @@ def user_get_xds(filename):
 	if abs(alpha-90.)<0.8: alpha = 90.
 	if abs(beta -90.)<0.8: beta=90.
 	if abs(gamma-90.)<0.8: gamma=90.
-	
+
 	(vecx, vecy, vecz, recH, recK, recL) = Lattice2vector(a,b,c,alpha,beta,gamma);
 	Bmat = np.array([recH, recK, recL]).T 
 	invBmat = np.linalg.inv(Bmat)
