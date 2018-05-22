@@ -29,13 +29,14 @@ print '### background: ', bool(args.sub)
 print '### hkl2xyz   : ', bool(args.hkl2xyz)
 
 
+### Only when we need one of the processes, we start to read the file
 if args.sym==1 or args.sub==1 or args.hkl2xyz==1:
 	print '### reading volume ... '
 	rawData = zf.h5reader(args.i, 'intens')
 	print '### max/min: ', np.amin(rawData), np.amax(rawData)
 
 
-
+### First step is to symmetrize the data
 if args.sym==1:
 	print '### symmetrizing data ...'
 	symData = lauesym(rawData, ithreshold=thr)
@@ -45,14 +46,13 @@ else:
 	symData = rawData.copy()
 
 
-
+### Second step is to subtract the background
 if args.sub==1:
 	print '### background calculation ... '
 	[backg, radius] = distri(symData, astar, bstar, cstar, ithreshold=thr, iscale=4, iwindow=5)
 	print '### bgd max/min: ', np.amin(backg), np.amax(backg)
 
 	#backg = meanf(backg, _scale=5, clim=(0.1, 50))
-
 	print '### subtracting background ... '
 	subData = symData.copy()
 	[nnxx, nnyy, nnzz] = rawData.shape
@@ -69,7 +69,7 @@ else:
 	subData = symData.copy()
 
 
-
+### Last step is to convert the hkl basis to xyz basis
 if args.hkl2xyz==1:
 	if np.amax( np.abs( Smat-np.eye(3) ) )>1e-3:
 		print "### converting hkl to xyz coordinate"
@@ -80,7 +80,6 @@ if args.hkl2xyz==1:
 		print "### This is already the best coordinate ... "
 		anisoData = subData.copy()
 
-	print ('### start saving files... ')  
-
+	print ('### start saving files... ')
 	zf.h5modify(args.i, args.name+'anisoData', anisoData)
 	zf.h5modify(args.i, args.name+'threeDRaw', threeDRaw)
