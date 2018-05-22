@@ -26,7 +26,7 @@ print '### cstar = ', cstar
 print '### threshold: ', thr
 print '### symmetrize: ', bool(args.sym)
 print '### background: ', bool(args.sub)
-print '### hkl2xyz   : ', bool(args.hkl2xyz)
+print '### hkl TO xyz: ', bool(args.hkl2xyz)
 
 
 ### Only when we need one of the processes, we start to read the file
