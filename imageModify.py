@@ -35,13 +35,8 @@ if comm_rank == 0:
 
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_g150t_cds5/crystal/rawImage/'+str(idx).zfill(5)+'.slice'
-	rot = zf.h5reader(filename, 'rotation')
-	Smat = zf.h5reader(filename, 'Smat')
-
-
-	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'rotation', rot)
-	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'Smat', Smat)
-
+	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/G150T/ICHg150t2/crystal/mergeImage/'+str(idx).zfill(5)+'.slice'
+	scale = zf.h5reader(filename, 'scale')
+	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale)
 	
 	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
