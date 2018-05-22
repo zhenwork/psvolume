@@ -18,6 +18,21 @@ def Lattice2vector(a,b,c,ag1,ag2,ag3):
 	recL = np.cross(vecx, vecy)/vecz.dot(np.cross(vecx, vecy));
 	return (vecx, vecy, vecz, recH, recK, recL)
 
+def ThreeDIndexing(a,b,c):
+	nx = int(a)
+	ny = int(b)
+	nz = int(c)
+	cx = nx/2.-1./2.
+	cy = ny/2.-1./2.
+	cz = nz/2.-1./2.
+	x = np.arange(nx)-cx
+	y = np.arange(ny)-cy
+	z = np.arange(nz)-cz
+	[xaxis, yaxis, zaxis] = np.meshgrid(x,y,z, indexing='ij')
+	return (xaxis, yaxis, zaxis)
+
+
+
 def Crystfel2Rotation(abc_star):
 	astar = abc_star[0:3]
 	bstar = abc_star[3:6]
