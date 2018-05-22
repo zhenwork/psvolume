@@ -23,9 +23,9 @@ def hklExtraction(idata, astar, bstar, cstar, icen=60, ithreshold=(-100,1000), i
 				pos = float(i)*astar+float(j)*bstar+float(k)*cstar
 				if np.sum(pos**2) > iradius[1]**2 or np.sum(pos**2) < iradius[0]**2: continue
 				hkl = np.around(pos+center).astype(int)
-				x = hkl[0]
-				y = hkl[1]
-				z = hkl[2]
+				x = hkl[0];
+				y = hkl[1];
+				z = hkl[2];
 
 				if (x<outer[0]) or (x>(num_samp-outer[0]-1)) or (y<outer[1]) or (y>(num_samp-1-outer[1])) or (z<outer[2]) or (z>(num_samp-1-outer[2])): continue
 
