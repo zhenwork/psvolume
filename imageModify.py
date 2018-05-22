@@ -22,7 +22,7 @@ comm_size = MPI.COMM_WORLD.Get_size()
 
 zf = iFile()
 if not (args.i).endswith('/'): args.i = args.i+'/'
-[num, allFile] = zf.counterFile(args.i, title='.slice')
+[num, allFile] = zio.counterFile(args.i, title='.slice')
 path = args.i[0:(len(args.i)-args.i[::-1].find('/',1))];
 if args.num != -1: num = int(args.num)
 
