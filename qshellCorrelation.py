@@ -99,7 +99,7 @@ if args.count != "":
 	print ("### reading the counter file from "+args.i)
 	counter = zf.h5reader(args.i, args.count )
 	print ("### max/min counter = ", np.amin(counter), np.amax(counter) )
-	index = np.where(counter<2.5)
+	index = np.where(counter<3.5)
 	print ("### mask out ", len(index[0]))
 	data_i[index] = ilim[0]-1024
 	data_j[index] = jlim[0]-1024
