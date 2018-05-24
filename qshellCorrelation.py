@@ -100,8 +100,9 @@ if args.count != "":
 	counter = zf.h5reader(args.i, args.count )
 	print ("### max/min counter = ", np.amin(counter), np.amax(counter) )
 	index = np.where(counter<2.5)
-	data_i[index] = ilim[0]-10
-	data_j[index] = jlim[0]-10
+	print ("### mask out ", len(index[0]))
+	data_i[index] = ilim[0]-1024
+	data_j[index] = jlim[0]-1024
 
 	
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"

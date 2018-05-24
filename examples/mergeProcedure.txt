@@ -13,7 +13,7 @@
 5. Run volumeProcess.py
 	python ~/software/psvolume/volumeProcess.py --i ./sr0001/merge.volume
 6. Run qshellCorrelation.py
-	python psvolume/qshellCorrelation.py --i ./sr0008/merge.volume -j /reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist_121.h5 --rmax 50 --mode ball
+	python ~/software/psvolume/qshellCorrelation.py --i ./sr0001/merge.volume -j /reg/data/ana04/users/zhensu/xpptut/experiment/0023/0018/volumelist_121.h5 --rmax 50 --mode ball
 
 If you don't have scalingFactor, use scale factor as 1 and then run 1-2-3 -7(wr=True) -3-4-5-6
 7. Run scalingFactor.py
