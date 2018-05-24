@@ -52,6 +52,7 @@ def hklExtraction(idata, astar, bstar, cstar, icen=60, ithreshold=(-100,1000), i
 @jit
 def lauesym(idata, ithreshold=(-100,1000)):
 	icopy = idata.copy()
+	icounter = np.zeros(idata.shape)
 	num_samp = idata.shape[0]
 	for i in range(num_samp):
 		for j in range(num_samp):
@@ -63,12 +64,33 @@ def lauesym(idata, ithreshold=(-100,1000)):
 				ori = pairs.copy()
 				pairs = pairs[np.where(pairs>ithreshold[0])].copy()
 				pairs = pairs[np.where(pairs<ithreshold[1])].copy()
-				if len(pairs) == 0: icopy[i,j,k] = np.mean(ori)
+				icounter[i,j,k] = len(pairs)
+				if len(pairs) == 0: icopy[i,j,k] = np.amin(ori)
 				else: icopy[i,j,k] = np.mean(pairs)
-	return icopy
-				
+	return [icopy, icounter]
+			
+
+@jit
+def inversesym(idata, ithreshold=(-100,1000)):
+	icopy = idata.copy()
+	icounter = np.zeros(idata.shape)
+	num_samp = idata.shape[0]
+	for i in range(num_samp):
+		for j in range(num_samp):
+			for k in range(num_samp):
+				mi = num_samp-1-i
+				mj = num_samp-1-j
+				mk = num_samp-1-k
+				pairs = np.array([ idata[i,j,k], idata[mi,mj,mk] ])
+				ori = pairs.copy()
+				pairs = pairs[np.where(pairs>ithreshold[0])].copy()
+				pairs = pairs[np.where(pairs<ithreshold[1])].copy()
+				icounter[i,j,k] = len(pairs)
+				if len(pairs) == 0: icopy[i,j,k] = np.amin(ori)
+				else: icopy[i,j,k] = np.mean(pairs)
+	return [icopy, icounter]
 	
-	
+
 @jit
 def hkl2volume(idata, astar, bstar, cstar, ithreshold=(-100,1000)):
 	num_samp = idata.shape[0]

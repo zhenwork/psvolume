@@ -163,9 +163,9 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 		y = xyz[1] 
 		z = xyz[2] 
 		
-		intx = int(round(x)) 
-		inty = int(round(y)) 
-		intz = int(round(z)) 
+		intx = int(round(x))
+		inty = int(round(y))
+		intz = int(round(z))
 
 		if (intx<0) or intx>(Vsize-1) or (inty<0) or inty>(Vsize-1) or (intz<0) or intz>(Vsize-1): continue
 

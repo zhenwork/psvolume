@@ -5,10 +5,10 @@ from fileManager import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="save folder", default=".", type=str)
-parser.add_argument("-thrmin","--thrmin", help="min value", default=-100, type=int)
+parser.add_argument("-thrmin","--thrmin", help="min value", default=-10, type=int)
 parser.add_argument("-thrmax","--thrmax", help="max value", default=1000, type=int)
 parser.add_argument("-name","--name", help="name", default="", type=str)
-parser.add_argument("-sym","--sym", help="process", default=1, type=int)
+parser.add_argument("-sym","--sym", help="process", default="laue", type=str)  #symmetry can be "laue","inv"
 parser.add_argument("-sub","--sub", help="process", default=1, type=int)
 parser.add_argument("-hkl2xyz","--hkl2xyz", help="process", default=1, type=int)
 args = parser.parse_args()
@@ -24,24 +24,31 @@ print '### astar = ', astar
 print '### bstar = ', bstar
 print '### cstar = ', cstar
 print '### threshold: ', thr
-print '### symmetrize: ', bool(args.sym)
+print '### symmetrize: ', args.sym
 print '### background: ', bool(args.sub)
 print '### hkl TO xyz: ', bool(args.hkl2xyz)
 
 
 ### Only when we need one of the processes, we start to read the file
-if args.sym==1 or args.sub==1 or args.hkl2xyz==1:
+if (args.sym == "laue") or (args.sym == "inv") or (args.sub==1) or (args.hkl2xyz==1):
 	print '### reading volume ... '
 	rawData = zf.h5reader(args.i, 'intens')
 	print '### max/min: ', np.amin(rawData), np.amax(rawData)
 
 
 ### First step is to symmetrize the data
-if args.sym==1:
-	print '### symmetrizing data ...'
-	symData = lauesym(rawData, ithreshold=thr)
+if args.sym=="laue":
+	print '### Laue symmetrizing data ...'
+	[symData, symCounter] = lauesym(rawData, ithreshold=thr)
 	print '### max/min: ', np.amin(symData), np.amax(symData)
 	zf.h5modify(args.i, args.name+'symData', symData)
+	zf.h5modify(args.i, args.name+'symCounter', symCounter)
+elif args.sym=="inv":
+	print '### Inv symmetrizing data ...'
+	[symData, symCounter] = inversesym(rawData, ithreshold=thr)
+	print '### max/min: ', np.amin(symData), np.amax(symData)
+	zf.h5modify(args.i, args.name+'InvsymData', symData)
+	zf.h5modify(args.i, args.name+'InvsymCounter', symCounter)
 else:
 	symData = rawData.copy()
 
