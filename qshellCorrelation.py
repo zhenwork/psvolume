@@ -18,6 +18,7 @@ parser.add_argument("-j1","--j1", help="jlim[0]", default="-100", type=str)
 parser.add_argument("-j2","--j2", help="jlim[1]", default="100", type=str)
 parser.add_argument("-iname","--iname", help="ilim[0]", default="anisoData", type=str)
 parser.add_argument("-jname","--jname", help="ilim[1]", default="anisoData", type=str)
+parser.add_argument("-count","--count", help="symCounter", default="", type=str)
 args = parser.parse_args()
 if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
@@ -93,6 +94,16 @@ print ('### reading dataset two ...')
 data_j = zf.h5reader(args.j, args.jname)
 assert data_i.shape == data_j.shape
 
+
+if args.count != "":
+	print ("### reading the counter file from "+args.i)
+	counter = zf.h5reader(args.i, args.count )
+	print ("### max/min counter = ", np.amin(counter), np.amax(counter) )
+	index = np.where(counter<2.5)
+	data_i[index] = ilim[0]-10
+	data_j[index] = jlim[0]-10
+
+	
 qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 
 fsave = args.o+'/corr-sep-list.h5'+args.tag
