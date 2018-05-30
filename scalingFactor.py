@@ -12,6 +12,7 @@ parser.add_argument("-rmax","--rmax", help="max radius", default=600, type=int)
 parser.add_argument("-wr","--wr", help="write the scaling factor", default=-1, type=int)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 parser.add_argument("-name","--name", help="name of saved dataset", default='RingScale', type=str)
+parser.add_argument("-o","--o", help="output file name", default='', type=str)
 args = parser.parse_args()
 
 zf = iFile()
@@ -64,7 +65,10 @@ if comm_rank == 0:
 		recvRank = md.small.rank
 		md = None
 		print '### received file from ' + str(recvRank).rjust(3)
-	zf.h5modify(path_i+'/image.process', args.name, scaleMatrix)
+	if args.wr != -1: 
+		zf.h5modify(path_i+'/image.process', args.name, scaleMatrix)
+	if args.o != "":
+		zf.h5writer(args.o, args.name, scaleMatrix)
 
 else:
 	md=mpidata()

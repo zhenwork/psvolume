@@ -17,7 +17,7 @@
 
 If you don't have scalingFactor, use scale factor as 1 and then run 1-2-3 -7(wr=True) -3-4-5-6
 7. Run scalingFactor.py
-	bsub -q psfehq -x -n 40 -R "span[ptile=8]" -o %J.out mpirun python ~/software/psvolume/scalingFactor.py --rmin 100 --rmax 600 --wr 1 --i ./mergeImage/
+	bsub -q psfehq -x -n 40 -R "span[ptile=8]" -o %J.out mpirun python ~/software/psvolume/scalingFactor.py --rmin 0 --rmax 160 --o ./scale_0000_0160.h5 --i ./mergeImage/
 Sometimes you need to modify the image files:
 8. Run imageModify.py
 	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/imageModify.py --o ./mergeImage
