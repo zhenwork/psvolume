@@ -48,11 +48,11 @@ def user_get_scalingFactor(idx):
 def user_get_mask(Geo, fname=None):
 	data = user_get_image(0, fname=fname)
 	mask = np.ones(data.shape).astype(int)
-	index = np.where(data > 10000)
+	index = np.where(data > 100000)
 	mask[index] = 0
-	mask[1260:1300,1235:2463] = 0
+	# mask[1260:1300,1235:2463] = 0
 	radius = make_radius(mask.shape, center=Geo['center'])
-	index = np.where(radius<25)
+	index = np.where(radius<10)
 	mask[index] = 0
 	return mask
 
