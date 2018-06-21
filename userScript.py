@@ -12,12 +12,22 @@ import h5py
 import cbf
 import os
 
+
 # How to read the idx image, return a 2d matrix
 def user_get_image(idx, fname=None):
 	if fname is None: raise Exception('no files')#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
-	content = cbf.read(fname)
-	image = np.array(content.data).astype(float)
+	# content = cbf.read(fname)
+	# image = np.array(content.data).astype(float)
+	# return image
+	f = open(fname,"rb")
+	raw = f.read()
+	h = raw[0:511]
+	d = raw[512:]
+	f.close()
+	flat_image = np.frombuffer(d,dtype=np.int16)
+	image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
 	return image
+
 
 
 # How to get the idx quaternion, return a quaternion (q1,q2,q3,q4)
