@@ -70,7 +70,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if args.fname != '.':
 		fname = args.fname.replace('#####', str(idx).zfill(5))
 	image = user_get_image(idx, fname = fname)
-	image[np.where(image>10000)] = -1
+	image[np.where(image>100000)] = -1
 	image[np.where(image<0)] = -1
 
 	quaternion = user_get_orientation(idx, increment=Geo['Angle_increment'])
