@@ -6,7 +6,7 @@ from imageMergeClient import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="save folder", default=".", type=str)
-parser.add_argument("-box","--box", help="spot size", default=2, type=int)
+parser.add_argument("-box","--box", help="spot size", default=0.25, type=int)
 args = parser.parse_args()
 
 
@@ -22,7 +22,7 @@ image = zf.h5reader(args.i, 'image')
 Geo = zio.get_image_info(args.i)
 
 print "### Processing the image: "+args.i
-image = RemoveBragg(image, Geo, box=int(args.box))
+image = RemoveBragg(image, Geo, box=args.box)
 
 
 fsave = args.i.split('/')[-1] + '-no-bragg'

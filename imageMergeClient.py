@@ -184,7 +184,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def RemoveBragg(image, Geo, box=2):
+def RemoveBragg(image, Geo, box=0.25):
 
 	voxel = Geometry(image, Geo)
 	Image = image.ravel()
@@ -205,7 +205,7 @@ def RemoveBragg(image, Geo, box=2):
 		kshift = abs(k - round(k))
 		lshift = abs(l - round(l))
 
-		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): 
+		if (hshift<box) and (kshift<box) and (lshift<box): 
 			Image[t] = -1.
 
 	Image.shape = image.shape
