@@ -32,7 +32,7 @@ def user_get_image(idx, fname=None):
 
 # How to get the idx quaternion, return a quaternion (q1,q2,q3,q4)
 def user_get_orientation(idx, increment=0.1):
-	angle = idx*increment*np.pi/180. + np.radians(-10)
+	angle = idx*increment*np.pi/180.
 	return (  np.cos( angle/2. ),   0.,   np.sin( angle/2. ),   0.  )
 
 

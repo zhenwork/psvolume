@@ -75,8 +75,15 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	quaternion = user_get_orientation(idx, increment=Geo['Angle_increment'])
 	R1 = Quat2Rotation(quaternion)
+
 	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
 	else: matrix = invAmat.dot(R1)
+
+	#####
+	FackR = Quat2Rotation( (  np.cos( np.radians(-10)/2. ),   0.,   np.sin( np.radians(-10)/2. ),   0.  ) )
+	matrix = FackR.dot(matrix)
+	#####
+
 
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
