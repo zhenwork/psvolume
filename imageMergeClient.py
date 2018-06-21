@@ -183,6 +183,37 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 	return [model3d, weight]
 
 
+@jit
+def RemoveBragg(image, Geo, box=2):
+
+	voxel = Geometry(image, Geo)
+	Image = image.ravel()
+	Rot = Geo['rotation']
+	HKL = Rot.dot(voxel).T
+
+	for t in range(len(HKL)):
+
+		if (Image[t] < 0): continue
+		
+		hkl = HKL[t]
+		
+		h = hkl[0] 
+		k = hkl[1] 
+		l = hkl[2] 
+		
+		hshift = abs(h - round(h))
+		kshift = abs(k - round(k))
+		lshift = abs(l - round(l))
+
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25): 
+			Image[t] = -1.
+
+	Image.shape = image.shape
+
+	return Image
+
+
+
 def ModelScaling(model3d, weight):
 	index = np.where(weight>0)
 	model3d[index] /= weight[index]
