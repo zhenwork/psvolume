@@ -28,6 +28,7 @@ if args.fname != '.':
 	suffix_i = zio.get_suffix(args.fname)
 	[counter, selectFile] = zio.counterFile(path_i, title=suffix_i)
 	args.num = counter
+	print "Total number of images: "+str(args.num)
 
 
 
