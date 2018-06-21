@@ -21,6 +21,7 @@ def user_get_xds(filename):
 	Geo['center'] = (float(content[8].split()[1]), float(content[8].split()[0]))
 	Geo['Angle_increment'] = float(content[1].split()[2])
 
+
 	## calculate the invAmat matrix
 	invAmat = np.zeros((3,3));
 	for i in range(4,7):

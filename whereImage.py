@@ -79,10 +79,11 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
 	else: matrix = invAmat.dot(R1)
 
-	#####
-	FackR = Quat2Rotation( (  np.cos( np.radians(-7)/2. ),   0.,   np.sin( np.radians(-7)/2. ),   0.  ) )
-	matrix = FackR.dot(matrix)
-	#####
+
+	# #####
+	# FackR = Quat2Rotation( (  np.cos( np.radians(-7)/2. ),   0.,   np.sin( np.radians(-7)/2. ),   0.  ) )
+	# matrix = FackR.dot(matrix)
+	# #####
 
 
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
