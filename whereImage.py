@@ -73,7 +73,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[np.where(image>100000)] = -1
 	image[np.where(image<0)] = -1
 
-	quaternion = user_get_orientation(idx, increment=Geo['Angle_increment'])
+	quaternion = user_get_orientation(-1.*idx, increment=Geo['Angle_increment'])
 	R1 = Quat2Rotation(quaternion)
 	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
 	else: matrix = invAmat.dot(R1)
