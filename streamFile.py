@@ -7,17 +7,11 @@ class placeTable:
 	This class saves the positions of lines of each marker
 	"""
 	def __init__(self, marker=None):
-		self.marker = marker    
-		self.level = None       ## level hasn't been used yet
-		self.table = None       
-		self.tableIndex = None  
-		self.status = False     
-		self.default()
-		
-
-	def default(self):
-		# self.markLevel = [1,1,1,1,2,1,2,2,2,1]
-		# self.map = [-1 if x==1 else idx-1-self.level[:idx][::-1].index(x-1) for idx, x in enumerate(self.level)]
+		self.marker = marker
+		self.level = None
+		self.table = None
+		self.tableIndex = None
+		self.status = False
 		if self.marker is None:
 			self.marker = [	'----- Begin chunk -----', 
 							'Image filename:',
@@ -29,6 +23,7 @@ class placeTable:
 							'End of reflections',
 							'--- End crystal',
 							'----- End chunk -----'	]
+
 						
 
 class streamFile:
@@ -37,19 +32,16 @@ class streamFile:
 		self.info = None
 		self.crystal = None
 		self.table = placeTable()
-		self.backup = placeTable() 
 		self.fstream = None
 		self.content = None
 
 
-					
-	def reset(self, fstream=None, marker=None):
+	def initial(self, fstream=None, marker=None):
 		"""
 		update stream file, this will reset everything
 		"""
 		if os.path.isfile(fstream):
 			self.clear()
-			self.fstream = fstream
 			try: 
 				with open(fstream,'r') as f: 
 					self.content = f.readlines() 
@@ -59,11 +51,9 @@ class streamFile:
 		if self.content is None:
 			raise Exception('### This is a bad stream file')
 		
-		self.label.default()
-		if isinstance(label_level, list):
-			self.label.level = label_level
-			self.label.map = [-1 if x==1 else idx-1-self.label.level[:idx][::-1].index(x-1) for idx, x in enumerate(self.label.level)]
-		if isinstance(label_id, list):
+		self.fstream = fstream
+		self.table.__init__()
+		if isinstance(marker, list):
 			self.label.id = label_id
 
 	def clear(self):
