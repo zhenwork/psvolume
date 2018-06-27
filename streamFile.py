@@ -25,7 +25,6 @@ class placeTable:
 							'----- End chunk -----'	]
 
 						
-
 class streamFile:
 
 	def __init__(self):
@@ -56,9 +55,12 @@ class streamFile:
 		if isinstance(marker, list):
 			self.label.id = label_id
 
+
 	def clear(self):
-		iStream.__init__(self)
+		### Clear the whole streamFile object
+		streamFile.__init__(self)
 		
+
 	def keep_label(self):
 		if self.label.index is None or self.label.hit is None:
 			return
@@ -67,6 +69,7 @@ class streamFile:
 			self.backup.hit = self.label.hit.copy()
 			self.label.status = True
 		
+
 	def update_content(self, newContent):
 		"""
 		You must call this function to make changes, you can't change content manually like self.content=0
@@ -74,7 +77,9 @@ class streamFile:
 		self.content = newContent
 		self.label.status = False
 		
-	def get_label_alg2(self):	
+
+
+	def get_label_alg2(self):
 		print 'getting label (alg=2)'
 		FinLabel = []
 		FinLabelall = []
