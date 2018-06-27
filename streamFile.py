@@ -1,52 +1,59 @@
 import numpy as np
-import h5py
 import os, sys
+import h5py
 
-class iLabel:
-	def __init__(self):
-		self.id = None
-		self.level = None
-		self.hit = None
+class markPosition:
+	def __init__(self, ):
+		self.markName = None
+		self.markLevel = None
+		self.peak = None
 		self.index = None
 		self.map = None
 		self.status = False
 		self.default()
-		
+	
+
 	def default(self):
-		self.level = [1,1,1,1,2,1,2,2,2,1]
+		self.markLevel = [1,1,1,1,2,1,2,2,2,1]
 		self.map = [-1 if x==1 else idx-1-self.level[:idx][::-1].index(x-1) for idx, x in enumerate(self.level)]
-		self.id = [ '----- Begin chunk -----', 
-					'Image filename:',
-					'Event: //',
-					'Peaks from peak search',
-					'End of peak list',
-					'--- Begin crystal',
-					'Reflections measured after indexing',
-					'End of reflections',
-					'--- End crystal',
-					'----- End chunk -----']
-								
-class iStream:
+		self.markName = [	'----- Begin chunk -----', 
+							'Image filename:',
+							'Event: //',
+							'Peaks from peak search',
+							'End of peak list',
+							'--- Begin crystal',
+							'Reflections measured after indexing',
+							'End of reflections',
+							'--- End crystal',
+							'----- End chunk -----'	]
+						
+
+class streamFile:
+
 	def __init__(self):
 		self.info = None
 		self.crystal = None
-		self.label = iLabel()
+		self.mark = iLabel()
 		self.backup = iLabel()
 		self.fstream = None
 		self.content = None
-		# backup saves default label
+
 					
 	def initial(self, fstream=None, label_id=None, label_level=None):
 		"""
 		update stream file, label_id and label_level, default id and level hold for no inputs
 		"""
-		if os.path.exists(str(fstream)):
+		if os.path.isfile(fstream):
 			self.clear()
 			self.fstream = fstream
 			try: 
-				with open(fstream,'r') as f: self.content = f.readlines()
-			except: pass
-		if self.content is None: raise Exception('### bad stream file ###')
+				with open(fstream,'r') as f: 
+					self.content = f.readlines() 
+			except: 
+				pass
+
+		if self.content is None:
+			raise Exception('### This is a bad stream file')
 		
 		self.label.default()
 		if isinstance(label_level, list):
@@ -226,6 +233,7 @@ class iStream:
 				irealPeak[j,2,i] = float(val[3])
 		return irealPeak
 		
+
 	def get_predPeak(self):
 		"""
 		return predicted peak position (maxNpeak, 7, numLabel)
