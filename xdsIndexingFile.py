@@ -27,11 +27,11 @@ def user_get_xds(filename):
 	for i in range(4,7):
 		for j in range(3):
 			invAmat[i-4,j] = float(content[i].split()[j])
-	if invAmat is not None:
+	# if invAmat is not None:
 		# invAmat[1,:] = -invAmat[1,:].copy()
-		tmp = invAmat[:,0].copy()
-		invAmat[:,0] = invAmat[:,1].copy()
-		invAmat[:,1] = tmp.copy()
+		# tmp = invAmat[:,0].copy()
+		# invAmat[:,0] = invAmat[:,1].copy()
+		# invAmat[:,1] = tmp.copy()
 
 	## calculate B matrix from lattice constants
 	Bmat = np.zeros((3,3));
