@@ -184,6 +184,44 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None):
+	Vsize = Volume['volumeSize']
+	Vcenter = Volume['volumeCenter']
+	Vsample = Volume['volumeSampling']
+	voxel = voxel
+
+	Image = image.ravel()
+	Rot = Geo['rotation']
+	HKL = Vsample*(Rot.dot(voxel)).T
+
+	for t in range(len(HKL)):
+
+		if (Image[t] < 0): continue
+		
+		hkl = HKL[t] + Vcenter
+		
+		h = hkl[0] 
+		k = hkl[1] 
+		l = hkl[2] 
+		
+		inth = int(round(h)) 
+		intk = int(round(k)) 
+		intl = int(round(l)) 
+
+		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
+		
+		hshift = abs(h/Vsample-round(h/Vsample))
+		kshift = abs(k/Vsample-round(k/Vsample))
+		lshift = abs(l/Vsample-round(l/Vsample))
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not Kpeak: continue
+		
+		weight[ inth,intk,intl] += 1.
+		model3d[inth,intk,intl] += Image[t] 
+
+	return [model3d, weight]
+
+
+@jit
 def RemoveBragg(image, Geo, box=0.25):
 
 	voxel = Geometry(image, Geo)
