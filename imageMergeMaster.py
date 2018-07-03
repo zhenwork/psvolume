@@ -28,10 +28,14 @@ Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
+
+
 #########################
 voxel = np.load('/reg/data/ana04/users/zhensu/staph_nuclease/snc_files_for_zhen/x_vectors.npy')
 voxel = voxel.T
 #########################
+
+
 
 if comm_rank == 0:
 	folder_o = zio.makeFolder(path_i, title='sr')
