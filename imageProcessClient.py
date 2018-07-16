@@ -58,6 +58,7 @@ def polarization_correction(image, Geo):
 	
 	if polarization is not None: 
 		pscale = (2.*zaxis**2 + (1-polarization)*xaxis**2 + (1+polarization)*yaxis**2 )/(2.*norm**2)
+		print 'new polzaization correction'
 	else: 
 		pscale = np.ones(image.shape)
 
