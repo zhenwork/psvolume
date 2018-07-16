@@ -57,10 +57,10 @@ def polarization_correction(image, Geo):
 	norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
 	
 	if polarization is not None: 
-		pscale = (2.*zaxis**2 + (1+polarization)*xaxis**2 + (1-polarization)*yaxis**2 )/(2.*norm**2)
+		pscale = (2.*zaxis**2 + (1-polarization)*xaxis**2 + (1+polarization)*yaxis**2 )/(2.*norm**2)
 	else: 
 		pscale = np.ones(image.shape)
-		
+
 	pscale /= np.amax(pscale)
 	pscale.shape = (nx,ny)
 	return pscale
