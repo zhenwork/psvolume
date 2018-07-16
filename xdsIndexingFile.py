@@ -16,7 +16,7 @@ def user_get_xds(filename):
 	Geo = {}
 	Geo['pixelSize'] = float(content[7].split()[3])
 	Geo['detDistance'] = float(content[8].split()[2])
-	Geo['polarization'] = 'y' if float(content[1].split()[3])>0.9 else 'x'
+	Geo['polarization'] = float(content[1].split()[3])
 	Geo['wavelength'] = float(content[2].split()[0])
 	Geo['center'] = (float(content[8].split()[1]), float(content[8].split()[0]))
 	Geo['Angle_increment'] = float(content[1].split()[2])

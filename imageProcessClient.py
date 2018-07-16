@@ -56,9 +56,11 @@ def polarization_correction(image, Geo):
 	zaxis = np.ones(nx*ny)*detDistance/pixelSize
 	norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
 	
-	if polarization=='x': pscale = (yaxis**2+zaxis**2)/norm**2
-	elif polarization=='y': pscale = (xaxis**2+zaxis**2)/norm**2
-	else: pscale = np.ones(image.shape)
+	if polarization is not None: 
+		pscale = (2.*zaxis**2 + (1+polarization)*xaxis**2 + (1-polarization)*yaxis**2 )/(2.*norm**2)
+	else: 
+		pscale = np.ones(image.shape)
+		
 	pscale /= np.amax(pscale)
 	pscale.shape = (nx,ny)
 	return pscale
