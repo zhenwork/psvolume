@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="read folder", default=".", type=str)
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
+parser.add_argument("-apscale","--apscale", help="num of images to process", default='ap', type=str)
+
 args = parser.parse_args()
 
 zf = iFile()
@@ -60,6 +62,16 @@ while True:
 		mask = zf.h5reader(path_o+'/image.process', 'mask');
 		break
 	except: continue;
+
+if args.apscale == 'a':
+	apscale = ascale.copy()
+	print "### only apply the solid-angle correction "
+elif args.apscale == 'p':
+	apscale = pscale.copy()
+	print "### only apply the polarization correction "
+else:
+	print "### apply both solid-angle and polarization correction "
+	pass
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
