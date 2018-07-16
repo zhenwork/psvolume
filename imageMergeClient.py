@@ -255,7 +255,7 @@ def RemoveBragg(image, Geo, box=0.25):
 def ModelScaling(model3d, weight):
 	index = np.where(weight>0)
 	model3d[index] /= weight[index]
-	index = np.where(weight<1.0e-4)
+	index = np.where(weight<4.) #np.where(weight<1.0e-4)
 	model3d[index] = -1024
 	return model3d
 
