@@ -184,7 +184,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None):
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx = idx):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
@@ -193,6 +193,14 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 	Image = image.ravel()
 	Rot = Geo['rotation']
 	HKL = Vsample*(Rot.dot(voxel)).T
+
+
+	####
+	newpx = np.zeros(len(HKL)).astype(int)
+	newpy = np.zeros(len(HKL)).astype(int)
+	newpz = np.zeros(len(HKL)).astype(int)
+	####
+
 
 	for t in range(len(HKL)):
 
@@ -208,6 +216,15 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 		intk = int(round(k)) 
 		intl = int(round(l)) 
 
+
+		######
+		newpx[t] = inth
+		newpy[t] = intk
+		newpz[t] = intl
+		continue
+		######
+
+
 		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
 		
 		hshift = abs(h/Vsample-round(h/Vsample))
@@ -217,6 +234,16 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 		
 		weight[ inth,intk,intl] += 1.
 		model3d[inth,intk,intl] += Image[t] 
+
+
+	######
+	newpx.shape = image.shape
+	newpy.shape = image.shape
+	newpz.shape = image.shape
+	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_h.list', newpx)
+	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_k.list', newpy)
+	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_l.list', newpz)
+	######
 
 	return [model3d, weight]
 
