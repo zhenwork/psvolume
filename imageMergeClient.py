@@ -195,11 +195,11 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 	HKL = Vsample*(Rot.dot(voxel)).T
 
 
-	####
-	newpx = np.zeros(len(HKL)).astype(int)
-	newpy = np.zeros(len(HKL)).astype(int)
-	newpz = np.zeros(len(HKL)).astype(int)
-	####
+	# ####
+	# newpx = np.zeros(len(HKL)).astype(int)
+	# newpy = np.zeros(len(HKL)).astype(int)
+	# newpz = np.zeros(len(HKL)).astype(int)
+	# ####
 
 
 	for t in range(len(HKL)):
@@ -217,12 +217,12 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 		intl = int(round(l)) 
 
 
-		######
-		newpx[t] = inth
-		newpy[t] = intk
-		newpz[t] = intl
-		continue
-		######
+		# ######
+		# newpx[t] = inth
+		# newpy[t] = intk
+		# newpz[t] = intl
+		# continue
+		# ######
 
 
 		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
@@ -236,14 +236,14 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 		model3d[inth,intk,intl] += Image[t] 
 
 
-	######
-	newpx.shape = image.shape
-	newpy.shape = image.shape
-	newpz.shape = image.shape
-	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_h.list', newpx)
-	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_k.list', newpy)
-	np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_l.list', newpz)
-	######
+	# ######
+	# newpx.shape = image.shape
+	# newpy.shape = image.shape
+	# newpz.shape = image.shape
+	# np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_h.list', newpx)
+	# np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_k.list', newpy)
+	# np.save('/reg/data/ana04/users/zhensu/staph_nuclease/hkllist/'+str(idx).zfill(5)+'_l.list', newpz)
+	# ######
 
 	return [model3d, weight]
 
