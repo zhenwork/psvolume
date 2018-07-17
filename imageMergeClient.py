@@ -184,7 +184,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx = idx):
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0):
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
