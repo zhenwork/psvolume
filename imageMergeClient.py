@@ -204,7 +204,7 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 
 	for t in range(len(HKL)):
 
-		if (Image[t] < 1): continue
+		if (Image[t] < -0.5): continue
 		
 		hkl = HKL[t] + Vcenter
 		
