@@ -80,6 +80,19 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	Geo = zio.get_image_info(fname)
 	image = zf.h5reader(fname, 'image')
 	image *= apscale
+
+
+
+	################
+	Mask = np.ones(image.shape)
+	index = np.where(image<0.01)
+	Mask[index] = 0
+	Mask = expand_mask(Mask, cwin=(2,2), value=0)
+	image *= Mask
+	################
+
+
+
 	sumIntens = round(np.sum(image), 8)
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
