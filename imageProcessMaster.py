@@ -84,6 +84,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 
 	################
+	from imageMergeClient import expand_mask
 	Mask = np.ones(image.shape)
 	index = np.where(image<0.01)
 	Mask[index] = 0
