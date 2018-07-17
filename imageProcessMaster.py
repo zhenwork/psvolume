@@ -90,6 +90,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	Mask[index] = 0
 	Mask = expand_mask(Mask, cwin=(2,2), value=0)
 	image *= Mask
+	image[np.where(image<0.001)] = -1
 	################
 
 
