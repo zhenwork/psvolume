@@ -12,6 +12,7 @@ parser.add_argument("-vSampling","--vSampling", help="num of images to process",
 # parser.add_argument("-vCenter","--vCenter", help="num of images to process", default=60, type=int)
 parser.add_argument("-nmin","--nmin", help="minimum image number", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, type=int)
+parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0, type=float)
 args = parser.parse_args()
 
 
@@ -89,7 +90,7 @@ else:
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
 		else:
 			moniter = 'hkl'
-			[model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx)
+			[model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
 		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10)
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
