@@ -14,19 +14,24 @@ import os
 
 
 # How to read the idx image, return a 2d matrix
-def user_get_image(idx, fname=None):
-	if fname is None: raise Exception('no files')#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
-	# content = cbf.read(fname)
-	# image = np.array(content.data).astype(float)
-	# return image
-	f = open(fname,"rb")
-	raw = f.read()
-	h = raw[0:511]
-	d = raw[512:]
-	f.close()
-	flat_image = np.frombuffer(d,dtype=np.int16)
-	image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
-	return image
+def user_get_image(fname=None):
+
+	if fname is None: raise Exception('no files') 
+	#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
+
+	if fname.endswith('.cbf')
+		content = cbf.read(fname)
+		image = np.array(content.data).astype(float)
+		return image
+	elif fname.endswith('.img'):
+		f = open(fname,"rb")
+		raw = f.read()
+		h = raw[0:511]
+		d = raw[512:]
+		f.close()
+		flat_image = np.frombuffer(d,dtype=np.int16)
+		image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
+		return image
 
 
 
@@ -48,11 +53,11 @@ def user_get_scalingFactor(idx):
 
 # How to define a users mask
 def user_get_mask(Geo, fname=None):
-	data = user_get_image(0, fname=fname)
+	data = user_get_image(fname=fname)
 	mask = np.ones(data.shape).astype(int)
 	index = np.where(data > 100000)
 	mask[index] = 0
-	# mask[1260:1300,1235:2463] = 0
+	mask[1260:1300,1235:2463] = 0
 	radius = make_radius(mask.shape, center=Geo['center'])
 	index = np.where(radius<10)
 	mask[index] = 0
