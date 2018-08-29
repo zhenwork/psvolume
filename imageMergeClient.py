@@ -115,7 +115,7 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 	for t in range(len(HKL)):
 
-		if (Image[t] < 0): continue
+		if (Image[t] < 0.01): continue
 		
 		hkl = HKL[t] + Vcenter
 		
@@ -155,7 +155,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 	for t in range(len(XYZ)):
 
-		if (Image[t] < 0): continue
+		if (Image[t] < 0.01): continue
 		
 		xyz = XYZ[t] + Vcenter
 		
@@ -184,7 +184,9 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0, thrmin=0):
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0, thrmin=0.01):
+
+	# FIXME: This is specific for the snc dataset
 	Vsize = Volume['volumeSize']
 	Vcenter = Volume['volumeCenter']
 	Vsample = Volume['volumeSampling']
