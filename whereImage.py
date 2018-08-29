@@ -70,9 +70,12 @@ sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if args.fname != '.':
 		fname = args.fname.replace('#####', str(idx).zfill(5))
+		
 	image = user_get_image(fname = fname)
 	image[np.where(image>100000)] = -1
-	image[np.where(image<0)] = -1
+	image[np.where(image<0.01)] = -1
+	index = np.where(mask==0)
+	image[index] = -1
 
 	quaternion = user_get_orientation(idx, increment=Geo['Angle_increment'])
 	R1 = Quat2Rotation(quaternion)
@@ -89,7 +92,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
 	zf.h5writer(fsave, 'readout', 'image')
-	zf.h5modify(fsave, 'image', image*mask)
+	zf.h5modify(fsave, 'image', image)
 	zf.h5modify(fsave, 'center', Geo['center'])
 	zf.h5modify(fsave, 'exp', False)
 	zf.h5modify(fsave, 'run', False)
