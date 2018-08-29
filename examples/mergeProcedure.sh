@@ -27,3 +27,4 @@ If you donnot have scalingFactor, use scale factor as 1 and then run 1-2-3 -7(wr
 Sometimes you need to modify the image files:
 8. Run imageModify.py
 	bsub -q psfehq -x -n 24 -R "span[ptile=8]" -o %J.out mpirun python psvolume/imageModify.py --o ./mergeImage
+	
