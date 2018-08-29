@@ -30,10 +30,12 @@ while True:
 	try: 
 		print '### Rank: '+str(comm_rank).rjust(3)+' is loading first file ...'
 		image = zf.h5reader(filename, 'image')
+		pscale = zf.h5reader(path_i+'/image.process', 'pscale')
 		break
 	except: continue;
 
-image[np.where(image<0.)] = 0.
+image *= pscale
+image[np.where(image<0.01)] = 0.
 Geo = zio.get_image_info(filename)
 (nx,ny) = image.shape
 (cx,cy) = Geo['center']
@@ -45,11 +47,13 @@ if comm_rank == 0:
 	print '### read from Path  : ', path_i
 	print '### read from Folder: ', folder_i
 	print '### Save to file: ', path_i+'/image.process'
+	zf.h5modify(path_i+'/image.process', 'pcorr_image', image)
 
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	filename = folder_i + '/'+str(idx).zfill(5)+'.slice'
 	image = zf.h5reader(filename, 'image')
+	image *= pscale
 	image[np.where(image<0.01)] = 0.
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
