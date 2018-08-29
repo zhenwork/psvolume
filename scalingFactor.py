@@ -44,6 +44,7 @@ mask = circle_region(image=None, center=(cx,cy), rmax=args.rmax, rmin=args.rmin,
 imgFirst = np.sum(image*mask)
 
 if comm_rank == 0:
+	print "### circle range: ", args.rmin, args.rmax
 	print '### read from Path  : ', path_i
 	print '### read from Folder: ', folder_i
 	print '### Save to file: ', path_i+'/image.process'
