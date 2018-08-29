@@ -69,7 +69,7 @@ class iPloter:
 		plt.tight_layout()
 		plt.show()
 
-	def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
+	def angularDistri(self, arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
 		"""
 		num denotes how many times you want to divide the angle
 		"""
