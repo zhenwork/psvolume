@@ -50,7 +50,7 @@ if comm_rank == 0:
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	filename = folder_i + '/'+str(idx).zfill(5)+'.slice'
 	image = zf.h5reader(filename, 'image')
-	image[np.where(image<0.)] = 0.
+	image[np.where(image<0.01)] = 0.
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
 	if args.wr != -1: 
