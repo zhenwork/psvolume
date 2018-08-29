@@ -19,7 +19,7 @@ def user_get_image(fname=None):
 	if fname is None: raise Exception('no files') 
 	#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
 
-	if fname.endswith('.cbf')
+	if fname.endswith('.cbf'):
 		content = cbf.read(fname)
 		image = np.array(content.data).astype(float)
 		return image
@@ -32,6 +32,8 @@ def user_get_image(fname=None):
 		flat_image = np.frombuffer(d,dtype=np.int16)
 		image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
 		return image
+	else:
+		return None
 
 
 
