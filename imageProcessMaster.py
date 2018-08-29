@@ -82,20 +82,19 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image *= apscale
 
 
-
-	################
-	from imageMergeClient import expand_mask
-	Mask = np.ones(image.shape)
-	index = np.where(image<0.01)
-	Mask[index] = 0
-	Mask = expand_mask(Mask, cwin=(2,2), value=0)
-	index = np.where(Mask<0.5)
-	image[index] = -1
-	image[np.where(image<0.001)] = -1
-	################
-
+	# ################
+	# from imageMergeClient import expand_mask
+	# Mask = np.ones(image.shape)
+	# index = np.where(image<0.01)
+	# Mask[index] = 0
+	# Mask = expand_mask(Mask, cwin=(2,2), value=0)
+	# index = np.where(Mask<0.5)
+	# image[index] = -1
+	# image[np.where(image<0.001)] = -1
+	# ################
 
 
+	image[np.where(image<0)] = -1
 	sumIntens = round(np.sum(image), 8)
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
