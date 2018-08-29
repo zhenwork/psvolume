@@ -42,7 +42,7 @@ def solid_angle_correction(image, Geo):
 	return ascale
 
 def polarization_correction(image, Geo):
-	## p=1 means x polarization. p=-1 means y polarization
+	## p=1 means y polarization. p=-1 means x polarization
 	detDistance  = Geo['detDistance']
 	pixelSize    = Geo['pixelSize']
 	polarization = Geo['polarization']
@@ -58,7 +58,7 @@ def polarization_correction(image, Geo):
 	norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
 	
 	if polarization is not None:
-		pscale = (2.*zaxis**2 + (1-polarization)*xaxis**2 + (1+polarization)*yaxis**2 )/(2.*norm**2)
+		pscale = (2.*zaxis**2 + (1+polarization)*xaxis**2 + (1-polarization)*yaxis**2 )/(2.*norm**2)
 		print 'new polzaization correction'
 	else: 
 		pscale = np.ones(image.shape)
