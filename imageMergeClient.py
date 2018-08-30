@@ -184,7 +184,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0, thrmin=0.01):
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0, thrmin=0):
 
 	# FIXME: This is specific for the snc dataset
 	Vsize = Volume['volumeSize']
