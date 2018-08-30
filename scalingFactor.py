@@ -13,6 +13,7 @@ parser.add_argument("-wr","--wr", help="write the scaling factor", default=-1, t
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 parser.add_argument("-name","--name", help="name of saved dataset", default='RingScale', type=str)
 parser.add_argument("-o","--o", help="output file name", default='', type=str)
+parser.add_argument("-p","--p", help="polarization correlation", default=0, type=int)
 args = parser.parse_args()
 
 zf = iFile()
@@ -34,7 +35,7 @@ while True:
 		break
 	except: continue;
 
-image *= pscale
+if args.p==1: image *= pscale
 image[np.where(image<0)] = 0.
 Geo = zio.get_image_info(filename)
 (nx,ny) = image.shape
@@ -54,7 +55,7 @@ if comm_rank == 0:
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	filename = folder_i + '/'+str(idx).zfill(5)+'.slice'
 	image = zf.h5reader(filename, 'image')
-	image *= pscale
+	if args.p==1: image *= pscale
 	image[np.where(image<0)] = 0.
 	maskImage = image*mask
 	scaleMatrix[idx] = np.sum(maskImage)
