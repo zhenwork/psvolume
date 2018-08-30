@@ -60,7 +60,7 @@ def user_get_mask(Geo, fname=None):
 
 	index = np.where(data > 100000)
 	mask[index] = 0
-	index = np.where(data < 0)
+	index = np.where(data < 0.001)
 	mask[index] = 0
 
 	# FIXME: This is specfic for Henry's detector
