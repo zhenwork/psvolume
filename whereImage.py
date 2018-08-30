@@ -73,7 +73,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 		
 	image = user_get_image(fname = fname)
 	image[np.where(image>100000)] = -1
-	image[np.where(image<0.01)] = -1
+	image[np.where(image<0)] = -1
 	index = np.where(mask==0)
 	image[index] = -1
 

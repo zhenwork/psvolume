@@ -155,7 +155,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 	for t in range(len(XYZ)):
 
-		if (Image[t] < 0.01): continue
+		if (Image[t] < 0): continue
 		
 		xyz = XYZ[t] + Vcenter
 		

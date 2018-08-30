@@ -57,10 +57,10 @@ def user_get_scalingFactor(idx):
 def user_get_mask(Geo, fname=None):
 	data = user_get_image(fname=fname)
 	mask = np.ones(data.shape).astype(int)
-	
+
 	index = np.where(data > 100000)
 	mask[index] = 0
-	index = np.where(data < 0.01)
+	index = np.where(data < 0)
 	mask[index] = 0
 
 	# FIXME: This is specfic for Henry's detector
