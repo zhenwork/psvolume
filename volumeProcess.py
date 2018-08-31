@@ -5,7 +5,7 @@ from fileManager import *
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="save folder", default=".", type=str)
-parser.add_argument("-thrmin","--thrmin", help="min value", default=-10, type=float)
+parser.add_argument("-thrmin","--thrmin", help="min value", default=-100, type=float)
 parser.add_argument("-thrmax","--thrmax", help="max value", default=1000, type=float)
 parser.add_argument("-name","--name", help="name", default="", type=str)
 parser.add_argument("-sym","--sym", help="process", default="laue", type=str)  #symmetry can be "laue","inv"
