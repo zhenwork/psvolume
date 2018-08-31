@@ -13,6 +13,7 @@ parser.add_argument("-vSampling","--vSampling", help="num of images to process",
 parser.add_argument("-nmin","--nmin", help="minimum image number", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, type=int)
 parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0, type=float)
+parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
 args = parser.parse_args()
 
 
@@ -28,7 +29,6 @@ Vol['volumeCenter'] = int(args.vSampling)*60
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
-
 
 
 # FIXME: This is specific for the snc dataset
@@ -79,6 +79,12 @@ if comm_rank == 0:
 else:
 	sep = np.linspace(args.nmin, args.nmax, comm_size).astype('int')
 	for idx in range(sep[comm_rank-1], sep[comm_rank]):
+
+		if args.choice=="even" and idx%2==1:
+			continue
+		if args.choice=="odd"  and idx%2==0:
+			continue
+
 		fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 		image = zf.h5reader(fname, 'image')
 		Geo = zio.get_image_info(fname)
