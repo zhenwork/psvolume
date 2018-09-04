@@ -39,7 +39,9 @@ if args.xds != ".":
 	print "### xds file imported: ", args.xds
 	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
 	[Geo, Bmat, invBmat, invAmat] = user_get_xds(args.xds)
-
+else:
+	print "### No valid xds file"
+	raise Exception('### No valid xds file')
 
 if comm_rank == 0:
 	print "### save to path: ", path_o
