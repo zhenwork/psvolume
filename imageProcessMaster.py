@@ -48,8 +48,9 @@ if comm_rank == 0:
 	print '## read from Folder: ', folder_i
 	print '## save to Path: ', path_o
 	print '## save to Folder: ', folder_o
-	
+	folder_p = path_o + '/pscale'
 	if not os.path.exists(folder_o): os.mkdir(folder_o)
+	if not os.path.exists(folder_p): os.mkdir(folder_p)
 	zf.h5modify(path_o+'/image.process', 'ascale' , ascale)
 	zf.h5modify(path_o+'/image.process', 'pscale' , pscale)
 	zf.h5modify(path_o+'/image.process', 'apscale', apscale)
@@ -76,11 +77,12 @@ else:
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
+	psave = folder_p + '/'+str(idx).zfill(5)+'.slice'
 
 	Geo = zio.get_image_info(fname)
 	image = zf.h5reader(fname, 'image')
-	image *= apscale
-
+	
+	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
 
 	# ################
 	# from imageMergeClient import expand_mask
@@ -93,12 +95,19 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	# image[np.where(image<0.001)] = -1
 	# ################
 
-
+	pimage = image * pscale
+	pimage[np.where(pimage<0)] = -1
+	
+	image *= apscale
 	image[np.where(image<0)] = -1
 	sumIntens = round(np.sum(image), 8)
-	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
+	#image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
+	
+
 
 	zio.copyFile(src=fname, dst=fsave)
+	zio.copyFile(src=fname, dst=psave)
 	zf.h5modify(fsave, 'image', image)
+	zf.h5modify(psave, 'image', pimage)
 	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1]) + '  sumIntens: '+str(sumIntens).ljust(10)
 	if idx>5000: break
