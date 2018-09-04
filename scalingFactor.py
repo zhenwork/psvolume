@@ -10,6 +10,7 @@ parser.add_argument("-i","--i", help="save folder", default=".", type=str)
 parser.add_argument("-rmin","--rmin", help="min radius", default=100, type=int)
 parser.add_argument("-rmax","--rmax", help="max radius", default=600, type=int)
 parser.add_argument("-wr","--wr", help="write the scaling factor", default=-1, type=int)
+parser.add_argument("-wmerge","--wmerge", help="write the scaling factor", default=-1, type=int)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 parser.add_argument("-name","--name", help="name of saved dataset", default='RingScale', type=str)
 parser.add_argument("-o","--o", help="output file name", default='', type=str)
@@ -19,6 +20,7 @@ args = parser.parse_args()
 zf = iFile()
 zio = IOsystem()
 [path_i, folder_i] = zio.get_path_folder(args.i)
+folder_merge = path_i + '/mergeImage'
 [num, allFile] = zio.counterFile(folder_i, title='.slice')
 if args.num == -1: args.num = int(num)
 
@@ -61,6 +63,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	scaleMatrix[idx] = np.sum(maskImage)
 	if args.wr != -1: 
 		zf.h5modify(folder_i + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
+	if args.wmerge != -1:
+		zf.h5modify(folder_merge + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
 	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 
 if comm_rank == 0:
