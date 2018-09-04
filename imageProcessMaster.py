@@ -24,6 +24,8 @@ zf = iFile()
 zio = IOsystem()
 [path_i, folder_i] = zio.get_path_folder(args.i)
 [path_o, folder_o] = zio.get_path_folder(args.o)
+folder_p = path_o + '/pscale'
+
 [num, allFile] = zio.counterFile(folder_i, title='.slice')
 prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
 if args.num ==-1: args.num = int(num)
@@ -48,7 +50,6 @@ if comm_rank == 0:
 	print '## read from Folder: ', folder_i
 	print '## save to Path: ', path_o
 	print '## save to Folder: ', folder_o
-	folder_p = path_o + '/pscale'
 	if not os.path.exists(folder_o): os.mkdir(folder_o)
 	if not os.path.exists(folder_p): os.mkdir(folder_p)
 	zf.h5modify(path_o+'/image.process', 'ascale' , ascale)
