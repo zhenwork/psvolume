@@ -7,6 +7,7 @@ submit jobs: mpirun -n 10 python imageProcessMaster.py --o /reg/neh/home/zhensu 
 """
 
 from imageProcessClient import *
+from imageMergeClient import RemoveBragg
 from fileManager import *
 from mpi4py import MPI
 import argparse
@@ -84,7 +85,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = zf.h5reader(fname, 'image')
 	
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
-
+	image = RemoveBragg(image, Geo, box=0.25)
+	
 	# ################
 	# from imageMergeClient import expand_mask
 	# Mask = np.ones(image.shape)
