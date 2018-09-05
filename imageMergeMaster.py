@@ -13,6 +13,7 @@ parser.add_argument("-vSampling","--vSampling", help="num of images to process",
 parser.add_argument("-nmin","--nmin", help="minimum image number", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, type=int)
 parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0, type=float)
+parser.add_argument("-voxel","--voxel", help="voxel exist or not", default=".", type=str)
 parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
 args = parser.parse_args()
 
@@ -33,8 +34,11 @@ weight  = np.zeros([Vol['volumeSize']]*3)
 
 # FIXME: This is specific for the snc dataset
 #########################
-voxel = np.load('/reg/data/ana04/users/zhensu/staph_nuclease/snc_files_for_zhen/x_vectors.npy')
-voxel = voxel.T
+if args.voxel != ".":
+	print "## voxel exist: %s" % args.voxel
+	voxel = np.load(args.voxel)
+	voxel = voxel.T
+	print "## Loaded the voxel file ... "
 #########################
 
 
@@ -92,7 +96,10 @@ else:
 
 		sumIntens = round(np.sum(image), 8)
 		
-		if args.mode=='xyz':
+		if args.voxel != ".":
+			moniter = 'voxel'
+			[model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
+		elif args.mode=='xyz':
 			moniter = 'xyz'
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
 		else:
@@ -102,7 +109,7 @@ else:
 			# FIXME: This is specific for snc dataset:
 			# [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
 		
-		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10)
+		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10) + " ### "+moniter
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
 	md=mpidata()
