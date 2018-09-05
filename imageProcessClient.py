@@ -67,26 +67,37 @@ def polarization_correction(image, Geo):
 	pscale.shape = (nx,ny)
 	return pscale
 
-def remove_peak_alg1(img, mask=None, sigma=15, cwin=(11,11)):
+def remove_peak_alg1(img, _mask=None, sigma=15, cwin=(11,11)):
 	"""
 	First throw away \pm sigma*std. Second throw away \pm sigma*std
 	"""
-	if mask is None: mask=np.ones(img.shape)
+	
+	if _mask is None: mask=np.ones(img.shape)
+	else: mask = _mask.copy()
+	
+	index = np.where(img<0)
+	mask[index] = 0
+	
 	image = img*mask
 	median = median_filter(image, cwin)*mask
 	submedian = image - median
+	
 	Tindex = np.where(mask==1)
 	Findex = np.where(mask==0)
+	
 	ave = np.mean(submedian[Tindex])
 	std = np.std( submedian[Tindex])
 	index = np.where((submedian>ave+std*sigma)+(submedian<ave-std*sigma)==True)
 	image[index] = -1
 	submedian[index] = 0
+	
 	ave = np.mean(submedian[Tindex])
 	std = np.std( submedian[Tindex])
 	index = np.where((submedian>ave+std*sigma)+(submedian<ave-std*sigma)==True)
 	image[index] = -1
+	
 	image[Findex] = -1
+	
 	return image
 
 def remove_peak_alg2(img, mask=None, thr=(None, None), cwin=(11,11)):
