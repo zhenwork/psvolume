@@ -62,17 +62,23 @@ def user_get_mask(Geo, fname=None):
 	data = user_get_image(fname=fname)
 	mask = np.ones(data.shape).astype(int)
 
-	index = np.where(data > 100000)
-	mask[index] = 0
-	index = np.where(data < 0.001)
-	mask[index] = 0
+	if fname.endswith('.img'):
+		radius = make_radius(mask.shape, center=Geo['center'])
+		index = np.where(radius<10)
+		mask[index] = 0
+	else:
+		index = np.where(data > 100000)
+		mask[index] = 0
+		index = np.where(data < 0.001)
+		mask[index] = 0
 
-	# FIXME: This is specfic for Henry's detector
-	mask[1260:1300,1235:2463] = 0
+		# FIXME: This is specfic for Henry's detector
+		mask[1260:1300,1235:2463] = 0
 
-	radius = make_radius(mask.shape, center=Geo['center'])
-	index = np.where(radius<10)
-	mask[index] = 0
+		radius = make_radius(mask.shape, center=Geo['center'])
+		index = np.where(radius<10)
+		mask[index] = 0
+		
 	return mask
 
 
