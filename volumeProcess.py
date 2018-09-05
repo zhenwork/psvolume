@@ -11,6 +11,7 @@ parser.add_argument("-name","--name", help="name", default="", type=str)
 parser.add_argument("-sym","--sym", help="process", default="laue", type=str)  #symmetry can be "laue","inv"
 parser.add_argument("-sub","--sub", help="process", default=1, type=int)
 parser.add_argument("-hkl2xyz","--hkl2xyz", help="process", default=1, type=int)
+parser.add_argument("-rescale","--rescale", help="if rescale=0.5, then voxel value will be smaller", default=1.0, type=float)
 args = parser.parse_args()
 thr = (args.thrmin, args.thrmax)
 zf = iFile()
@@ -27,12 +28,16 @@ print '### threshold: ', thr
 print '### symmetrize: ', args.sym
 print '### background: ', bool(args.sub)
 print '### hkl TO xyz: ', bool(args.hkl2xyz)
+print "### rescale factor: ", args.rescale
 
 
 ### Only when we need one of the processes, we start to read the file
 if (args.sym == "laue") or (args.sym == "inv") or (args.sub==1) or (args.hkl2xyz==1):
 	print '### reading volume ... '
-	rawData = zf.h5reader(args.i, 'intens')
+	rawData = zf.h5reader(args.i, 'intens') 
+	index = np.where(rawData < -1000)
+	rawData *= args.rescale
+	rawData[index] = -1024
 	print '### max/min: ', np.amin(rawData), np.amax(rawData)
 
 
