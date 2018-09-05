@@ -251,9 +251,10 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 
 
 @jit
-def RemoveBragg(image, Geo, box=0.25):
+def RemoveBragg(image, Geo, box=0.25, voxel=None):
 
-	voxel = Geometry(image, Geo)
+	if voxel is None:
+		voxel = Geometry(image, Geo)
 	Image = image.ravel()
 	Rot = Geo['rotation']
 	HKL = Rot.dot(voxel).T
