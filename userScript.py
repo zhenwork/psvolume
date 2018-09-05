@@ -31,6 +31,10 @@ def user_get_image(fname=None):
 		f.close()
 		flat_image = np.frombuffer(d,dtype=np.int16)
 		image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
+		
+		## FIXME: To make the image compatible with x_vectors.npy
+		image = image.T
+		
 		return image
 	else:
 		return None
