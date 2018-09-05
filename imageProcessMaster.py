@@ -18,6 +18,7 @@ parser.add_argument("-i","--i", help="read folder", default=".", type=str)
 parser.add_argument("-o","--o", help="save folder", default=".", type=str)
 parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
 parser.add_argument("-apscale","--apscale", help="num of images to process", default='ap', type=str)
+parser.add_argument("-voxel","--voxel", help="voxel list", default='.', type=str)
 
 args = parser.parse_args()
 
@@ -76,6 +77,20 @@ else:
 	print "### apply both solid-angle and polarization correction "
 	pass
 
+
+# FIXME: This is specific for the snc dataset
+#########################
+if args.voxel != ".":
+	print "## voxel exist: %s" % args.voxel
+	voxel = np.load(args.voxel)
+	voxel = voxel.T
+	print "## Loaded the voxel file ... "
+else:
+	print "## voxel doesn't exist ... "
+	voxel = None
+#########################
+
+
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
@@ -85,7 +100,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image = zf.h5reader(fname, 'image')
 	
 	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
-	image = RemoveBragg(image, Geo, box=0.25)
+	image = RemoveBragg(image, Geo, box=0.25, voxel=voxel)
 	
 	# ################
 	# from imageMergeClient import expand_mask
