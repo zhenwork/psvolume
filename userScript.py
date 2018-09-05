@@ -77,7 +77,7 @@ def user_get_mask(Geo, fname=None):
 		mask[1260:1300,1235:2463] = 0
 
 		radius = make_radius(mask.shape, center=Geo['center'])
-		index = np.where(radius<10)
+		index = np.where(radius<30)
 		mask[index] = 0
 		
 	return mask
