@@ -99,7 +99,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	Geo = zio.get_image_info(fname)
 	image = zf.h5reader(fname, 'image')
 	
-	image = remove_peak_alg1(image, mask=mask, sigma=15, cwin=(11,11))
+	image = remove_peak_alg1(image, _mask=mask, sigma=15, cwin=(11,11))
 	image = RemoveBragg(image, Geo, box=0.25, voxel=voxel)
 	
 	# ################
