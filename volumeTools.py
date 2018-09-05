@@ -60,10 +60,13 @@ def lauesym(idata, ithreshold=(-100,1000)):
 				mi = num_samp-1-i
 				mj = num_samp-1-j
 				mk = num_samp-1-k
-				pairs = np.array([ idata[i,j,k], idata[mi,mj,mk], idata[mi,j,mk], idata[i,mj,k] ]) #P1211
+				
+				# FIXME: only applicable to P21 symmetry
+				#pairs = np.array([ idata[i,j,k], idata[mi,mj,mk], idata[mi,j,mk], idata[i,mj,k] ]) #P1211
 				
 				# FIXME: only applicable for snc data
-				#pairs = np.array([ idata[i,j,k], idata[mi,mj,k], idata[mj,i,k], idata[j,mi,k], idata[mi,mj,mk], idata[i,j,mk], idata[j,mi,mk], idata[mj,i,mk]])
+				pairs = np.array([ idata[i,j,k], idata[mi,mj,k], idata[mj,i,k], idata[j,mi,k], idata[mi,mj,mk], idata[i,j,mk], idata[j,mi,mk], idata[mj,i,mk]])
+				
 				ori = pairs.copy()
 				pairs = pairs[np.where(pairs>ithreshold[0])].copy()
 				pairs = pairs[np.where(pairs<ithreshold[1])].copy()
