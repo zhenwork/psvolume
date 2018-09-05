@@ -74,10 +74,13 @@ def user_get_mask(Geo, fname=None):
 		mask[index] = 0
 
 		# FIXME: This is specfic for Henry's detector
-		mask[1260:1300,1235:2463] = 0
+		# mask[1260:1300,1235:2463] = 0
+		mask[1255:1300,1235:2463] = 0
+		mask[1255:1305,1735:2000] = 0
+		mask[1255:1310,2000:2463] = 0
 
 		radius = make_radius(mask.shape, center=Geo['center'])
-		index = np.where(radius<30)
+		index = np.where(radius<40)
 		mask[index] = 0
 		
 	return mask
