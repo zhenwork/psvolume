@@ -15,6 +15,7 @@ parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, t
 parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0, type=float)
 parser.add_argument("-voxel","--voxel", help="voxel exist or not", default=".", type=str)
 parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
+parser.add_argument("-list","--list", help="merge list", default=".", type=str)
 args = parser.parse_args()
 
 
@@ -42,7 +43,17 @@ if args.voxel != ".":
 #########################
 
 
+## If the merge list exists:
+if args.list == ".":
+	mergeList = np.arange(args.nmin, args.nmax)
+	print "### Merge All from %d to %d " % (args.nmin, args.nmax)
+else:
+	print "### Merge List exists"
+	mergeList = np.load(args.list)
+	print "### Loaded the merge list"
 
+	
+	
 if comm_rank == 0:
 	folder_o = zio.makeFolder(path_i, title='sr')
 
@@ -87,6 +98,8 @@ else:
 		if args.choice=="even" and idx%2==1:
 			continue
 		if args.choice=="odd"  and idx%2==0:
+			continue
+		if idx not in mergeList:
 			continue
 
 		fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
