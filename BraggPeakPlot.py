@@ -1,6 +1,7 @@
 import numpy as np 
 from mpidata import *
 from fileManager import *
+from imageProcessClient import *
 from numba import jit
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
@@ -25,7 +26,7 @@ if args.nmax == -1: args.nmax = int(num)
 
 
 if comm_rank == 0:
-	args.o = args.o+"_"+args.name+".process"
+	if args.name!="": args.o = args.o+"_"+args.name+".process"
 	print "### Resource folder: %s"%folder_i
 	print "### Radial range: %d-%d"%(args.rmin, args.rmax)
 	print "### Index range:  %d-%d"%(args.nmin, args.nmax)
