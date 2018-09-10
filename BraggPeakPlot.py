@@ -2,6 +2,7 @@ import numpy as np
 from mpidata import *
 from fileManager import *
 from imageProcessClient import *
+from imageMergeClient import *
 from numba import jit
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
@@ -144,7 +145,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	zf.h5writer("./pmark/%.5d.slice"%idx, "pmark", pmark)
 
-	print "### Rank %4d finished %.4d-%.4d-%.4d"%(comm_rank, sep[comm_rank], idx, sep[comm_rank+1])
+	print "### Rank %.4d finished %.4d-%.4d-%.4d"%(comm_rank, sep[comm_rank], idx, sep[comm_rank+1])
 
 
 if comm_rank == 0:
