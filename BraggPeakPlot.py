@@ -111,7 +111,8 @@ image = zf.h5reader(filename, 'image')
 print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
 mask = circle_region(image=None, center=(cx,cy), rmax=args.rmax, rmin=args.rmin, size=(nx,ny))
 mask = mask * zf.h5reader(path_i+'image.process','mask')
-zf.h5writer('./test_mask.h5', 'mask', mask)
+if comm_rank==0:
+	zf.h5writer('./test_mask.h5', 'mask', mask)
 
 
 BraggPeakIntensity = np.zeros(args.nmax)
