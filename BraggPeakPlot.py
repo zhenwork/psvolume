@@ -12,7 +12,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="save folder", default=".", type=str)
 parser.add_argument("-rmin","--rmin", help="min radius", default=100, type=int)
-parser.add_argument("-rmax","--rmax", help="max radius", default=600, type=int)
+parser.add_argument("-rmax","--rmax", help="max radius", default=1200, type=int)
 parser.add_argument("-nmin","--nmin", help="smallest index of image", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="largest index of image", default=-1, type=int)
 parser.add_argument("-o","--o", help="output file name", default="BraggPeakIntensity", type=str)
@@ -79,7 +79,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=(0, 0.15), backRing=(0.25,0.
 			peakIntensity[inth,intk,intl] += Image[t] 
 			peakCounts[inth,intk,intl] += 1.
 			pmark[t] = 10.
-		elif max(hshift, kshift, lshift)<0.40:
+		elif max(hshift, kshift, lshift)<backRing[1]:
 			backIntensity[inth,intk,intl] += Image[t] 
 			backCounts[inth,intk,intl] += 1.
 			pmark[t] = 1.
@@ -139,7 +139,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[index] = -1
 
 
-	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=(-1, 0.15), backRing=(0.15,0.5))
+	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=(-1, 0.15), backRing=(0.15,0.4))
 	BraggPeakIntensity[idx] = peakIntensity
 	BraggPeakCounts[idx] = peakCounts
 
