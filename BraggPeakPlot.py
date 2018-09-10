@@ -78,11 +78,11 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=(0, 0.15), backRing=(0.25,0.
 		if (hshift>=peakRing[0]) and (hshift<=peakRing[1]) and (kshift>=peakRing[0]) and (kshift<=peakRing[1]) and (lshift>=peakRing[0]) and (lshift<=peakRing[1]):
 			peakIntensity[inth,intk,intl] += Image[t] 
 			peakCounts[inth,intk,intl] += 1.
-			pmark[inth,intk,intl] = 10.
+			pmark[t] = 10.
 		if (hshift>=backRing[0]) and (hshift<=backRing[1]) and (kshift>=backRing[0]) and (kshift<=backRing[1]) and (lshift>=backRing[0]) and (lshift<=backRing[1]):
 			backIntensity[inth,intk,intl] += Image[t] 
 			backCounts[inth,intk,intl] += 1.
-			pmark[inth,intk,intl] = 1.
+			pmark[t] = 1.
 
 	index = np.where(peakCounts>0.5)
 	peakIntensity[index] /= peakCounts[index]
