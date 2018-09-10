@@ -118,7 +118,7 @@ BraggPeakCounts = np.zeros(args.nmax)
 
 
 sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
-print "### Rank %4d will process [%4d, %4d]"%(comm_rank, args.nmin, args.nmax)
+print "### Rank %4d will process [%4d, %4d]"%(comm_rank, sep[comm_rank], sep[comm_rank+1])
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
