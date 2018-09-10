@@ -110,7 +110,7 @@ image = zf.h5reader(filename, 'image')
 (cx,cy) = Geo['center']
 print 'making mask:  ('+str(nx)+','+str(ny)+')-('+str(cx)+','+str(cy)+')'
 mask = circle_region(image=None, center=(cx,cy), rmax=args.rmax, rmin=args.rmin, size=(nx,ny))
-mask = mask * zf.h5reader(path_i+'image.process','mask')
+#mask = mask * zf.h5reader(path_i+'image.process','mask')
 if comm_rank==0:
 	zf.h5writer('./test_mask.h5', 'mask', mask)
 
