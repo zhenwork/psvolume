@@ -125,7 +125,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	fname = "%s/%5d.slice"%(folder_i, idx)
 	
 	if not os.path.isfile(fname):
-		raiseException("No such file: %s"%fname)
+		print "### No such file: %s" % fname"
+		raiseException("No such file: %s")
 		continue
 
 	image = zf.h5reader(fname, 'image')
