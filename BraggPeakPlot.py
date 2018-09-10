@@ -79,7 +79,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=(0, 0.15), backRing=(0.25,0.
 			peakIntensity[inth,intk,intl] += Image[t] 
 			peakCounts[inth,intk,intl] += 1.
 			pmark[t] = 10.
-		if (hshift>=backRing[0]) and (hshift<=backRing[1]) and (kshift>=backRing[0]) and (kshift<=backRing[1]) and (lshift>=backRing[0]) and (lshift<=backRing[1]):
+		elif max(hshift, kshift, lshift)<0.40:
 			backIntensity[inth,intk,intl] += Image[t] 
 			backCounts[inth,intk,intl] += 1.
 			pmark[t] = 1.
@@ -139,7 +139,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[index] = -1
 
 
-	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=(-1, 0.15), backRing=(0.2,0.4))
+	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=(-1, 0.15), backRing=(0.15,0.5))
 	BraggPeakIntensity[idx] = peakIntensity
 	BraggPeakCounts[idx] = peakCounts
 
