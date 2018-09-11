@@ -28,6 +28,7 @@ if args.nmax == -1: args.nmax = int(num)
 
 if comm_rank == 0:
 	if args.name!="": args.o = args.o+"_"+args.name+".process"
+	else: args.o = args.o+".process"
 	print "### Resource folder: %s"%folder_i
 	print "### Radial range: %d-%d"%(args.rmin, args.rmax)
 	print "### Index range:  %d-%d"%(args.nmin, args.nmax)
