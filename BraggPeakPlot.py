@@ -148,7 +148,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[index] = -1
 
 
-	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=(-1, 0.15), backRing=(0.15,0.4))
+	[peakIntensity, peakCounts, pmark] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40 )
 	BraggPeakIntensity[idx] = peakIntensity
 	BraggPeakCounts[idx] = peakCounts
 
