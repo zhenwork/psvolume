@@ -117,6 +117,11 @@ if comm_rank==0:
 	folder_o = args.o
 	if not os.path.isdir(folder_o):
 		os.makedirs(folder_o)
+else:
+	import time
+	folder_o = args.o
+	while not os.path.isdir(folder_o):
+		time.sleep(5)
 
 
 sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
