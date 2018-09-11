@@ -172,7 +172,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 
 	## index is all HKLs that fit the condition
 	keepVolume = np.zeros(peakCounts.shape).astype(int)
-	index = np.where((peakCounts>=5)*(backCounts>=10)*(aveSubIntensity>5.)==True)
+	index = np.where((peakCounts>=5)*(backCounts>=10)*(subIntensity>5.*4)==True)
 	keepVolume[index] = 1
 	
 	## calculate sum of peak intensity at suitable HKLs
@@ -209,9 +209,9 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 
 		if keepVolume[inth, intk, intl] < 1:
 			continue
-		if max(hshift, kshift, lshift)<0.15:
+		if max(hshift, kshift, lshift)<peakRing:
 			continue
-		elif max(hshift, kshift, lshift)<0.30:
+		elif max(hshift, kshift, lshift)<backRing:
 			peakTest[t] = 1000
 
 	peakTest.shape = image.shape
@@ -263,7 +263,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[index] = -1
 
 
-	[peakIntensity, peakCounts, pmark, peakTest] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.30 )
+	[peakIntensity, peakCounts, pmark, peakTest] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.20, backRing=0.30 )
 	BraggPeakIntensity[idx] = peakIntensity
 	BraggPeakCounts[idx] = peakCounts
 
