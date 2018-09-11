@@ -98,7 +98,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 
 	## index is all HKLs that fit the condition
 	keepVolume = np.zeros(peakCounts.shape).astype(int)
-	index = np.where((peakCounts>=5)*(backCounts>=10)*(subIntensity>10.*4)==True)
+	index = np.where((peakCounts>=5)*(backCounts>=10)*(subIntensity>100.)==True)
 	keepVolume[index] = 1
 	
 	## calculate sum of peak intensity at suitable HKLs
