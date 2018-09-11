@@ -90,6 +90,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 	
 	## peakIntensity subtract the average background*peak numbers
 	subIntensity = peakIntensity - backIntensity*peakCounts
+	aveSubIntensity = subIntensity.copy()
 	
 	## calculate average subIntensity (only for calculating index)
 	index = np.where(peakCounts>0.5)
