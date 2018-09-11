@@ -56,7 +56,8 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 
 	for t in range(len(HKL)):
 
-		if (Image[t] < 0): continue
+		if (Image[t] < 0) or (Image[t] > 10000): continue
+		
 		
 		hkl = HKL[t] + Vcenter
 		
@@ -114,7 +115,7 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 	peakTest = Image.copy()
 	for t in range(len(HKL)):
 
-		if (Image[t] < 0): continue
+		if (Image[t] < 0) or (Image[t] > 10000): continue
 		
 		hkl = HKL[t] + Vcenter
 		
@@ -187,6 +188,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	## make pixel value to -1 for bad mask position
 	index = np.where(mask==0)
 	image[index] = -1
+	image[np.where(image<0.001)] = -1
 
 
 	[peakIntensity, peakCounts, pmark, peakTest] = CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.20, backRing=0.30 )
