@@ -37,7 +37,7 @@ if comm_rank == 0:
 
 
 @jit
-def CalBraggPeakIntensity_alg1(image, Geo, peakRing=(0, 0.15), backRing=(0.25,0.5)):
+def CalBraggPeakIntensity_alg1(image, Geo, peakRing=0.15, backRing=0.40):
 	Vsize = 121
 	Vcenter = 60
 	Vsample = 1
@@ -75,22 +75,30 @@ def CalBraggPeakIntensity_alg1(image, Geo, peakRing=(0, 0.15), backRing=(0.25,0.
 		kshift = abs(k/Vsample-round(k/Vsample))
 		lshift = abs(l/Vsample-round(l/Vsample))
 
-		if (hshift>=peakRing[0]) and (hshift<=peakRing[1]) and (kshift>=peakRing[0]) and (kshift<=peakRing[1]) and (lshift>=peakRing[0]) and (lshift<=peakRing[1]):
+		if (hshift<=peakRing) and (kshift<=peakRing) and (lshift<=peakRing):
 			peakIntensity[inth,intk,intl] += Image[t] 
 			peakCounts[inth,intk,intl] += 1.
-			pmark[t] = 10.
-		elif max(hshift, kshift, lshift)<backRing[1]:
+			pmark[t] += 10.
+		elif max(hshift, kshift, lshift)<backRing:
 			backIntensity[inth,intk,intl] += Image[t] 
 			backCounts[inth,intk,intl] += 1.
-			pmark[t] = 1.
+			pmark[t] += 5.
 
-	index = np.where(peakCounts>0.5)
-	peakIntensity[index] /= peakCounts[index]
+	## calculate average background (per pixel)
 	index = np.where(backCounts>0.5)
 	backIntensity[index] /= backCounts[index]
-	subIntensity = peakIntensity - backIntensity
+	
+	## peakIntensity subtract the average background*peak numbers
+	subIntensity = peakIntensity - backIntensity*peakCounts
+	
+	## calculate average subIntensity (only for calculating index)
+	index = np.where(peakCounts>0.5)
+	aveSubIntensity[index] = subIntensity[index]/peakCounts[index]
 
-	index = np.where((peakCounts>=9)*(backCounts>=10)*(subIntensity>=5.)==True)
+	## index is all HKLs that fit the condition
+	index = np.where((peakCounts>=5)*(backCounts>=10)*(aveSubIntensity>5.)==True)
+	
+	## calculate sum of peak intensity at suitable HKLs
 	data = subIntensity[index].copy()
 	(A,B) = (np.sum(data), len(data))
 
