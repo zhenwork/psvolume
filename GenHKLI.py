@@ -86,7 +86,7 @@ def saveHKLI(HKLI_List, weight, fname):
 	index = np.where(weight<10)
 	HKLI_List[index] = -1024
 	f = open(fname,'w')
-	f.writelines("H".rjust(5)+"K".rjust(5)+"L".rjust(5)+"I".rjust(10)+"\n")
+	#f.writelines("H".rjust(5)+"K".rjust(5)+"L".rjust(5)+"I".rjust(10)+"\n")
 	for H in range(-60,60):
 		for K in range(-60,60):
 			for L in range(-60,60):
