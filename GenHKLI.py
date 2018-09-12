@@ -148,7 +148,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	image = zf.h5reader(fname, 'image')
 	Geo = zio.get_image_info(fname)
-
+	image = image * Geo['scale']
+	
 	## make pixel value to -1 for bad mask position
 	index = np.where(mask==0)
 	image[index] = -1
