@@ -102,8 +102,8 @@ if comm_rank == 0:
 	zf.h5modify(pathIntens, 'sampling', Vol['volumeSampling'])
 	chunks = list(model3d.shape[1:])
 	chunks.insert(0,1)
-	zf.h5modify(pathIntens, 'intens', model3d, chunks=chunks, opts=7)
-	zf.h5modify(pathIntens, 'weight', weight,  chunks=chunks, opts=7)
+	zf.h5modify(pathIntens, 'intens', model3d, chunks=tuple(chunks), opts=7)
+	zf.h5modify(pathIntens, 'weight', weight,  chunks=tuple(chunks), opts=7)
 	zf.h5modify(pathIntens, 'Smat', Smat)
 
 else:
