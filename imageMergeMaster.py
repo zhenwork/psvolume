@@ -16,6 +16,7 @@ parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0,
 parser.add_argument("-voxel","--voxel", help="voxel exist or not", default=".", type=str)
 parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
 parser.add_argument("-list","--list", help="merge list", default=".", type=str)
+parser.add_argument("-cc12","--cc12", help="calculate the CC1/2", default=0, type=int)
 args = parser.parse_args()
 
 
@@ -29,12 +30,20 @@ Vol = {}
 Vol['volumeSampling'] = int(args.vSampling)
 Vol['volumeCenter'] = int(args.vSampling)*60
 Vol['volumeSize'] = 2*Vol['volumeCenter']+1
+
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
+
+model3d_1 = np.zeros([Vol['volumeSize']]*3)
+weight_1  = np.zeros([Vol['volumeSize']]*3)
+
+model3d_2 = np.zeros([Vol['volumeSize']]*3)
+weight_2  = np.zeros([Vol['volumeSize']]*3)
 
 
 # FIXME: This is specific for the snc dataset
 #########################
+voxel = None
 if args.voxel != ".":
 	print "## voxel exist: %s" % args.voxel
 	voxel = np.load(args.voxel)
@@ -111,7 +120,10 @@ else:
 		
 		if args.voxel != ".":
 			moniter = 'voxel'
-			[model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
+			[model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, thrmin = args.thrmin)
+		elif args.cc12 != 0:
+			moniter = "cc1/2"
+			[model3d_1, weight_1, model3d_2, weight_2] = ImageMerge_HKL_CC12(model3d_1, weight_1, model3d_2, weight_2, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, thrmin = args.thrmin)
 		elif args.mode=='xyz':
 			moniter = 'xyz'
 			[model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
@@ -125,6 +137,9 @@ else:
 		print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10) + " ### "+moniter
 
 	print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
+	if args.cc12 != 0:
+		model3d = np.array([model3d_1, model3d_2])
+		weight = np.array([weight_1, weight_2])
 	md=mpidata()
 	md.addarray('model3d', model3d)
 	md.addarray('weight', weight)
