@@ -19,6 +19,7 @@ parser.add_argument("-j2","--j2", help="jlim[1]", default="100", type=str)
 parser.add_argument("-iname","--iname", help="ilim[0]", default="anisoData", type=str)
 parser.add_argument("-jname","--jname", help="ilim[1]", default="anisoData", type=str)
 parser.add_argument("-count","--count", help="symCounter", default="", type=str)
+parser.add_argument("-v","--v", help="verbose", default=0, type=int)
 args = parser.parse_args()
 if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
@@ -112,3 +113,11 @@ print '### saving file: ', fsave
 ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
+
+if args.v !==0:
+	import matplotlib.pyplot as plt
+	plt.figure(figsize=(10,6))
+	plt.plot(qCorr)
+	plt.tight_layout()
+	plt.show()
+
