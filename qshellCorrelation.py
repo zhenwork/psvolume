@@ -118,6 +118,7 @@ if args.v != 0:
 	import matplotlib.pyplot as plt
 	plt.figure(figsize=(10,6))
 	plt.plot(qCorr)
+	plt.ylim(0.5,1.1)
 	plt.tight_layout()
 	plt.show()
 
