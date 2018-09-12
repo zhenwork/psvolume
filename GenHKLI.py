@@ -23,7 +23,8 @@ zio = IOsystem()
 [path_i, folder_i] = zio.get_path_folder(args.i)
 [num, allFile] = zio.counterFile(folder_i, title='.slice')
 if args.nmax == -1: args.nmax = int(num)
-
+testFolder = path_i+'/testFolder'
+	
 if comm_rank == 0:
 	print "### Resource folder: %s"%folder_i
 	print "### Radial range: %d-%d"%(args.rmin, args.rmax)
@@ -48,6 +49,8 @@ def GenHKLI_alg1(image, Geo, peakRing=0.25):
 	Rot = Geo['rotation']
 	HKL = Vsample*(Rot.dot(voxel)).T
 
+	image_copy = Image.copy()
+	
 	for t in range(len(HKL)):
 
 		if Image[t] < 0: 
@@ -75,8 +78,11 @@ def GenHKLI_alg1(image, Geo, peakRing=0.25):
 		else:
 			HKLI_List[inth,intk,intl] += Image[t]
 			weight[inth,intk,intl] += 1.
+			image_copy[t] = -100
 
-	return HKLI_List, weight
+	image_copy.shape = image.shape
+	
+	return HKLI_List, weight, image_copy
 
 
 
@@ -117,6 +123,8 @@ if comm_rank==0:
 	folder_o = args.o
 	if not os.path.isdir(folder_o):
 		os.makedirs(folder_o)
+	if not os.path.isdir(testFolder):
+		os.makedirs(testFolder)
 else:
 	import time
 	folder_o = args.o
@@ -124,6 +132,8 @@ else:
 		time.sleep(5)
 
 
+
+		
 sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
 print "### Rank %.4d will process [%.4d, %.4d]"%(comm_rank, sep[comm_rank], sep[comm_rank+1])
 
@@ -146,7 +156,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	image[np.where(image>10000)] = -1
 
 
-	HKLI_List, weight = GenHKLI_alg1(image, Geo, peakRing=0.25)
+	HKLI_List, weight, image_copy = GenHKLI_alg1(image, Geo, peakRing=0.25)
 	saveHKLI(HKLI_List, weight, fname = "%s/%.5d.hkl"%(folder_o,idx) )
+	zf.h5writer(testFolder+'/'+str(idx).zfill(5)+'.slice', 'image', image_copy)
 
 	print "### Rank %.4d finished %.4d-%.4d-%.4d"%(comm_rank, sep[comm_rank], idx, sep[comm_rank+1])
