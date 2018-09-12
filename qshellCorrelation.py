@@ -114,7 +114,7 @@ ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
 
-if args.v !==0:
+if args.v != 0:
 	import matplotlib.pyplot as plt
 	plt.figure(figsize=(10,6))
 	plt.plot(qCorr)
