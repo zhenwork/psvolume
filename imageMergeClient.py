@@ -184,7 +184,7 @@ def ImageMerge_XYZ(model3d, weight, image, Geo, Volume, Kpeak=False):
 
 
 @jit
-def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, idx=0, thrmin=0):
+def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel=None, thrmin=0):
 
 	# FIXME: This is specific for the snc dataset
 	Vsize = Volume['volumeSize']
@@ -248,6 +248,52 @@ def ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Volume, Kpeak=False, voxel
 	# ######
 
 	return [model3d, weight]
+
+@jit
+def ImageMerge_HKL_CC12(model3d_1, weight_1, model3d_2, weight_2, image, Geo, Volume, Kpeak=False, voxel=None, thrmin=0):
+
+	Vsize = Volume['volumeSize']
+	Vcenter = Volume['volumeCenter']
+	Vsample = Volume['volumeSampling']
+	voxel = Geometry(image, Geo)
+
+	Image = image.ravel()
+	Rot = Geo['rotation']
+	HKL = Vsample*(Rot.dot(voxel)).T
+	
+	randomArray = (np.random.random((Vsize,Vsize,Vsize))*2).astype(int)
+
+	for t in range(len(HKL)):
+
+		if (Image[t] < thrmin): continue
+		
+		hkl = HKL[t] + Vcenter
+		
+		h = hkl[0] 
+		k = hkl[1] 
+		l = hkl[2] 
+		
+		inth = int(round(h)) 
+		intk = int(round(k)) 
+		intl = int(round(l)) 
+
+		if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1): continue
+		
+		hshift = abs(h/Vsample-round(h/Vsample))
+		kshift = abs(k/Vsample-round(k/Vsample))
+		lshift = abs(l/Vsample-round(l/Vsample))
+		
+		if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not Kpeak: continue
+		
+		if randomArray[inth, intk, intl] == 0:
+			weight_1[ inth,intk,intl] += 1.
+			model3d_1[inth,intk,intl] += Image[t] 
+		else:
+			weight_2[ inth,intk,intl] += 1.
+			model3d_2[inth,intk,intl] += Image[t] 
+
+	return [model3d_1, weight_1, model3d_2, weight_2]
+
 
 
 @jit
