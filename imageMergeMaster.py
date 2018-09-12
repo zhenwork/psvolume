@@ -34,11 +34,15 @@ Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
-model3d_1 = np.zeros([Vol['volumeSize']]*3)
-weight_1  = np.zeros([Vol['volumeSize']]*3)
+if args.cc12 != 0:
+	model3d_1 = np.zeros([Vol['volumeSize']]*3)
+	weight_1  = np.zeros([Vol['volumeSize']]*3)
 
-model3d_2 = np.zeros([Vol['volumeSize']]*3)
-weight_2  = np.zeros([Vol['volumeSize']]*3)
+	model3d_2 = np.zeros([Vol['volumeSize']]*3)
+	weight_2  = np.zeros([Vol['volumeSize']]*3)
+	
+	model3d = np.array([model3d_1, model3d_2])
+	weight = np.array([weight_1, weight_2])
 
 
 # FIXME: This is specific for the snc dataset
