@@ -5,6 +5,7 @@ import mpi4py.MPI as MPI
 import time
 import h5py
 
+
 tic = time.time()
 comm = MPI.COMM_WORLD  
 comm_rank = comm.Get_rank()  
