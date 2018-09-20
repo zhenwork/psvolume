@@ -123,8 +123,6 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 
 		print '### R: '+str(r1).rjust(4)+" -> "+str(r2).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[n],5)).ljust(8)
 
-		r1 = r
-		n = n+1
 
 
 	index = np.where((rMatrix>=rmin)*(rMatrix<rmax)==True)
