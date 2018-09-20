@@ -124,6 +124,14 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 		rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz)
 	else:
 		rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz, lattice=lattice)
+		## Testing:
+		print "3,5,7", rMatrix[3,5,7]
+		print "100,105,97", rMatrix[100,105,97]
+		print "33,75,7", rMatrix[33,75,7]
+		print "63,65,67", rMatrix[63,65,67]
+		print "13,55,77", rMatrix[13,55,77]
+
+
 	#rMatrix = np.around(rMatrix)
 	if int(rmax)==-1: rmax=np.amax(rMatrix)+0.1
 
