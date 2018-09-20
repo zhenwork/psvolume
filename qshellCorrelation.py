@@ -121,7 +121,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 		if len(list_i)<8: qCorr[n] = 0.0
 		else: qCorr[n] = cal_correlation(list_i, list_j)
 
-		print '### R: '+str(r1).rjust(4)+" -> "+str(r2).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[n],5)).ljust(8)
+		print '### R: '+str(round(r1,1)).rjust(4)+" -> "+str(round(r2,1)).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[n],5)).ljust(8)
 
 
 
@@ -133,7 +133,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	if len(list_i)<8: totCorr = 0.0
 	else: totCorr = cal_correlation(list_i, list_j)
 
-	print "### TOTAL: "+str(rmin).rjust(4)+" -> "+str(rmax).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(totCorr,5)).ljust(8)
+	print "### TOTAL: "+str(round(rmin,1)).rjust(4)+" -> "+str(round(rmax,1)).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(totCorr,5)).ljust(8)
 	return qCorr, totCorr
 
 
