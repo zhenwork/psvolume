@@ -143,7 +143,12 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	else: totCorr = cal_correlation(list_i, list_j)
 
 	print "### TOTAL: "+str(round(rmin,1)).rjust(4)+" -> "+str(round(rmax,1)).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(totCorr,5)).ljust(8)
-	return qCorr, totCorr
+	
+	r1 = np.array(rList[:bins])
+	r2 = np.array(rList[1:])
+	rList = (r1+r2)/2.
+
+	return qCorr, rList, totCorr
 
 
 
@@ -170,7 +175,7 @@ if args.count != "":
 if args.bins == -1:
 	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=int(args.rmin), rmax=int(args.rmax), expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 elif args.bins > 1:
-	qCorr, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim)
+	qCorr, rList, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim)
 else:
 	raiseException("### Bins is wrong")
 
@@ -179,6 +184,8 @@ print '### saving file: ', fsave
 ThisFile = zf.readtxt(os.path.realpath(__file__))
 zf.h5writer(fsave, 'execute', ThisFile)
 zf.h5modify(fsave, 'qCorr', qCorr)
+if args.bins > 1:
+	zf.h5modify(fsave, 'rList', rList)
 
 if args.v != 0:
 	import matplotlib.pyplot as plt
