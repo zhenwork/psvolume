@@ -97,7 +97,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	if cx==-1: cx=(nx-1.)/2.
 	if cy==-1: cy=(ny-1.)/2.
 	if cz==-1: cz=(nz-1.)/2.
-	rMatrix = expand*1.0*make_3d_radius(nx, ny, nz, cx, cy, cz);
+	rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz);
 	rMatrix = np.around(rMatrix).astype(int)
 	if rmax==-1: rmax=int(np.amax(rMatrix))+1
 
