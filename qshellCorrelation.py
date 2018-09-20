@@ -111,8 +111,9 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	nRList = np.linspace(0, nTotal, bins+1).astype(int)
 
 	rList = np.zeros(bins+1)
-	for n in range(bins+1):
+	for n in range(bins):
 		rList[n] = tmpData[nRList[n]]
+	rList[bins] = tmpData[-1]
 
 	for n in range(bins):
 
