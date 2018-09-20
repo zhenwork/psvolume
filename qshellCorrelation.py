@@ -106,7 +106,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	qCorr = np.zeros(bins)
 	r1 = 0
 	n = 0
-	for r in range(rmin, rmax*10-9):
+	for r in range(int(rmin), (int(rmax)+1)*10-9):
 		r = r/10.0
 		index = np.where((rMatrix>r1)*(rMatrix<=r)==True)
 		if len(index[0]) < nvoxel_per_bin:
@@ -159,7 +159,7 @@ if args.count != "":
 
 	
 if args.bins == -1:
-	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
+	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=int(args.rmin), rmax=int(args.rmax), expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 elif args.bins > 1:
 	qCorr, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim)
 else:
