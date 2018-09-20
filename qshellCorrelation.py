@@ -127,7 +127,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	#rMatrix = np.around(rMatrix)
 	if int(rmax)==-1: rmax=np.amax(rMatrix)+0.1
 
-	index = np.where((rMatrix>=rmin)*(rMatrix<rmax)==True)
+	index = np.where( (rMatrix>=rmin)*(rMatrix<rmax)*(data_i>=ilim[0])*(data_i<=ilim[1])*(data_j>=jlim[0])*(data_j<=jlim[1])==True )
 	nTotal = len(index[0])
 	nvoxel_per_bin = int(nTotal/float(bins))
 	qCorr = np.zeros(bins)
@@ -145,7 +145,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 		r1 = rList[n]
 		r2 = rList[n+1]
 
-		index = np.where((rMatrix>=r1)*(rMatrix<r2)==True)
+		index = np.where((rMatrix>=r1)*(rMatrix<r2)*(data_i>=ilim[0])*(data_i<=ilim[1])*(data_j>=jlim[0])*(data_j<=jlim[1])==True)
 		list_i = data_i[index].ravel()
 		list_j = data_j[index].ravel()
 
