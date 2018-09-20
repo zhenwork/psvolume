@@ -58,6 +58,10 @@ def make_3d_radius(nx, ny, nz, cx, cy, cz, lattice=None):
 		recK /= lens(recK)
 		recL /= lens(recK)
 
+		print "### recH = ", recH
+		print "### recK = ", recK
+		print "### recL = ", recL
+
 		Xaxis = xaxis * recH[0] + yaxis * recK[0] + zaxis * recL[0]
 		Yaxis = xaxis * recH[1] + yaxis * recK[1] + zaxis * recL[1]
 		Zaxis = xaxis * recH[2] + yaxis * recK[2] + zaxis * recL[2]
@@ -190,11 +194,16 @@ if args.count != "":
 	data_i[index] = ilim[0]-1024
 	data_j[index] = jlim[0]-1024
 
+if args.lattice != "":
+	lattice = [float(each) for each in args.lattice.split()]
+	print "### Lattice Constants: ", lattice
+else:
+	lattice = None
 	
 if args.bins == -1:
 	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=int(args.rmin), rmax=int(args.rmax), expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 elif args.bins > 1:
-	qCorr, rList, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim)
+	qCorr, rList, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim, lattice=lattice)
 else:
 	raiseException("### Bins is wrong")
 
