@@ -125,7 +125,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 		n = n+1
 
 
-	index = np.where((rMatrix>rmin)*(rMatrix<=rmax-1)==True)
+	index = np.where((rMatrix>int(rmin))*(rMatrix<=int(rmax))==True)
 	list_i = data_i[index].ravel()
 	list_j = data_j[index].ravel()
 	(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
