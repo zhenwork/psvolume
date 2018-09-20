@@ -260,6 +260,8 @@ def ImageMerge_HKL_CC12(model3d_1, weight_1, model3d_2, weight_2, image, Geo, Vo
 	Image = image.ravel()
 	Rot = Geo['rotation']
 	HKL = Vsample*(Rot.dot(voxel)).T
+	HKL[:,2] = np.abs(HKL[:,2])
+	HKL[:,1] = np.abs(HKL[:,1])
 	
 	randomArray = (np.random.random((Vsize,Vsize,Vsize))*2).astype(int)
 
@@ -273,7 +275,7 @@ def ImageMerge_HKL_CC12(model3d_1, weight_1, model3d_2, weight_2, image, Geo, Vo
 		k = hkl[1] 
 		l = hkl[2] 
 		
-		inth = int(round(h)) 
+		inth = int(round(h))
 		intk = int(round(k)) 
 		intl = int(round(l)) 
 
