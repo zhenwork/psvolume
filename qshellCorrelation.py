@@ -105,20 +105,23 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	nvoxel_per_bin = int(nTotal/float(bins))+1
 	qCorr = np.zeros(bins)
 	r1 = 0
+	n = 0
 	for r in range(rmin, rmax):
 		index = np.where((rMatrix>r1)*(rMatrix<=r)==True)
 		if len(index[0]) < nvoxel_per_bin:
-			continue
+			if r < rmax - 1:
+				continue
 		
 		list_i = data_i[index].ravel()
 		list_j = data_j[index].ravel()
 		(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
 		commLength = len(list_i)
-		if len(list_i)<8: qCorr[r] = 0.0
-		else: qCorr[r] = cal_correlation(list_i, list_j);
+		if len(list_i)<8: qCorr[n] = 0.0
+		else: qCorr[n] = cal_correlation(list_i, list_j);
 		print '### R: '+str(r1).rjust(4)+" -> "+str(r).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[r],5)).ljust(8)
 
 		r1 = r
+		n = n+1
 
 
 	index = np.where((rMatrix>rmin)*(rMatrix<=rmax-1)==True)
