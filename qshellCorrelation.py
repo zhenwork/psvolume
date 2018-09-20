@@ -99,41 +99,43 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	if cz==-1: cz=(nz-1.)/2.
 	rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz);
 	#rMatrix = np.around(rMatrix)
-	if rmax==-1: rmax=int(np.amax(rMatrix))+1
+	if int(rmax)==-1: rmax=np.amax(rMatrix)+0.1
 
-	nTotal = len(np.where(rMatrix<=rmax)[0])
-	nvoxel_per_bin = int(nTotal/float(bins))+1
+	index = np.where((rMatrix>=rmin)*(rMatrix<rmax)==True)
+	nTotal = len(index[0])
+	nvoxel_per_bin = int(nTotal/float(bins))
 	qCorr = np.zeros(bins)
-	r1 = 0
-	n = 0
-	for r in range(int(rmin), (int(rmax))*10-9):
-		r = r/10.0
-		index = np.where((rMatrix>r1)*(rMatrix<=r)==True)
-		if len(index[0]) < nvoxel_per_bin:
-			if r < rmax - 1.0001:
-				continue
-		
+	rList = np.linspace(rmin, rmax, bins+1)
+	for n in range(bins):
+
+		r1 = rList[n]
+		r2 = rList[n+1]
+
+		index = np.where((rMatrix>=r1)*(rMatrix<r2)==True)
 		list_i = data_i[index].ravel()
 		list_j = data_j[index].ravel()
+
 		(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
 		commLength = len(list_i)
+
 		if len(list_i)<8: qCorr[n] = 0.0
-		else: qCorr[n] = cal_correlation(list_i, list_j);
-		print '### R: '+str(r1).rjust(4)+" -> "+str(r).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[n],5)).ljust(8)
+		else: qCorr[n] = cal_correlation(list_i, list_j)
+
+		print '### R: '+str(r1).rjust(4)+" -> "+str(r2).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[n],5)).ljust(8)
 
 		r1 = r
 		n = n+1
 
 
-	index = np.where((rMatrix>rmin)*(rMatrix<=rmax)==True)
+	index = np.where((rMatrix>=rmin)*(rMatrix<rmax)==True)
 	list_i = data_i[index].ravel()
 	list_j = data_j[index].ravel()
 	(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
 	commLength = len(list_i)
 	if len(list_i)<8: totCorr = 0.0
-	else: totCorr = cal_correlation(list_i, list_j);
+	else: totCorr = cal_correlation(list_i, list_j)
 
-	print "### TOTAL: "+str(rmin).rjust(4)+" -> "+str(rmax-1).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(totCorr,5)).ljust(8)
+	print "### TOTAL: "+str(rmin).rjust(4)+" -> "+str(rmax).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(totCorr,5)).ljust(8)
 	return qCorr, totCorr
 
 
