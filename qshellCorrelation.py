@@ -106,7 +106,7 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	qCorr = np.zeros(bins)
 	r1 = 0
 	n = 0
-	for r in range(int(rmin), (int(rmax)+1)*10-9):
+	for r in range(int(rmin), (int(rmax))*10-9):
 		r = r/10.0
 		index = np.where((rMatrix>r1)*(rMatrix<=r)==True)
 		if len(index[0]) < nvoxel_per_bin:
