@@ -92,12 +92,13 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 
 
 def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=args.bins, ilim=ilim, jlim=jlim):
+
 	(nx,ny,nz) = data_i.shape;
 	(cx,cy,cz) = center;
 	if cx==-1: cx=(nx-1.)/2.
 	if cy==-1: cy=(ny-1.)/2.
 	if cz==-1: cz=(nz-1.)/2.
-	rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz);
+	rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz)
 	#rMatrix = np.around(rMatrix)
 	if int(rmax)==-1: rmax=np.amax(rMatrix)+0.1
 
@@ -105,7 +106,14 @@ def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=ar
 	nTotal = len(index[0])
 	nvoxel_per_bin = int(nTotal/float(bins))
 	qCorr = np.zeros(bins)
-	rList = np.linspace(rmin, rmax, bins+1)
+
+	tmpData = np.sort(rMatrix[index].copy())
+	nRList = np.linspace(0, nTotal, bins+1).astype(int)
+
+	rList = np.zeros(bins+1)
+	for n in range(bins+1):
+		rList[n] = tmpData[nRList[n]]
+
 	for n in range(bins):
 
 		r1 = rList[n]
