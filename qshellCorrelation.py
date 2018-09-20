@@ -21,6 +21,7 @@ parser.add_argument("-jname","--jname", help="ilim[1]", default="anisoData", typ
 parser.add_argument("-count","--count", help="symCounter", default="", type=str)
 parser.add_argument("-v","--v", help="verbose", default=0, type=int)
 parser.add_argument("-bins","--bins", help="bins", default=-1, type=int)
+parser.add_argument("-lattice","--lattice", help="lattice constants", default="", type=str)
 args = parser.parse_args()
 if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
@@ -28,7 +29,8 @@ if args.j1 == "." or args.j2 == ".": jlim=None
 else: jlim=(float(args.j1), float(args.j2))
 
 
-
+def lens(arr):
+	return np.sqrt(np.sum(arr**2))
 
 ## correlation function
 def cal_correlation(list1, list2):
@@ -44,12 +46,25 @@ def cal_correlation(list1, list2):
 	return float(S1)/float(S2)
 
 ## 3d radius matrix
-def make_3d_radius(nx, ny, nz, cx, cy, cz):
+def make_3d_radius(nx, ny, nz, cx, cy, cz, lattice=None):
 	x = np.arange(nx) - cx
 	y = np.arange(ny) - cy
 	z = np.arange(nz) - cz
 	[xaxis, yaxis, zaxis] = np.meshgrid(x,y,z,indexing='ij')
-	rMatrix = np.sqrt(xaxis**2+yaxis**2+zaxis**2)
+	if lattice is not None:
+		from imageMergeClient import Lattice2vector
+		(vecx, vecy, vecz, recH, recK, recL) = Lattice2vector(lattice[0], lattice[1], lattice[2], lattice[3], lattice[4], lattice[5])
+		recH /= lens(recK)
+		recK /= lens(recK)
+		recL /= lens(recK)
+
+		Xaxis = xaxis * recH[0] + yaxis * recK[0] + zaxis * recL[0]
+		Yaxis = xaxis * recH[1] + yaxis * recK[1] + zaxis * recL[1]
+		Zaxis = xaxis * recH[2] + yaxis * recK[2] + zaxis * recL[2]
+
+		rMatrix = np.sqrt(Xaxis**2+Yaxis**2+Zaxis**2)
+	else:
+		rMatrix = np.sqrt(xaxis**2+yaxis**2+zaxis**2)
 	return rMatrix
 
 ## remove bad pixels
@@ -91,14 +106,18 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 
 
 
-def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=args.bins, ilim=ilim, jlim=jlim):
+def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=args.bins, ilim=ilim, jlim=jlim, lattice=None):
 
 	(nx,ny,nz) = data_i.shape;
 	(cx,cy,cz) = center;
 	if cx==-1: cx=(nx-1.)/2.
 	if cy==-1: cy=(ny-1.)/2.
 	if cz==-1: cz=(nz-1.)/2.
-	rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz)
+
+	if lattice is None:
+		rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz)
+	else:
+		rMatrix = 1.0*make_3d_radius(nx, ny, nz, cx, cy, cz, lattice=lattice)
 	#rMatrix = np.around(rMatrix)
 	if int(rmax)==-1: rmax=np.amax(rMatrix)+0.1
 

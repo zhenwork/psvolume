@@ -28,7 +28,7 @@ def user_get_xds(filename):
 		for j in range(3):
 			invAmat[i-4,j] = float(content[i].split()[j])
 	if invAmat is not None:
-		# invAmat[1,:] = -invAmat[1,:].copy()
+		invAmat[1,:] = -invAmat[1,:].copy()
 		tmp = invAmat[:,0].copy()
 		invAmat[:,0] = invAmat[:,1].copy()
 		invAmat[:,1] = tmp.copy()
