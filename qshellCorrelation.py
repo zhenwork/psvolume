@@ -20,6 +20,7 @@ parser.add_argument("-iname","--iname", help="ilim[0]", default="anisoData", typ
 parser.add_argument("-jname","--jname", help="ilim[1]", default="anisoData", type=str)
 parser.add_argument("-count","--count", help="symCounter", default="", type=str)
 parser.add_argument("-v","--v", help="verbose", default=0, type=int)
+parser.add_argument("-bins","--bins", help="bins", default=-1, type=int)
 args = parser.parse_args()
 if args.i1 == "." or args.i2 == ".": ilim=None
 else: ilim=(float(args.i1), float(args.i2))
@@ -64,6 +65,7 @@ def data_remove(list1, list2, ilim=ilim, jlim=jlim):
 		list2 = list2[index].copy()
 	return (list1, list2)
 
+
 ## correlation calculation
 def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, ilim=None, jlim=None, mode='shell'):
 	(nx,ny,nz) = data_i.shape;
@@ -88,6 +90,52 @@ def q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=0, rmax=-1, expand=1, i
 	return qCorr
 
 
+
+def q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=args.bins, ilim=ilim, jlim=jlim):
+	(nx,ny,nz) = data_i.shape;
+	(cx,cy,cz) = center;
+	if cx==-1: cx=(nx-1.)/2.
+	if cy==-1: cy=(ny-1.)/2.
+	if cz==-1: cz=(nz-1.)/2.
+	rMatrix = expand*1.0*make_3d_radius(nx, ny, nz, cx, cy, cz);
+	rMatrix = np.around(rMatrix).astype(int)
+	if rmax==-1: rmax=int(np.amax(rMatrix))+1
+
+	nTotal = len(np.where(rMatrix<=rmax)[0])
+	nvoxel_per_bin = int(nTotal/float(bins))+1
+	qCorr = np.zeros(bins)
+	r1 = 0
+	for r in range(rmin, rmax):
+		index = np.where((rMatrix>r1)*(rMatrix<=r)==True)
+		if len(index[0]) < nvoxel_per_bin:
+			continue
+		
+		list_i = data_i[index].ravel()
+		list_j = data_j[index].ravel()
+		(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
+		commLength = len(list_i)
+		if len(list_i)<8: qCorr[r] = 0.0
+		else: qCorr[r] = cal_correlation(list_i, list_j);
+		print '### R: '+str(r1).rjust(4)+" -> "+str(r).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[r],5)).ljust(8)
+
+		r1 = r
+
+
+	index = np.where((rMatrix>rmin)*(rMatrix<=rmax-1)==True)
+	list_i = data_i[index].ravel()
+	list_j = data_j[index].ravel()
+	(list_i, list_j) = data_remove(list_i, list_j, ilim=ilim, jlim=jlim)
+	commLength = len(list_i)
+	if len(list_i)<8: totCorr = 0.0
+	else: totCorr = cal_correlation(list_i, list_j);
+
+	print "### TOTAL: "+str(rmin).rjust(4)+" -> "+str(rmax-1).rjust(4)+'   NUM:'+str(commLength).rjust(6)+'   qCorr:  ' + str(round(qCorr[r],5)).ljust(8)
+	return qCorr, totCorr
+
+
+
+
+
 zf = iFile()
 print ('### reading dataset one ...')
 data_i = zf.h5reader(args.i, args.iname)
@@ -106,7 +154,12 @@ if args.count != "":
 	data_j[index] = jlim[0]-1024
 
 	
-qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
+if args.bins == -1:
+	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
+elif args.bins > 1:
+	qCorr, totCorr = q_Shell_Corr_Bins(data_i, data_j, center=(-1,-1,-1), rmin=args.rmin, rmax=args.rmax, bins=int(args.bins), ilim=ilim, jlim=jlim)
+else:
+	raiseException("### Bins is wrong")
 
 fsave = args.o+'/corr-sep-list.h5'+args.tag
 print '### saving file: ', fsave
