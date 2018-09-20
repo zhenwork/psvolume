@@ -52,11 +52,13 @@ def make_3d_radius(nx, ny, nz, cx, cy, cz, lattice=None):
 	z = np.arange(nz) - cz
 	[xaxis, yaxis, zaxis] = np.meshgrid(x,y,z,indexing='ij')
 	if lattice is not None:
+
 		from imageMergeClient import Lattice2vector
 		(vecx, vecy, vecz, recH, recK, recL) = Lattice2vector(lattice[0], lattice[1], lattice[2], lattice[3], lattice[4], lattice[5])
+
 		recH /= lens(recK)
-		recK /= lens(recK)
 		recL /= lens(recK)
+		recK /= lens(recK)
 
 		print "### recH = ", recH
 		print "### recK = ", recK
@@ -199,7 +201,7 @@ if args.lattice != "":
 	print "### Lattice Constants: ", lattice
 else:
 	lattice = None
-	
+
 if args.bins == -1:
 	qCorr = q_Shell_Corr(data_i, data_j, center=(-1,-1,-1), rmin=int(args.rmin), rmax=int(args.rmax), expand=args.expand, ilim=ilim, jlim=jlim, mode=args.mode) #mode can be "ball" or "shell"
 elif args.bins > 1:
