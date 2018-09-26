@@ -15,6 +15,7 @@ parser.add_argument("-rmin","--rmin", help="min radius", default=100, type=int)
 parser.add_argument("-rmax","--rmax", help="max radius", default=1200, type=int)
 parser.add_argument("-nmin","--nmin", help="smallest index of image", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="largest index of image", default=-1, type=int)
+parser.add_argument("-upShift","--upShift", help="increase", default=100, type=float)
 parser.add_argument("-o","--o", help="output folder", default="HKLI_List", type=str)
 parser.add_argument("-bg","--bg", help="background volume", default=None)
 args = parser.parse_args()
@@ -89,11 +90,8 @@ def GenHKLI_alg1(image, Geo, backg=None, peakRing=0.25):
 
 
 
-def saveHKLI(HKLI_List, weight, fname):
-	index = np.where(weight>=10)
-	HKLI_List[index] /= weight[index]
-	index = np.where(weight<10)
-	HKLI_List[index] = -1024
+def saveHKLI(HKLI_List, fname, vmax=1000, vmin=0):
+
 	f = open(fname,'w')
 	#f.writelines("H".rjust(5)+"K".rjust(5)+"L".rjust(5)+"I".rjust(10)+"\n")
 	for H in range(-60,60):
@@ -167,6 +165,20 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 
 	HKLI_List, weight, image_copy = GenHKLI_alg1(image, Geo, peakRing=0.25, backg = backg)
+
+	## remove the bad values
+	index = np.where(weight>=10)
+	HKLI_List[index] /= weight[index]
+	index = np.where(weight<10)
+	HKLI_List[index] = -1024
+
+	HKLI_List += float(args.upShift)
+
+	index = np.where(HKLI_List>1000)
+	HKLI_List[index] = -1024
+	index = np.where(HKLI_List<0)
+	HKLI_List[index] = -1024
+
 	saveHKLI(HKLI_List, weight, fname = "%s/%.5d.hkl"%(folder_o,idx) )
 	zf.h5writer(testFolder+'/'+str(idx).zfill(5)+'.slice', 'image', image_copy)
 
