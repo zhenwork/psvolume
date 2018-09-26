@@ -122,3 +122,9 @@ def get_users_mask(Geo, imageType="PILATUS"):
 		index = np.where(radius<40)
 		mask[index] = 0
 		return mask
+
+
+def angle2quaternion(angle, axis='y'):
+	## angle is original angle without making it half
+	## angle = idx*increment*np.pi/180.
+	return (np.cos( angle/2. ),0.,np.sin( angle/2. ),0.)
