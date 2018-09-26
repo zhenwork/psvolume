@@ -1,23 +1,6 @@
 import numpy as np
 from numba import jit
 
-def Lattice2vector(a,b,c,ag1,ag2,ag3):
-	"""
-	convert lattice constants into x,y,z vectors and h,k,l reciprocal vectors.
-	alpha, beta, gamma are in angle (0-180)
-	a,b,c are in A
-	"""
-	alpha = ag1/180.*np.pi;
-	beta  = ag2/180.*np.pi;
-	gamma = ag3/180.*np.pi;
-	vecx = a*np.array([1., 0., 0.]);
-	vecy = b*np.array([np.cos(gamma), np.sin(gamma), 0]);
-	vecz = c*np.array([np.cos(beta), (np.cos(alpha)-np.cos(gamma)*np.cos(beta))/np.sin(gamma), np.sqrt(1.+2.*np.cos(alpha)*np.cos(beta)*np.cos(gamma)-np.cos(alpha)**2-np.cos(beta)**2-np.cos(gamma)**2)/np.sin(gamma)])
-	recH = np.cross(vecy, vecz)/vecx.dot(np.cross(vecy, vecz));
-	recK = np.cross(vecz, vecx)/vecy.dot(np.cross(vecz, vecx));
-	recL = np.cross(vecx, vecy)/vecz.dot(np.cross(vecx, vecy));
-	return (vecx, vecy, vecz, recH, recK, recL)
-
 def ThreeDIndexing(a,b,c):
 	nx = int(a)
 	ny = int(b)
