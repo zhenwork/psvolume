@@ -34,21 +34,17 @@ def load_GXPARM_XDS(xds_file):
     Geo = {}
     Geo['pixelSize'] = float(content[7].split()[3])
     Geo['detDistance'] = float(content[8].split()[2])
-    Geo['polarization'] = 1.0 #float(content[1].split()[3])
+    Geo['polarization'] = -1.0
     Geo['wavelength'] = float(content[2].split()[0])
-    Geo['center'] = (float(content[8].split()[1]), float(content[8].split()[0]))
-    Geo['Angle_increment'] = float(content[1].split()[2])
+    Geo['shape']  = (int(content[7].split()[1]),   int(content[7].split()[2]))
+    Geo['center'] = (float(content[8].split()[0]), float(content[8].split()[1]))
+    Geo['increment'] = float(content[1].split()[2])
 
     ## calculate the invAmat matrix
-    invAmat = np.zeros((3,3));
+    invAmat = np.zeros((3,3))
     for i in range(4,7):
         for j in range(3):
             invAmat[i-4,j] = float(content[i].split()[j])
-    # if invAmat is not None:
-    #     invAmat[1,:] = -invAmat[1,:].copy()
-    #     tmp = invAmat[:,0].copy()
-    #     invAmat[:,0] = invAmat[:,1].copy()
-    #     invAmat[:,1] = tmp.copy()
 
     ## calculate B matrix from lattice constants
     (a,b,c,alpha,beta,gamma) = [float(each) for each in content[3].split()[1:]]
@@ -64,3 +60,67 @@ def load_GXPARM_XDS(xds_file):
     return [Geo, Bmat, invBmat, invAmat]
 
 
+## load diffraction patterns
+def load_image(filename):
+	## load cbf file
+	if filename.endswith('.cbf'):
+		content = cbf.read(filename)
+		image = np.array(content.data).astype(float)
+		## Sometimes the image is transposed in the cbf file
+		## It affects the polarization correction
+		image = image.T
+		return image
+
+	## load .img file
+	if filename.endswith('.img'):
+		f = open(filename,"rb")
+		raw = f.read()
+		h = raw[0:511]
+		d = raw[512:]
+		f.close()
+		flat_image = np.frombuffer(d,dtype=np.int16)
+		image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
+
+		## This transpose operation is compatible with x_vectors
+		image = image.T
+		return image
+
+	## load numpy arrays
+	if filename.endswith(".npy"):
+		return np.load(filename)
+
+	## other formats are not supported
+	raiseException("## This file format is not supported")
+	return None
+
+
+# How to define a users mask
+def get_users_mask(Geo, imageType):
+
+	mask = np.ones(Geo["shape"]).astype(int)
+
+	## detector of "ccd" 
+	if imageType=="ccd":
+		radius = make_radius(Geo["shape"], center=Geo['center'])
+		index = np.where(radius<10)
+		mask[index] = 0
+		mask[506:557, 471:517] = 0
+		return mask
+
+	## detector of "cbf"
+	if imageType=="":
+		index = np.where(data > 100000)
+		mask[index] = 0
+		index = np.where(data < 0.001)
+		mask[index] = 0
+
+		# FIXME: This is specfic for Henry's detector
+		# mask[1260:1300,1235:2463] = 0
+		mask[1235:2463, 1255:1300] = 0
+		mask[1735:2000, 1255:1305] = 0
+		mask[2000:2463, 1255:1310] = 0
+
+		radius = make_radius(Geo["shape"], center=Geo['center'])
+		index = np.where(radius<40)
+		mask[index] = 0
+		return mask

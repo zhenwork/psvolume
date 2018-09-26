@@ -14,30 +14,6 @@ import os
 
 
 # How to read the idx image, return a 2d matrix
-def user_get_image(fname=None):
-
-	if fname is None: raise Exception('no files') 
-	#fname = '/reg/data/ana04/users/zhensu/xpptut/volume/ICH_wt_cds4/blank/rawcbf/ICH_wt_cds4_blk_1_'+str(idx+1).zfill(5)+'.cbf'
-
-	if fname.endswith('.cbf'):
-		content = cbf.read(fname)
-		image = np.array(content.data).astype(float)
-		return image
-	elif fname.endswith('.img'):
-		f = open(fname,"rb")
-		raw = f.read()
-		h = raw[0:511]
-		d = raw[512:]
-		f.close()
-		flat_image = np.frombuffer(d,dtype=np.int16)
-		image = np.reshape(flat_image, ((1024,1024)) ).astype(float)
-		
-		## FIXME: To make the image compatible with x_vectors.npy
-		image = image.T
-		
-		return image
-	else:
-		return None
 
 
 
@@ -48,42 +24,6 @@ def user_get_orientation(idx, increment=0.1):
 
 
 
-# How to get the scale factor, return a number (if not using, return None)
-def user_get_scalingFactor(idx):
-	return 1.
-	f = h5py.File('/reg/data/ana04/users/zhensu/xpptut/experiment/0024/wtich/data-ana/scalesMike.h5')
-	scale = f[f.keys()[0]].value
-	f.close()
-	return scale[idx]
-
-
-# How to define a users mask
-def user_get_mask(Geo, fname=None):
-	data = user_get_image(fname=fname)
-	mask = np.ones(data.shape).astype(int)
-
-	if fname.endswith('.img'):
-		radius = make_radius(mask.shape, center=Geo['center'])
-		index = np.where(data == 0 )
-		mask[index] = 0
-		mask[506:557, 471:517] = 0
-	else:
-		index = np.where(data > 100000)
-		mask[index] = 0
-		index = np.where(data < 0.001)
-		mask[index] = 0
-
-		# FIXME: This is specfic for Henry's detector
-		# mask[1260:1300,1235:2463] = 0
-		mask[1255:1300,1235:2463] = 0
-		mask[1255:1305,1735:2000] = 0
-		mask[1255:1310,2000:2463] = 0
-
-		radius = make_radius(mask.shape, center=Geo['center'])
-		index = np.where(radius<40)
-		mask[index] = 0
-		
-	return mask
 
 
 
