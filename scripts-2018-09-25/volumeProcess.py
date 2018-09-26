@@ -68,6 +68,7 @@ if args.sub==1:
 	print '### subtracting background ... '
 	subData = symData.copy()
 	rawSubData = rawData.copy()
+	volumeBack = np.zeros(rawData.shape)
 	[nnxx, nnyy, nnzz] = rawData.shape
 	for i in range(nnxx):
 		for j in range(nnyy):
@@ -75,9 +76,11 @@ if args.sub==1:
 				intr = radius[i,j,k]
 				subData[i,j,k] -= backg[intr]
 				rawSubData[i,j,k] = rawData[i,j,k] - backg[intr]
+				volumeBack[i,j,k] = backg[intr]
 	print '### max/min: ', np.amin(subData), np.amax(subData)
 	zf.h5modify(args.i, args.name+'subData', subData)
 	zf.h5modify(args.i, args.name+'backg', backg)
+	zf.h5modify(args.i, args.name+'volumeBack', volumeBack)
 else:
 	subData = symData.copy()
 

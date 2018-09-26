@@ -132,8 +132,6 @@ else:
 		time.sleep(5)
 
 
-
-		
 sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
 print "### Rank %.4d will process [%.4d, %.4d]"%(comm_rank, sep[comm_rank], sep[comm_rank+1])
 
