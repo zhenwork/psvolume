@@ -2,6 +2,20 @@ import numpy as np
 import h5py
 from scipy.ndimage.filters import median_filter
 
+
+def make_radius(size, center=None):
+	(nx, ny) = size
+	if center is None:
+		cx = (nx-1.)/2.
+		cy = (ny-1.)/2.
+		center = (cx,cy)
+	x = np.arange(nx) - center[0]
+	y = np.arange(ny) - center[1]
+	[xaxis, yaxis] = np.meshgrid(x, y, indexing='ij')
+	radius = np.sqrt(xaxis**2 + yaxis**2)
+	return radius
+
+
 def circle_region(image=None, center=(-1,-1), rmax=10, rmin=0, size=(100,100)):
 	"""
 	input an image, throw away any value out of [rmin, rmax]: set those values to zero

@@ -54,17 +54,6 @@ def Euler2Rotation(Euler):
 def RandomRotation():
 	return 
 
-def make_radius(size, center=None):
-	(nx, ny) = size
-	if center is None:
-		cx = (nx-1.)/2.
-		cy = (ny-1.)/2.
-		center = (cx,cy)
-	x = np.arange(nx) - center[0]
-	y = np.arange(ny) - center[1]
-	[xaxis, yaxis] = np.meshgrid(x, y, indexing='ij')
-	radius = np.sqrt(xaxis**2 + yaxis**2)
-	return radius
 
 def Geometry(image, Geo):
 	"""

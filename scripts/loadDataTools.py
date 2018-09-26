@@ -95,26 +95,24 @@ def load_image(filename):
 
 
 # How to define a users mask
-def get_users_mask(Geo, imageType):
+def get_users_mask(Geo, imageType="PILATUS"):
 
 	mask = np.ones(Geo["shape"]).astype(int)
 
-	## detector of "ccd" 
-	if imageType=="ccd":
+	## CCD detector
+	if imageType.upper()=="CCD":
+
+		## This is for SNC data
 		radius = make_radius(Geo["shape"], center=Geo['center'])
 		index = np.where(radius<10)
 		mask[index] = 0
 		mask[506:557, 471:517] = 0
 		return mask
 
-	## detector of "cbf"
-	if imageType=="":
-		index = np.where(data > 100000)
-		mask[index] = 0
-		index = np.where(data < 0.001)
-		mask[index] = 0
+	## PILATUS detector
+	if imageType.upper()=="PILATUS":
 
-		# FIXME: This is specfic for Henry's detector
+		## This is for ICH data
 		# mask[1260:1300,1235:2463] = 0
 		mask[1235:2463, 1255:1300] = 0
 		mask[1735:2000, 1255:1305] = 0
