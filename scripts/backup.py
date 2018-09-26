@@ -1,29 +1,3 @@
-"""
-start point of the merging process
- 
-All unit should be Angstrom (A): wavelength, crystal lattice 
-
-If you have input the xds indexing file, you don't have to input basic parameters here
-"""
-
-import numpy as np 
-from imageMergeClient import *
-import h5py
-import cbf
-import os
-
-
-# How to read the idx image, return a 2d matrix
-
-
-
-# How to get the idx quaternion, return a quaternion (q1,q2,q3,q4)
-
-
-
-
-
-
 
 ## basic parameters
 Geo = {}
@@ -46,6 +20,7 @@ invUmat = np.array([[-0.2438,  0.9655,  -0.0919],
 Bmat = np.array([[ 0.007369 ,   0.017496 ,   -0.000000],
 				 [ 0.000000 ,   0.000000 ,    0.017263],
 				 [ 0.015730 ,   0.000000,     0.000000]]).T
+
 sima = Bmat[:,0].copy()
 simb = Bmat[:,1].copy()
 simc = Bmat[:,2].copy()

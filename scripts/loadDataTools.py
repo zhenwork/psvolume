@@ -90,7 +90,7 @@ def load_image(filename):
 		return np.load(filename)
 
 	## other formats are not supported
-	raiseException("## This file format is not supported")
+	raise Exception("## This file format is not supported")
 	return None
 
 

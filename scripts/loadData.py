@@ -1,55 +1,59 @@
-"""
-run this script: mpirun -n 10 python whereImage.py --o /reg/neh/home/zhensu --num 1000
-
-If the output "--o" folder is not specified, then it will save to the current path
-
---xds should be a file path 
-"""
-from userScript import *
-from xdsIndexingFile import *
 from fileManager import *
-from imageProcessClient import *
+from loadDataTools import *
+from imageProcessTools import *
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
+
+
 zf = iFile()
 zio = IOsystem()
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-o","--o", help="save folder", default="./", type=str)
-parser.add_argument("-fname","--fname", help="input files", default=".", type=str)
-parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
-parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
+parser.add_argument("-fname","--fname", help="input files", default=None)
+parser.add_argument("-o","--o", help="save folder", default=None)
+parser.add_argument("-xds","--xds", help="xds file", default=None)
+parser.add_argument("-nmin","--nmin", help="smallest number", default=0, type=int)
+parser.add_argument("-nmax","--nmax", help="largest number", default=-1, type=int)
 args = parser.parse_args()
+
+## path_o: the path of output dir
+## folder_o: the folder to save results
+## path_i: the path of input dir
+## folder_i: the folder to load images
 [path_o, folder_o] = zio.get_path_folder(args.o)
-if args.fname != '.':
+if args.fname is not None:
 	[path_i, folder_i] = zio.get_path_folder(args.fname)
 	suffix_i = zio.get_suffix(args.fname)
 	[counter, selectFile] = zio.counterFile(path_i, title=suffix_i)
-	args.num = counter
-	print "Total number of images: "+str(args.num)
+	print "## Total number in %s is:%5d" % (path_i, counter)
+
+if args.nmax==-1:
+	args.nmax = counter+args.nmin
 
 
-
-
-
-# computation
-if args.xds != ".":
-	print "### xds file imported: ", args.xds
+# load xds indexing files
+if args.xds is not None:
+	print "### xds file: %s"%args.xds
 	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
-	[Geo, Bmat, invBmat, invAmat] = user_get_xds(args.xds)
+	[Geo, Bmat, invBmat, invAmat] = load_GXPARM_XDS(args.xds)
 else:
-	print "### No valid xds file"
 	raise Exception('### No valid xds file')
 
+
+## print some parameters
 if comm_rank == 0:
-	print "### save to path: ", path_o
-	print "### save to folder: ", folder_o
-	if not os.path.exists(folder_o):
-		os.mkdir(folder_o)
+	print "## path_i: %s"%path_i
+	print "## folder_i: %s"%folder_i
+	print "## path_o: %s"%path_o
+	print "## folder_o: %s"%folder_o
+	print "## Process %5d - %5d"%(args.nmin, args.nmax)
+	if not os.path.isdir(folder_o):
+		os.makedirs(folder_o)
 else:
-	while not os.path.exists(folder_o): pass
+	while not os.path.isdir(folder_o): pass
+
 
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 
