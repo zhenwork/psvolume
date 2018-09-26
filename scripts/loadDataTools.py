@@ -136,3 +136,27 @@ def angle2quaternion(angle, axis='y'):
 		return (np.cos(angle/2.), 0., 0., np.sin(angle/2.))
 	else:
 		return None
+
+
+def get_tmpMask(image, vmin=0.0, vmax=1.0e7):
+	## mask is int number
+	tmpMask = np.ones(image.shape).astype(int)
+	tmpMask[np.where(image<vmin)] = 0
+	tmpMask[np.where(image>vmax)] = 0
+	return tmpMask
+
+
+def save_image(fsave, image, Geo):
+	zf.h5writer(fsave, 'readout', 'image')
+	zf.h5modify(fsave, 'image', image)
+	zf.h5modify(fsave, 'center', Geo['center'])
+	zf.h5modify(fsave, 'exp', False)
+	zf.h5modify(fsave, 'run', False)
+	zf.h5modify(fsave, 'event', False)
+	zf.h5modify(fsave, 'waveLength', Geo['wavelength'])
+	zf.h5modify(fsave, 'detDistance', Geo['detDistance'])
+	zf.h5modify(fsave, 'pixelSize', Geo['pixelSize'])
+	zf.h5modify(fsave, 'polarization', Geo['polarization'])
+	zf.h5modify(fsave, 'rot', 'matrix')
+
+
