@@ -90,7 +90,7 @@ def GenHKLI_alg1(image, Geo, backg=None, peakRing=0.25):
 
 
 
-def saveHKLI(HKLI_List, fname, vmax=1000, vmin=0):
+def saveHKLI(HKLI_List, fname):
 
 	f = open(fname,'w')
 	#f.writelines("H".rjust(5)+"K".rjust(5)+"L".rjust(5)+"I".rjust(10)+"\n")
@@ -167,19 +167,19 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	HKLI_List, weight, image_copy = GenHKLI_alg1(image, Geo, peakRing=0.25, backg = backg)
 
 	## remove the bad values
-	index = np.where(weight>=10)
+	index = np.where(weight>=10)      ## smallest weight
 	HKLI_List[index] /= weight[index]
 	index = np.where(weight<10)
 	HKLI_List[index] = -1024
 
 	HKLI_List += float(args.upShift)
 
-	index = np.where(HKLI_List>1000)
+	index = np.where(HKLI_List>1000)  ## vmax
 	HKLI_List[index] = -1024
-	index = np.where(HKLI_List<0)
+	index = np.where(HKLI_List<0)     ## vmin
 	HKLI_List[index] = -1024
 
-	saveHKLI(HKLI_List, weight, fname = "%s/%.5d.hkl"%(folder_o,idx) )
+	saveHKLI(HKLI_List, fname = "%s/%.5d.hkl"%(folder_o,idx) )
 	zf.h5writer(testFolder+'/'+str(idx).zfill(5)+'.slice', 'image', image_copy)
 
 	print "### Rank %.4d finished %.4d-%.4d-%.4d"%(comm_rank, sep[comm_rank], idx, sep[comm_rank+1])
