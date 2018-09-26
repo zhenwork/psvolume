@@ -27,6 +27,7 @@ zio = IOsystem()
 if args.nmax == -1: args.nmax = int(num)
 testFolder = path_i+'/testFolder'
 
+
 	
 if comm_rank == 0:
 	print "### Resource folder: %s"%folder_i
@@ -137,6 +138,7 @@ else:
 if args.bg is None:
 	backg = np.zeros((121,121,121))
 else:
+	print "### Loading background: %s"%args.bg
 	backg = zf.h5reader(args.bg,'volumeBack')
 	assert backg.shape==(121,121,121)
 
