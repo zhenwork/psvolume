@@ -127,4 +127,11 @@ def get_users_mask(Geo, imageType="PILATUS"):
 def angle2quaternion(angle, axis='y'):
 	## angle is original angle without making it half
 	## angle = idx*increment*np.pi/180.
-	return (np.cos( angle/2. ),0.,np.sin( angle/2. ),0.)
+	if axis.upper()=='X' or axis.upper()=='A':
+		return (np.cos(angle/2.), np.sin(angle/2.), 0., 0.)
+	elif axis.upper()=="Y" or axis.upper()=='B':
+		return (np.cos(angle/2.), 0., np.sin(angle/2.), 0.)
+	elif axis.upper()=="Z" or axis.upper()=='C':
+		return (np.cos(angle/2.), 0., 0., np.sin(angle/2.))
+	else:
+		return None
