@@ -48,6 +48,7 @@ def load_GXPARM_XDS(xds_file):
 
     ## calculate B matrix from lattice constants
     (a,b,c,alpha,beta,gamma) = [float(each) for each in content[3].split()[1:]]
+    lattice = np.array((a,b,c,alpha,beta,gamma))
 
     if abs(alpha-90.)<0.5: alpha = 90.
     if abs(beta -90.)<0.5: beta=90.
@@ -57,7 +58,7 @@ def load_GXPARM_XDS(xds_file):
     Bmat = np.array([recH, recK, recL]).T 
     invBmat = np.linalg.inv(Bmat)
 
-    return [Geo, Bmat, invBmat, invAmat]
+    return [Geo, Bmat, invBmat, invAmat, lattice]
 
 
 ## load diffraction patterns

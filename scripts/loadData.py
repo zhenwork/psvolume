@@ -1,13 +1,10 @@
+import time
 from fileManager import *
 from loadDataTools import *
 from imageProcessTools import *
 from mpi4py import MPI
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
-
-
-zf = iFile()
-zio = IOsystem()
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -22,6 +19,8 @@ args = parser.parse_args()
 ## folder_o: the folder to save results
 ## path_i: the path of input dir
 ## folder_i: the folder to load images
+zf = iFile()
+zio = IOsystem()
 [path_o, folder_o] = zio.get_path_folder(args.o)
 if args.fname is not None:
 	[path_i, folder_i] = zio.get_path_folder(args.fname)
@@ -31,15 +30,12 @@ if args.fname is not None:
 
 if args.nmax==-1:
 	args.nmax = counter+args.nmin
-
-
 # load xds indexing files
 if args.xds is not None:
 	print "### xds file: %s"%args.xds
-	Geo = {}; Bmat = None; invBmat = None;  invAmat = None
-	[Geo, Bmat, invBmat, invAmat] = load_GXPARM_XDS(args.xds)
+	[Geo, Bmat, invBmat, invAmat, lattice] = load_GXPARM_XDS(args.xds)
 else:
-	raise Exception('### No valid xds file')
+	raise Exception('### Not a valid xds file')
 
 
 ## print some parameters
@@ -52,13 +48,14 @@ if comm_rank == 0:
 	if not os.path.isdir(folder_o):
 		os.makedirs(folder_o)
 else:
-	while not os.path.isdir(folder_o): pass
+	while not os.path.isdir(folder_o): 
+		time.sleep(5)
 
 
 Smat = Bmat*1.0/np.sqrt(np.sum(Bmat[:,1]**2))
 
 
-if args.fname != '.': fname = args.fname.replace('#####', str(0).zfill(5))
+if args.fname is None: fname = args.fname.replace('#####', str(0).zfill(5))
 else: fname=None
 mask = user_get_mask(Geo, fname=fname)
 Mask = expand_mask(mask, cwin=(2,2), value=0)
@@ -88,12 +85,6 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
 
 	if invAmat is None: matrix = invBmat.dot(invUmat.dot(R1))
 	else: matrix = invAmat.dot(R1)
-
-
-	# #####
-	# FackR = Quat2Rotation( (  np.cos( np.radians(-7)/2. ),   0.,   np.sin( np.radians(-7)/2. ),   0.  ) )
-	# matrix = FackR.dot(matrix)
-	# #####
 
 
 	fsave = folder_o + '/'+str(idx).zfill(5)+'.slice'
