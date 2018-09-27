@@ -93,6 +93,7 @@ if args.hkl2xyz==1:
 		print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
 		anisoSubRaw = hkl2volume(rawSubData, astar, bstar, cstar, ithreshold=thr)
 		threeDRaw = hkl2volume(rawData, astar, bstar, cstar, ithreshold=thr)
+		symDataXYZ = hkl2volume(symData, astar, bstar, cstar, ithreshold=thr)
 	else: 
 		print "### This is already the best coordinate ... "
 		anisoData = subData.copy()
@@ -101,4 +102,5 @@ if args.hkl2xyz==1:
 	zf.h5modify(args.i, args.name+'anisoData', anisoData)
 	zf.h5modify(args.i, args.name+'anisoSubRaw', anisoSubRaw)
 	zf.h5modify(args.i, args.name+'threeDRaw', threeDRaw)
+	zf.h5modify(args.i, args.name+'symDataXYZ', symDataXYZ)
 
