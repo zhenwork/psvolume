@@ -81,6 +81,7 @@ if args.sub==1:
 	zf.h5modify(args.i, args.name+'subData', subData)
 	zf.h5modify(args.i, args.name+'backg', backg)
 	zf.h5modify(args.i, args.name+'volumeBack', volumeBack)
+	zf.h5modify(args.i, args.name+'rawSubData', rawSubData)
 else:
 	subData = symData.copy()
 
