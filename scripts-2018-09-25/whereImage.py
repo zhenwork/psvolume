@@ -71,7 +71,7 @@ if comm_rank == 0:
 sep = np.linspace(0, args.num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
 	if args.fname != '.':
-		fname = args.fname.replace('#####', str(idx).zfill(5))
+		fname = args.fname.replace('#####', str(idx+1).zfill(5))
 		
 	image = user_get_image(fname = fname)
 	image[np.where(image>100000)] = -1
