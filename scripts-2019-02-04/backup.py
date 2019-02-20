@@ -12,14 +12,14 @@ Geo['Angle_increment'] = 0.1
 ## inverse U matrix is usually unknown in cctbx result
 invAmat = None
 invUmat = np.array([[-0.2438,  0.9655,  -0.0919],
-					[-0.8608, -0.2591,  -0.4381],
-					[-0.4468, -0.0277,   0.8942]])
-
+                    [-0.8608, -0.2591,  -0.4381],
+                    [-0.4468, -0.0277,   0.8942]])
+        
 
 ## B matrix (crystal lattice) in the unit of A-1
 Bmat = np.array([[ 0.007369 ,   0.017496 ,   -0.000000],
-				 [ 0.000000 ,   0.000000 ,    0.017263],
-				 [ 0.015730 ,   0.000000,     0.000000]]).T
+                 [ 0.000000 ,   0.000000 ,    0.017263],
+                 [ 0.015730 ,   0.000000,     0.000000]]).T
 
 sima = Bmat[:,0].copy()
 simb = Bmat[:,1].copy()

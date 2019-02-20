@@ -16,15 +16,15 @@ prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
 
 
 if comm_rank == 0:
-	print '### Path  : ', path
-	print '### Folder: ', args.i
-	print '### Prefix: ', prefix 
-	print '### Total number: '+str(num).rjust(5)
-	if not os.path.exists(path + '/subImage'): 
-		os.mkdir(path + '/subImage')
-	print '### save folder: '+ path + '/subImage'
+    print '### Path  : ', path
+    print '### Folder: ', args.i
+    print '### Prefix: ', prefix 
+    print '### Total number: '+str(num).rjust(5)
+    if not os.path.exists(path + '/subImage'): 
+        os.mkdir(path + '/subImage')
+    print '### save folder: '+ path + '/subImage'
 else:
-	while not os.path.exists(path + '/subImage'): pass
+    while not os.path.exists(path + '/subImage'): pass
 
 imgFirst = zf.h5reader(prefix+str(0).zfill(5)+'.slice', 'image')
 imgFirst = np.sum(imgFirst*(imgFirst>0))
@@ -34,44 +34,44 @@ print '### Rank'+str(comm_rank).rjust(3)+' sumIntens of imgFirst: '+str(round(im
 Rindex = None
 sep = np.linspace(0, num, comm_size+1).astype('int')
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	fname = prefix+str(idx).zfill(5)+'.slice'
-	Geo = zf.get_image_info(fname)
-	assert Geo['readout']=='image'
-	image = zf.h5reader(fname, 'image')
+    fname = prefix+str(idx).zfill(5)+'.slice'
+    Geo = zf.get_image_info(fname)
+    assert Geo['readout']=='image'
+    image = zf.h5reader(fname, 'image')
 
-	sumIntens = np.sum(image*(image>0))
+    sumIntens = np.sum(image*(image>0))
 
-	image = image/sumIntens*imgFirst
-	Geo['scale'] = 1.
-	
-	sumIntens = round(sumIntens, 8)
+    image = image/sumIntens*imgFirst
+    Geo['scale'] = 1.
+    
+    sumIntens = round(sumIntens, 8)
 
-	image = remove_bragg_peak(image, Geo);
+    image = remove_bragg_peak(image, Geo);
 
-	if Rindex is None:
-		Rindex = get_Rindex(image.shape, center=Geo['center'], depth=3)
-		image = remove_peak_alg3(image, Rindex=Rindex)
-	else:
-		image = remove_peak_alg3(image, Rindex=Rindex)
+    if Rindex is None:
+        Rindex = get_Rindex(image.shape, center=Geo['center'], depth=3)
+        image = remove_peak_alg3(image, Rindex=Rindex)
+    else:
+        image = remove_peak_alg3(image, Rindex=Rindex)
 
-	image = image + 100.
-	image[np.where(image<0)] = -1.;
+    image = image + 100.
+    image[np.where(image<0)] = -1.;
 
-	fsave = path + '/subImage/subImage_'+str(idx).zfill(5)+'.slice'
+    fsave = path + '/subImage/subImage_'+str(idx).zfill(5)+'.slice'
 
-	zf.h5writer(fsave, 'readout', 'image') # image, event
-	zf.h5modify(fsave, 'image', image)
-	zf.h5modify(fsave, 'center', Geo['center'])
-	zf.h5modify(fsave, 'exp', Geo['exp'])
-	zf.h5modify(fsave, 'run', Geo['exp'])
-	zf.h5modify(fsave, 'event', Geo['exp'])
-	zf.h5modify(fsave, 'waveLength', Geo['waveLength'])
-	zf.h5modify(fsave, 'detDistance', Geo['detDistance'])
-	zf.h5modify(fsave, 'pixelSize', Geo['pixelSize'])
-	zf.h5modify(fsave, 'polarization', Geo['polarization'])
-	zf.h5modify(fsave, 'rot', 'matrix')
-	zf.h5modify(fsave, 'rotation', Geo['rotation'])
-	zf.h5modify(fsave, 'scale', Geo['scale'])
-	zf.h5modify(fsave, 'Smat', Geo['Smat'])
-	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1]) + '  sumIntens: '+str(sumIntens).ljust(10)
-	if idx>5000: break
+    zf.h5writer(fsave, 'readout', 'image') # image, event
+    zf.h5modify(fsave, 'image', image)
+    zf.h5modify(fsave, 'center', Geo['center'])
+    zf.h5modify(fsave, 'exp', Geo['exp'])
+    zf.h5modify(fsave, 'run', Geo['exp'])
+    zf.h5modify(fsave, 'event', Geo['exp'])
+    zf.h5modify(fsave, 'waveLength', Geo['waveLength'])
+    zf.h5modify(fsave, 'detDistance', Geo['detDistance'])
+    zf.h5modify(fsave, 'pixelSize', Geo['pixelSize'])
+    zf.h5modify(fsave, 'polarization', Geo['polarization'])
+    zf.h5modify(fsave, 'rot', 'matrix')
+    zf.h5modify(fsave, 'rotation', Geo['rotation'])
+    zf.h5modify(fsave, 'scale', Geo['scale'])
+    zf.h5modify(fsave, 'Smat', Geo['Smat'])
+    print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1]) + '  sumIntens: '+str(sumIntens).ljust(10)
+    if idx>5000: break

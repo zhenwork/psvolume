@@ -4,8 +4,8 @@ import pyqtgraph as pg
 import os, sys
 import matplotlib.pyplot as plt
 
-
-class iPloter:
+        
+class imagePloter:
     def pgplot(self, idata, clim=None):
         dataff = idata.copy()
         if clim is None:

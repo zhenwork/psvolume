@@ -68,7 +68,6 @@ if args.sub==1:
     print '### subtracting background ... '
     subData = symData.copy()
     rawSubData = rawData.copy()
-    volumeBack = np.zeros(rawData.shape)
     [nnxx, nnyy, nnzz] = rawData.shape
     for i in range(nnxx):
         for j in range(nnyy):
@@ -76,12 +75,9 @@ if args.sub==1:
                 intr = radius[i,j,k]
                 subData[i,j,k] -= backg[intr]
                 rawSubData[i,j,k] = rawData[i,j,k] - backg[intr]
-                volumeBack[i,j,k] = backg[intr]
     print '### max/min: ', np.amin(subData), np.amax(subData)
     zf.h5modify(args.i, args.name+'subData', subData)
     zf.h5modify(args.i, args.name+'backg', backg)
-    zf.h5modify(args.i, args.name+'volumeBack', volumeBack)
-    zf.h5modify(args.i, args.name+'rawSubData', rawSubData)
 else:
     subData = symData.copy()
 
@@ -94,7 +90,6 @@ if args.hkl2xyz==1:
         print '### max/min: ', np.amin(anisoData), np.amax(anisoData)
         anisoSubRaw = hkl2volume(rawSubData, astar, bstar, cstar, ithreshold=thr)
         threeDRaw = hkl2volume(rawData, astar, bstar, cstar, ithreshold=thr)
-        symDataXYZ = hkl2volume(symData, astar, bstar, cstar, ithreshold=thr)
     else: 
         print "### This is already the best coordinate ... "
         anisoData = subData.copy()
@@ -103,5 +98,4 @@ if args.hkl2xyz==1:
     zf.h5modify(args.i, args.name+'anisoData', anisoData)
     zf.h5modify(args.i, args.name+'anisoSubRaw', anisoSubRaw)
     zf.h5modify(args.i, args.name+'threeDRaw', threeDRaw)
-    zf.h5modify(args.i, args.name+'symDataXYZ', symDataXYZ)
 

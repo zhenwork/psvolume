@@ -64,10 +64,6 @@ def lauesym(idata, ithreshold=(-100,1000)):
                 # FIXME: only applicable to P21 symmetry
                 pairs = np.array([ idata[i,j,k], idata[mi,mj,mk], idata[mi,j,mk], idata[i,mj,k] ]) #P1211
                 
-                # FIXME: only applicable to friedel symmetry
-                # pairs = np.array([ idata[i,j,k], idata[mi,mj,mk] ]) #P1211
-                
-
                 # FIXME: only applicable for snc data
                 #pairs = np.array([ idata[i,j,k], idata[mi,mj,k], idata[mj,i,k], idata[j,mi,k], idata[mi,mj,mk], idata[i,j,mk], idata[j,mi,mk], idata[mj,i,mk]])
                 

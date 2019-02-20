@@ -3,127 +3,284 @@ import h5py
 import os
 from shutil import copyfile
 
-class iFile:
+try: import cbf
+except: print "!! No cbf package installed."
 
-	def h5writer(self, fname, keys, data, chunks=None, opts=7):
-		f = h5py.File(fname, 'w')
-		if chunks is None:
-			idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
-		else:
-			idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression='gzip', compression_opts=opts)
-		idatawr[...] = np.array(data)
-		f.close()
-		
-	def h5reader(self, fname, keys=None):		
-		f = h5py.File(fname, 'r')
-		if keys is None: keys = f.keys()[0]
-		idata = f[keys].value
-		f.close()
-		return idata
-		
-	def h5modify(self, fname, keys, data, chunks=None, opts=7):
-		f = h5py.File(fname, 'r+')
-		try: f.__delitem__(keys)
-		except: pass
-		
-		if chunks is None:
-			idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
-		else:
-			idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression='gzip', compression_opts=opts)
-		idatawr[...] = np.array(data)
-		f.close()
 
-	def h5compare(self, src=None, dst=None, copy=None, keep=None):
-		if src is None or dst is None: raise Exception('error')
+class H5FileManager:
 
-		if isinstance(copy, str):
-			data = self.h5reader(src, copy)
-			self.h5modify(dst, copy, data)
+    def h5writer(self, fname, keys, data, chunks=None, opts=7):
+        """
+        Write data to h5 file. It can be any types of data like string, list, numpy array.
+        The function will totally rewrite the file.
+        """
+        try:
+            f = h5py.File(fname, 'w')
+            if chunks is None:
+                idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+            else:
+                idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression='gzip', compression_opts=opts)
+            idatawr[...] = np.array(data)
+            f.close()
+        except Exception as error:
+            print "!! ERROR:", error
+            f = None
+        
+    def h5reader(self, fname, keys=None):
+        """
+        Read data from h5 files, default key is the first key.
+        The file must exist
+        """
+        try:
+            f = h5py.File(fname, 'r')
+            if keys is None: keys = f.keys()[0]
+            idata = f[keys].value
+            f.close()
+            return idata
+        except Exception as error:
+            print "!! ERROR:", error
+            f = None
+        
+    def h5modify(self, fname, keys, data, chunks=None, opts=7):
+        """
+        The data can be an existing or non-existing dataset
+        The file must be an existing h5 file.
+        """
+        try: 
+            f = h5py.File(fname, 'r+')
+            try: f.__delitem__(keys)
+            except: pass
+            
+            if chunks is None:
+                idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+            else:
+                idatawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression='gzip', compression_opts=opts)
+            idatawr[...] = np.array(data)
+            f.close()
+        except Exception as error:
+            print "!! ERROR:", error
+            f = None
 
-		elif isinstance(copy, list) and isinstance(copy[0], str): 
-			for i in range(len(copy)):
-				data = self.h5reader(src, copy[i])
-				self.h5modify(dst, copy[i], data)
+    def h5copy(self, src=None, dst=None, copy=None, keep=None):
+        """
+        Goal: data transfer between two h5 files.
+        src: source file
+        dst: can be an existing and non-existing file
+        copy: string or list of strings. copy from src to dst.
+        keep: string or list of strings. keep the original data in src.
+        """
+        if src is None or dst is None: 
+            raise Exception('error')
 
-		elif copy is None:
-			self.zio = IOsystem()
-			if isinstance(keep, str):
-				data = self.h5reader(dst, keep)
-				self.zio.copyFile(src=src, dst=dst)
-				self.h5modify(dst, keep, data)
-			elif isinstance(keep, list) and isinstance(keep[0], str):
-				num = len(keep)
-				dataList = []
-				for i in range(num):
-					dataList.append(self.h5reader(dst, keep[i]))
-				self.zio.copyFile(src=src, dst=dst)
-				for i in range(num):
-					self.h5modify(dst, keep[i], dataList[i])
-			elif keep is None:
-				self.zio.copyFile(src=src, dst=dst)
+        if isinstance(copy, str):
+            data = self.h5reader(src, copy)
+            self.h5modify(dst, copy, data)
 
-		else: raise Exception('error')
+        elif isinstance(copy, list) and isinstance(copy[0], str): 
+            for i in range(len(copy)):
+                data = self.h5reader(src, copy[i])
+                self.h5modify(dst, copy[i], data)
 
-	def readtxt(self, path):
-		f = open(path)
-		content = f.readlines()
-		f.close()
-		return content
+        elif copy is None:
+            self.zio = FileSystem()
+            if isinstance(keep, str):
+                data = self.h5reader(dst, keep)
+                self.zio.copyFile(src=src, dst=dst)
+                self.h5modify(dst, keep, data)
+            elif isinstance(keep, list) and isinstance(keep[0], str):
+                num = len(keep)
+                dataList = []
+                for i in range(num):
+                    dataList.append(self.h5reader(dst, keep[i]))
+                self.zio.copyFile(src=src, dst=dst)
+                for i in range(num):
+                    self.h5modify(dst, keep[i], dataList[i])
+            elif keep is None:
+                self.zio.copyFile(src=src, dst=dst)
 
-class IOsystem:
-	def get_path_folder(self, strFile):
-		if not (strFile).endswith('/'): strFile = strFile+'/'
-		path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))]
-		folder = strFile
-		return [path, folder]
+        else: 
+            raise Exception('!! ERROR')
 
-	def get_suffix(self, strFile):
-		suffix = strFile[len(strFile)-strFile[::-1].find('.',1)-1:]
-		return suffix
+    def h5finder(self, filename, guessname):
+        """
+        With a full name of a dataset, just guess one.
+        """
+        global h5finder_search_name
+        h5finder_search_name = guessname
+        def tmpGetFullName(cxi_name):
+            if cxi_name.endswith(h5finder_search_name):
+                return cxi_name
+        try:
+            fh5finder = h5py.File(filename, 'r')
+            cxiName = fh5finder.visit(tmpGetFullName)
+            fh5finder.close()
+            if cxiName is None:
+                print "## No such dataset"
+            else:
+                print "## Fit name: ", cxiName
+            return cxiName
+        except Exception as error:
+            print "!! ERROR:", error
+            fh5finder = None
+            return None
 
-	def makeFolder(self, path, title='sp'):
-		allFile = os.listdir(path)
-		fileNumber = [0]
-		for each in allFile:
-			if each[:2] == title and each[-4:].isdigit():
-				fileNumber.append(int(each[-4:]))
-		newNumber = np.amax(fileNumber) + 1
-		fnew = os.path.join(path, title+str(newNumber).zfill(4))
-		if not os.path.exists(fnew): os.mkdir(fnew)
-		return fnew
+    def h5datasets(self, filename):
+        """
+        List all dataset names in a h5py file
+        """
+        def tmpListDataName(cxi_name):
+            print cxi_name
+        try:
+            fh5list = h5py.File(filename, 'r')
+            fh5list.visit(tmpListDataName)
+            fh5list.close()
+        except Exception as error:
+            print "!! ERROR:", error
+            fh5list = None
 
-	def counterFile(self, path, title='.slice'):
-		allFile = os.listdir(path)
-		counter = 0
-		selectFile = []
-		for each in allFile:
-			if title in each:
-				counter += 1
-				selectFile.append(path+'/'+each)
-		return [counter, selectFile]
 
-		# file_name = os.path.realpath(__file__)
-		# if (os.path.isfile(file_name)): shutil.copy(file_name, folder_new)
+class OtherFileManager:
+    def save_pickle(self, params, fileName):
+        try:
+            f = open(fileName, 'wb')
+            pickle.dump(params, f)
+            f.close()
+            return True
+        except:
+            return False
 
-	def get_image_info(self, path):
-		f = h5py.File(path, 'r')
-		Info = {}
-		Info['readout'] = f['readout'].value
-		Info['waveLength'] = f['waveLength'].value
-		Info['polarization'] = f['polarization'].value
-		Info['detDistance'] = f['detDistance'].value
-		Info['pixelSize'] = f['pixelSize'].value
-		Info['center'] = f['center'].value
-		Info['exp'] = f['exp'].value
-		Info['run'] = f['run'].value
-		Info['event'] = f['event'].value
-		Info['rotation'] = f['rotation'].value
-		Info['rot'] = f['rot'].value
-		Info['scale'] = f['scale'].value
-		Info['Smat'] = f['Smat'].value
-		f.close()
-		return Info
+    def load_pickle(self, fileName):
+        try:
+            f = open(fileName, 'rb')
+            params = pickle.load(f)
+            f.close()
+            return params
+        except:
+            return False
 
-	def copyFile(self, src=None, dst=None):
-		if src is not None and dst is not None:
-			copyfile(src, dst)
+    def load_json(self, fileName):
+        try:
+            with open(fileName, 'r') as f:
+                params = json.load(f)
+            return params
+        except:
+            return False
+
+    def save_json(self, params, fileName):
+        try:
+            with open(fileName, 'w') as f:
+                json.dump(params, f, indent=4)
+            return True
+        except:
+            return False
+            
+
+class PsvolumeManager:
+    def psvm2h5py(self, psvmParams, fileName):
+        h5M = H5FileManager()
+        for idx, item in enumerate(psvmParams):
+            if idx == 0:
+                h5M.h5writer(fileName, item, psvmParams[item])
+            else:
+                h5M.h5modify(fileName, item, psvmParams[item])
+        h5M = None
+        return True
+
+
+class CBFManager:
+	def getData(fileName):
+		"""
+		Data is float numpy array 
+		"""
+		content = cbf.read(fileName)
+        data = np.array(content.data).astype(float)
+		return data
+
+	def getHeader(fileName):
+		"""
+		Header is python dict {}
+		"""
+		content = cbf.read(fileName, metadata=True, parse_miniheader=True)
+		header = content.miniheader
+		return header
+
+	def getDataHeader(fileName):
+		"""
+		Data is float numpy array 
+		Header is python dict {}
+		"""
+		content = cbf.read(fileName, metadata=True, parse_miniheader=True)
+		data = np.array(content.data).astype(float)
+		header = content.miniheader
+		return (data, header)
+
+
+class FileSystem:
+
+    def fileName(self, strFile):
+        return os.path.basename(strFile)
+
+    def baseFolder(self, strFile):
+        """
+        strFile = "/a/b/c/d", "/a/b.file"
+        path = "/a/b/c/", "/a/"
+        """
+        if not (strFile).endswith('/'): 
+            strFile = strFile+'/'
+        path = strFile[0:(len(strFile)-strFile[::-1].find('/',1))]
+        return path
+
+    def getSuffix(self, strFile):
+        """
+        strFile = "/a/b", "/a/b.py"
+        suffix = "", ".py"
+        """
+        suffix = strFile[len(strFile)-strFile[::-1].find('.',1)-1:]
+        return suffix
+
+    def makeFolderWithPrefix(self, path, title='sp'):
+        """
+        create folder with starting name *title*
+        """
+        allFile = os.listdir(path)
+        fileNumber = [0]
+        for each in allFile:
+            if each[:2] == title and each[-4:].isdigit():
+                fileNumber.append(int(each[-4:]))
+        newNumber = np.amax(fileNumber) + 1
+        fnew = os.path.join(path, title+str(newNumber).zfill(4))
+        if not os.path.exists(fnew): 
+            os.mkdir(fnew)
+        return fnew
+
+    def countFilesWith(self, path, title='.slice'):
+        """
+        count the number of files containing *title* in *path*
+        """
+        allFile = os.listdir(path)
+        counter = 0
+        for each in allFile:
+            if title in each:
+                counter += 1
+        return counter
+
+    def listFilesWith(self, path, title='.slice'):
+        """
+        return a list of files containing *title* in *path*
+        """
+        allFile = os.listdir(path)
+        counter = 0
+        selectFile = []
+        for each in allFile:
+            if title in each:
+                counter += 1
+                filename = os.path.realpath(path+'/'+each)
+                selectFile.append(filename)
+        return selectFile.sort()
+
+        # file_name = os.path.realpath(__file__)
+        # if (os.path.isfile(file_name)): shutil.copy(file_name, folder_new)
+
+    def copyFile(self, src=None, dst=None):
+        if src is not None and dst is not None:
+            copyfile(src, dst)

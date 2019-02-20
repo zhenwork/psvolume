@@ -14,8 +14,8 @@ zf = iFile()
 zio = IOsystem()
 
 if ( not os.path.isfile(args.i) ) or (args.i == '.'):
-	raise Exception('### no such file ... ')
-	
+    raise Exception('### no such file ... ')
+    
 
 print "### Reading the image: "+args.i
 image = zf.h5reader(args.i, 'image')

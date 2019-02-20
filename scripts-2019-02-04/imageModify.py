@@ -29,15 +29,15 @@ if args.num != -1: num = int(args.num)
 
 sep = np.linspace(0, num, comm_size+1).astype('int')
 if comm_rank == 0:
-	print "### Path: ", path
-	print "### Folder: ", args.i
-	print "### Images: ", num
+    print "### Path: ", path
+    print "### Folder: ", args.i
+    print "### Images: ", num
 
 
 ## modify image
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = '/reg/data/ana04/users/zhensu/xpptut/volume/G150T/ICHg150t2/crystal/mergeImage/'+str(idx).zfill(5)+'.slice'
-	scale = zf.h5reader(filename, 'scale')
-	zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale)
-	
-	print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
+    filename = '/reg/data/ana04/users/zhensu/xpptut/volume/G150T/ICHg150t2/crystal/mergeImage/'+str(idx).zfill(5)+'.slice'
+    scale = zf.h5reader(filename, 'scale')
+    zf.h5modify('./mergeImage/'+str(idx).zfill(5)+'.slice', 'scale', scale)
+    
+    print '### rank ' + str(comm_rank).rjust(3) + ' is processing: ' +str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])

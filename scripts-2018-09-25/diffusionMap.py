@@ -15,21 +15,21 @@ args = parser.parse_args()
 if args.i is "": raise Exception('no such file ... ')
 
 def nearest(idata, N):
-	data = idata.astype(float)
-	for i in range(len(data)):
-		index = np.argsort(data[i])[::-1]
-		data[i, index[N:]] = 0
-	data1 = data.copy()
-	data2 = np.transpose(data).copy()
-	num1 = data1 > 0
-	num1 = num1.astype(float)
-	num2 = data2 > 0
-	num2 = num2.astype(float)
-	data = data1+data2
-	num = (num1+num2)
-	index = np.where(num>0)
-	data[index] /= num[index]
-	return data
+    data = idata.astype(float)
+    for i in range(len(data)):
+        index = np.argsort(data[i])[::-1]
+        data[i, index[N:]] = 0
+    data1 = data.copy()
+    data2 = np.transpose(data).copy()
+    num1 = data1 > 0
+    num1 = num1.astype(float)
+    num2 = data2 > 0
+    num2 = num2.astype(float)
+    data = data1+data2
+    num = (num1+num2)
+    index = np.where(num>0)
+    data[index] /= num[index]
+    return data
 
 Dmatrix = zf.h5reader(args.i, 'dmatrix-sym')
 label = zf.h5reader(args.i, 'label')
@@ -48,11 +48,11 @@ D121 = np.zeros((N,N))
 alpha = 0.5
 
 for i in range(N):
-	D12[i,i] = np.sum(Dmatrix[i,:])**(-alpha)
+    D12[i,i] = np.sum(Dmatrix[i,:])**(-alpha)
 L12 = np.dot(D12, np.dot(Dmatrix, D12))
 
 for i in range(N):
-	D121[i,i] = np.sum(L12[i,:])**(-1.)
+    D121[i,i] = np.sum(L12[i,:])**(-1.)
 Mmatrix = np.dot(D121, L12)
 
 val, vec = np.linalg.eig(Mmatrix)
@@ -78,17 +78,17 @@ zf.h5writer('InPlot.h5', 'InPlot', InPlot, 'float64')
 
 fig, ax = plt.subplots(figsize=(10,10))
 
-plt.plot(val[args.x]*vec[:,args.x].ravel(),	  val[args.y]*vec[:,args.y].ravel(), '.', ms=8, color='b')
+plt.plot(val[args.x]*vec[:,args.x].ravel(),      val[args.y]*vec[:,args.y].ravel(), '.', ms=8, color='b')
 plt.plot(val[args.x]*vec[label, args.x].ravel(), val[args.y]*vec[label, args.y].ravel(), '.', ms=8, color='r')
 plt.xlim(minx-gapx*0.1, maxx+gapx*0.2)
 plt.ylim(miny-gapy*0.2, maxy+gapy*0.2)
 
 label = zf.h5reader(args.i, 'label')
 if args.v:
-	for i in range(N):
-		#if i%10 != 0: continue
-		if label[i] < 3.5: continue
-		ax.text(val[args.x]*vec[i][args.x], val[args.y]*vec[i][args.y], str(i), fontsize=11)
+    for i in range(N):
+        #if i%10 != 0: continue
+        if label[i] < 3.5: continue
+        ax.text(val[args.x]*vec[i][args.x], val[args.y]*vec[i][args.y], str(i), fontsize=11)
 index = np.argsort(vec[:,args.y])
 print index[:100]
 

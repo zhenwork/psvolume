@@ -29,12 +29,12 @@ scaleMatrix = np.zeros(args.num)
 ## read the first image
 filename = folder_i + '/00000.slice'
 while True:
-	try: 
-		print '### Rank: '+str(comm_rank).rjust(3)+' is loading first file ...'
-		image = zf.h5reader(filename, 'image')
-		pscale = zf.h5reader(path_i+'/image.process', 'pscale')
-		break
-	except: continue;
+    try: 
+        print '### Rank: '+str(comm_rank).rjust(3)+' is loading first file ...'
+        image = zf.h5reader(filename, 'image')
+        pscale = zf.h5reader(path_i+'/image.process', 'pscale')
+        break
+    except: continue;
 
 image[np.where(image<0)] = 0.
 Geo = zio.get_image_info(filename)
@@ -45,42 +45,42 @@ mask = circle_region(image=None, center=(cx,cy), rmax=args.rmax, rmin=args.rmin,
 imgFirst = np.sum(image*mask)
 
 if comm_rank == 0:
-	print "### circle range: ", args.rmin, args.rmax
-	print '### read from Path  : ', path_i
-	print '### read from Folder: ', folder_i
-	print '### Save to file: ', path_i+'/image.process'
-	zf.h5modify(path_i+'/image.process', 'pcorr_image', image)
+    print "### circle range: ", args.rmin, args.rmax
+    print '### read from Path  : ', path_i
+    print '### read from Folder: ', folder_i
+    print '### Save to file: ', path_i+'/image.process'
+    zf.h5modify(path_i+'/image.process', 'pcorr_image', image)
 
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-	filename = folder_i + '/'+str(idx).zfill(5)+'.slice'
-	image = zf.h5reader(filename, 'image')
-	image[np.where(image<0)] = 0.
-	maskImage = image*mask
-	scaleMatrix[idx] = np.sum(maskImage)
-	if args.wr != -1: 
-		zf.h5modify(folder_i + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
-	if args.wmerge != -1:
-		zf.h5modify(folder_merge + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
-	print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
+    filename = folder_i + '/'+str(idx).zfill(5)+'.slice'
+    image = zf.h5reader(filename, 'image')
+    image[np.where(image<0)] = 0.
+    maskImage = image*mask
+    scaleMatrix[idx] = np.sum(maskImage)
+    if args.wr != -1: 
+        zf.h5modify(folder_i + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
+    if args.wmerge != -1:
+        zf.h5modify(folder_merge + '/'+str(idx).zfill(5)+'.slice', 'scale', imgFirst*1.0/scaleMatrix[idx])
+    print '### Rank: '+str(comm_rank).rjust(3)+' finished image: '+str(sep[comm_rank])+'/'+str(idx)+'/'+str(sep[comm_rank+1])
 
 if comm_rank == 0:
-	for i in range(comm_size-1):
-		md=mpidata()
-		md.recv()
-		scaleMatrix += md.scaleMatrix
-		recvRank = md.small.rank
-		md = None
-		print '### received file from ' + str(recvRank).rjust(3)
-	if args.wr != -1: 
-		zf.h5modify(path_i+'/image.process', args.name, scaleMatrix)
-	if args.o != "":
-		zf.h5writer(args.o, args.name, scaleMatrix)
+    for i in range(comm_size-1):
+        md=mpidata()
+        md.recv()
+        scaleMatrix += md.scaleMatrix
+        recvRank = md.small.rank
+        md = None
+        print '### received file from ' + str(recvRank).rjust(3)
+    if args.wr != -1: 
+        zf.h5modify(path_i+'/image.process', args.name, scaleMatrix)
+    if args.o != "":
+        zf.h5writer(args.o, args.name, scaleMatrix)
 
 else:
-	md=mpidata()
-	md.addarray('scaleMatrix', scaleMatrix)
-	md.small.rank = comm_rank
-	md.send()
-	md = None
-	print '### Rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
+    md=mpidata()
+    md.addarray('scaleMatrix', scaleMatrix)
+    md.small.rank = comm_rank
+    md.send()
+    md = None
+    print '### Rank ' + str(comm_rank).rjust(3) + ' is sending file ... '

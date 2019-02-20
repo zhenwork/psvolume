@@ -15,11 +15,8 @@ parser.add_argument("-rmin","--rmin", help="min radius", default=100, type=int)
 parser.add_argument("-rmax","--rmax", help="max radius", default=1200, type=int)
 parser.add_argument("-nmin","--nmin", help="smallest index of image", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="largest index of image", default=-1, type=int)
-parser.add_argument("-upShift","--upShift", help="increase", default=100, type=float)
-parser.add_argument("-o","--o", help="output folder", default="HKLI_List", type=str)
-parser.add_argument("-bg","--bg", help="background volume", default=None)
+parser.add_argument("-o","--o", help="output file name", default="HKLI_List", type=str)
 args = parser.parse_args()
-
 
 zf = iFile()
 zio = IOsystem()
@@ -27,8 +24,6 @@ zio = IOsystem()
 [num, allFile] = zio.counterFile(folder_i, title='.slice')
 if args.nmax == -1: args.nmax = int(num)
 testFolder = path_i+'/testFolder'
-
-
     
 if comm_rank == 0:
     print "### Resource folder: %s"%folder_i
@@ -38,8 +33,9 @@ if comm_rank == 0:
 
 
 
+
 @jit
-def GenHKLI_alg1(image, Geo, backg=None, peakRing=0.25):
+def GenHKLI_alg1(image, Geo, peakRing=0.25):
 
     Vsize = 121
     Vcenter = 60
@@ -80,8 +76,8 @@ def GenHKLI_alg1(image, Geo, backg=None, peakRing=0.25):
         if max(hshift, kshift, lshift)<peakRing:
             continue
         else:
-            HKLI_List[inth,intk,intl] += Image[t]-backg[inth,intk,intl]
-            weight[inth,intk,intl]    += 1. 
+            HKLI_List[inth,intk,intl] += Image[t]
+            weight[inth,intk,intl] += 1.
             image_copy[t] = -100
 
     image_copy.shape = image.shape
@@ -90,8 +86,11 @@ def GenHKLI_alg1(image, Geo, backg=None, peakRing=0.25):
 
 
 
-def saveHKLI(HKLI_List, fname):
-
+def saveHKLI(HKLI_List, weight, fname):
+    index = np.where(weight>=10)
+    HKLI_List[index] /= weight[index]
+    index = np.where(weight<10)
+    HKLI_List[index] = -1024
     f = open(fname,'w')
     #f.writelines("H".rjust(5)+"K".rjust(5)+"L".rjust(5)+"I".rjust(10)+"\n")
     for H in range(-60,60):
@@ -133,14 +132,6 @@ else:
         time.sleep(5)
 
 
-if args.bg is None:
-    backg = np.zeros((121,121,121))
-else:
-    print "### Loading background: %s"%args.bg
-    backg = zf.h5reader(args.bg,'volumeBack')
-    assert backg.shape==(121,121,121)
-
-        
 sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
 print "### Rank %.4d will process [%.4d, %.4d]"%(comm_rank, sep[comm_rank], sep[comm_rank+1])
 
@@ -150,7 +141,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
     
     if not os.path.isfile(fname):
         print "### No such file: %s" % fname
-        raise Exception("No such file: %s")
+        raiseException("No such file: %s")
         continue
 
     image = zf.h5reader(fname, 'image')
@@ -164,22 +155,8 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
     image[np.where(image>10000)] = -1
 
 
-    HKLI_List, weight, image_copy = GenHKLI_alg1(image, Geo, peakRing=0.25, backg = backg)
-
-    ## remove the bad values
-    index = np.where(weight>=10)      ## smallest weight
-    HKLI_List[index] /= weight[index]
-    index = np.where(weight<10)
-    HKLI_List[index] = -1024
-
-    HKLI_List += float(args.upShift)
-
-    index = np.where(HKLI_List>1000)  ## vmax
-    HKLI_List[index] = -1024
-    index = np.where(HKLI_List<0)     ## vmin
-    HKLI_List[index] = -1024
-
-    saveHKLI(HKLI_List, fname = "%s/%.5d.hkl"%(folder_o,idx) )
+    HKLI_List, weight, image_copy = GenHKLI_alg1(image, Geo, peakRing=0.25)
+    saveHKLI(HKLI_List, weight, fname = "%s/%.5d.hkl"%(folder_o,idx) )
     zf.h5writer(testFolder+'/'+str(idx).zfill(5)+'.slice', 'image', image_copy)
 
     print "### Rank %.4d finished %.4d-%.4d-%.4d"%(comm_rank, sep[comm_rank], idx, sep[comm_rank+1])

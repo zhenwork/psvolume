@@ -1,41 +1,29 @@
-"""
-Preprocess of the images
-submit jobs: mpirun -n 10 python imageProcessMaster.py --o /reg/neh/home/zhensu --num 2000
-
---o: the former folder path. the path "before" rawImage folder
---num: The number of images to process. If no input, then it will search how many files in the rawImage folder
-"""
-
-from imageProcessClient import *
-from imageMergeClient import RemoveBragg
+from imageProcessTools import *
+from imageMergeTools import RemoveBragg
 from fileManager import *
 from mpi4py import MPI
 import argparse
 comm_rank = MPI.COMM_WORLD.Get_rank()
 comm_size = MPI.COMM_WORLD.Get_size()
 parser = argparse.ArgumentParser()
-parser.add_argument("-i","--i", help="read folder", default=".", type=str)
-parser.add_argument("-o","--o", help="save folder", default=".", type=str)
-parser.add_argument("-num","--num", help="num of images to process", default=-1, type=int)
-parser.add_argument("-apscale","--apscale", help="num of images to process", default='ap', type=str)
-parser.add_argument("-voxel","--voxel", help="voxel list", default='.', type=str)
-
+parser.add_argument("-i","--i", help="read folder", default=None)
+parser.add_argument("-o","--o", help="save folder", default=None)
+parser.add_argument("-nmin","--nmin", help="small number", default=0, type=int)
+parser.add_argument("-nmax","--nmax", help="large number", default=-1, type=int)
+parser.add_argument("-voxel","--voxel", help="voxel list", default=None)
 args = parser.parse_args()
 
 zf = iFile()
 zio = IOsystem()
 [path_i, folder_i] = zio.get_path_folder(args.i)
 [path_o, folder_o] = zio.get_path_folder(args.o)
-folder_p = path_o + '/pscale'
-
 [num, allFile] = zio.counterFile(folder_i, title='.slice')
 prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
-if args.num ==-1: args.num = int(num)
-sep = np.linspace(0, args.num, comm_size+1).astype('int')
+if args.nmax ==-1: 
+    args.nmax = num+args.nmin
 
 
-
-## get image information from sample pattern
+## FIXME: 
 Geo = zio.get_image_info(folder_i+'/00000.slice')
 image = zf.h5reader(folder_i+'/00000.slice', 'image')
 
@@ -47,13 +35,14 @@ apscale = 1./apscale
 ascale  = 1./ascale
 pscale  = 1./pscale
 
+folder_p = path_o + '/pscale'
 if comm_rank == 0:
     print '## Total number: '+str(args.num).rjust(5)
     print '## read from Folder: ', folder_i
     print '## save to Path: ', path_o
     print '## save to Folder: ', folder_o
-    if not os.path.exists(folder_o): os.mkdir(folder_o)
-    if not os.path.exists(folder_p): os.mkdir(folder_p)
+    if not os.path.isdir(folder_o): os.mkdir(folder_o)
+    if not os.path.isdir(folder_p): os.mkdir(folder_p)
     zf.h5modify(path_o+'/image.process', 'ascale' , ascale)
     zf.h5modify(path_o+'/image.process', 'pscale' , pscale)
     zf.h5modify(path_o+'/image.process', 'apscale', apscale)
@@ -78,6 +67,7 @@ else:
     pass
 
 
+
 # FIXME: This is specific for the snc dataset
 #########################
 if args.voxel != ".":
@@ -90,6 +80,9 @@ else:
     voxel = None
 #########################
 
+## save image to the rawImage folder
+sep = np.linspace(args.nmin, args.nmax, comm_size+1).astype('int')
+print "## Rank:%3d/%3d processes: %4d - %4d"%(comm_rank,comm_size,sep[comm_rank],sep[comm_rank+1])
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
     fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
