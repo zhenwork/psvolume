@@ -247,6 +247,7 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, stepSize=None,
     aveRadius = (radiusRange[:length-1] + radiusRange[1:])/2.
     sumIntens = np.zeros(length-1)
     sumCount = np.zeros(length-1)
+    aveIntens = np.zeros(length-1)
 
     for idx in range(len(radiusRange)-1):
         rmin = radiusRange[idx]
