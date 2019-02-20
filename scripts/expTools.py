@@ -42,7 +42,7 @@ def xdsIndex2psvm(fileGXPARMS):
     ## Bmat is the user's defined coordinates
     (a,b,c,alpha,beta,gamma) = [float(each) for each in content[3].split()[1:]]
     latticeConstant = np.array([a,b,c,alpha,beta,gamma])
-    Bmat = psvmStandardBmat(latticceConstant=(a,b,c,alpha,beta,gamma))
+    Bmat = crystalTools.psvmStandardBmat(latticceConstant=(a,b,c,alpha,beta,gamma))
     psvmParms["latticeConstant"] = latticeConstant
     psvmParms["Amat"] = Amat
     psvmParms["Bmat"] = Bmat
