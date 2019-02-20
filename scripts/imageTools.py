@@ -32,7 +32,7 @@ class MaskTools:
             vmin = _vmin - 1
         if vmax is None:
             vmax = _vmax + 1
-        index = np.where((image>=vmin) & (image<=vmax)):
+        index = np.where((image>=vmin) & (image<=vmax))
         mask[index] = 1
         return mask
 
