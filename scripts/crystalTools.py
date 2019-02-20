@@ -7,9 +7,9 @@ def lattice2vector(a, b, c, alpha, beta, gamma):
     alpha, beta, gamma are in angle (0-180)
     a,b,c are in A
     """
-    alpha = ag1/180.*np.pi
-    beta  = ag2/180.*np.pi
-    gamma = ag3/180.*np.pi
+    alpha = alpha/180.*np.pi
+    beta  = beta/180.*np.pi
+    gamma = gamma/180.*np.pi
     vecx = a*np.array([1., 0., 0.])
     vecy = b*np.array([np.cos(gamma), np.sin(gamma), 0]);
     vecz = c*np.array([np.cos(beta), (np.cos(alpha)-np.cos(gamma)*np.cos(beta))/np.sin(gamma), np.sqrt(1.+2.*np.cos(alpha)*np.cos(beta)*np.cos(gamma)-np.cos(alpha)**2-np.cos(beta)**2-np.cos(gamma)**2)/np.sin(gamma)])
