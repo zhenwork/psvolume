@@ -10,6 +10,8 @@ class MaskTools:
         if center is None: 
             cx=(nx-1.)/2.
             cy=(ny-1.)/2.
+        else:
+            (cx,cy) = center
         if rmin is None:
             rmin = -1
         if rmax is None:
