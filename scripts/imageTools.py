@@ -218,6 +218,49 @@ def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,N
     return [aveAngle, aveIntens]
 
 
+def radialProfile(image, mask, center=None, vmin=None, vmax=None, stepSize=None, sampling=None, rmin=None, rmax=None):
+    (nx, ny) = image.shape
+    if center is None: 
+        cx = (nx-1.)/2.
+        cy = (ny-1.)/2.
+    else:
+        cx = center[0]
+        cy = center[1]
+
+    x = np.arange(nx)-cx 
+    y = np.arange(ny)-cy 
+    xaxis,yaxis = np.meshgrid(x, y, indexing='ij')
+    radius = np.sqrt(xaxis**2+yaxis**2)
+
+    if rmin is None: 
+        rmin = 0
+    if rmax is None:
+        rmax = np.ceil(np.amax(radius))
+    if stepSize is not None:
+        stepSize = 1
+        radiusRange = np.arange(rmin, int(rmax)+2, stepSize) - 0.5
+    if sampling is not None:
+        sampling = int(rmax - rmin) + 2
+        radiusRange = np.linspace(rmin, rmax+1, sampling) - 0.5
+    
+    length = len(radiusRange)
+    aveRadius = (radiusRange[:length-1] + radiusRange[1:])/2.
+    sumIntens = np.zeros(length-1)
+    sumCount = np.zeros(length-1)
+
+    for idx in range(len(radiusRange)-1):
+        rmin = radiusRange[idx]
+        rmax = radiusRange[idx+1]
+        index = np.where((radius >= rmin) & (radius < rmax))
+        sumIntens[idx] = np.sum(image[index])
+        sumCount[idx] = np.sum(mask[index])
+
+    index = np.where(sumCount > 0)
+    aveIntens[index] = sumIntens[index] * 1.0 / sumCount[index]
+
+    return aveRadius, aveIntens
+
+
 def sliceCut(data, axis='x', window=5, center=None, clim=None):
     """
     input a 3d volume, then it will output the average slice within certain range and angle
