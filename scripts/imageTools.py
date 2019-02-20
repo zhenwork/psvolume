@@ -176,7 +176,7 @@ def removeExtremes(_image, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vmax=No
         return None
 
 
-def angularDistri(self, arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
+def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
     """
     num denotes how many times you want to divide the angle
     """
@@ -220,7 +220,7 @@ def angularDistri(self, arr, Arange=None, num=30, rmax=None, rmin=None, center=(
     return [aveAngle, aveIntens]
 
 
-def sliceCut(self, data, axis='x', window=5, center=None, clim=None):
+def sliceCut(data, axis='x', window=5, center=None, clim=None):
     """
     input a 3d volume, then it will output the average slice within certain range and angle
     """
