@@ -188,31 +188,31 @@ class PsvolumeManager:
 
 
 class CBFManager:
-	def getData(fileName):
-		"""
-		Data is float numpy array 
-		"""
-		content = cbf.read(fileName)
+    def getData(fileName):
+        """
+        Data is float numpy array 
+        """
+        content = cbf.read(fileName)
         data = np.array(content.data).astype(float)
-		return data
+        return data
 
-	def getHeader(fileName):
-		"""
-		Header is python dict {}
-		"""
-		content = cbf.read(fileName, metadata=True, parse_miniheader=True)
-		header = content.miniheader
-		return header
+    def getHeader(fileName):
+        """
+        Header is python dict {}
+        """
+        content = cbf.read(fileName, metadata=True, parse_miniheader=True)
+        header = content.miniheader
+        return header
 
-	def getDataHeader(fileName):
-		"""
-		Data is float numpy array 
-		Header is python dict {}
-		"""
-		content = cbf.read(fileName, metadata=True, parse_miniheader=True)
-		data = np.array(content.data).astype(float)
-		header = content.miniheader
-		return (data, header)
+    def getDataHeader(fileName):
+        """
+        Data is float numpy array 
+        Header is python dict {}
+        """
+        content = cbf.read(fileName, metadata=True, parse_miniheader=True)
+        data = np.array(content.data).astype(float)
+        header = content.miniheader
+        return (data, header)
 
 
 class FileSystem:
