@@ -63,7 +63,7 @@ class ScalingTools:
         x = np.arange(nx) - cx
         y = np.arange(ny) - cy
         [xaxis, yaxis] = np.meshgrid(x, y, indexing="ij") 
-        zaxis = np.ones(nx*ny)*detectorDistance/pixelSize
+        zaxis = np.ones((nx,ny))*detectorDistance/pixelSize
         norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
         solidAngle = zaxis * 1.0 / norm**3
         solidAngle /= np.amax(solidAngle)
@@ -82,7 +82,7 @@ class ScalingTools:
         x = np.arange(nx) - center[0]
         y = np.arange(ny) - center[1]
         [xaxis, yaxis] = np.meshgrid(x, y, indexing="ij") 
-        zaxis = np.ones(nx*ny)*detectorDistance/pixelSize
+        zaxis = np.ones((nx,ny))*detectorDistance/pixelSize
         norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
         
         if polarization is not None:
