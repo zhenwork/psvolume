@@ -188,7 +188,7 @@ class PsvolumeManager:
 
 
 class CBFManager:
-    def getData(fileName):
+    def getData(self, fileName):
         """
         Data is float numpy array 
         """
@@ -196,7 +196,7 @@ class CBFManager:
         data = np.array(content.data).astype(float)
         return data
 
-    def getHeader(fileName):
+    def getHeader(self, fileName):
         """
         Header is python dict {}
         """
@@ -204,7 +204,7 @@ class CBFManager:
         header = content.miniheader
         return header
 
-    def getDataHeader(fileName):
+    def getDataHeader(self, fileName):
         """
         Data is float numpy array 
         Header is python dict {}
