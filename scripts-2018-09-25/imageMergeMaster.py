@@ -17,6 +17,7 @@ parser.add_argument("-voxel","--voxel", help="voxel exist or not", default=".", 
 parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
 parser.add_argument("-list","--list", help="merge list", default=".", type=str)
 parser.add_argument("-cc12","--cc12", help="calculate the CC1/2", default=0, type=int)
+parser.add_argument("-mask","--mask", help="numpy array", default=None, type=str)
 args = parser.parse_args()
 
 
@@ -64,7 +65,9 @@ else:
     print "### Merge List exists"
     mergeList = np.load(args.list)
     print "### Loaded the merge list"
-
+if args.mask is not None:
+    print "### loading mask"
+    mask = np.load(args.mask)
     
     
 if comm_rank == 0:
@@ -121,7 +124,8 @@ else:
         image = zf.h5reader(fname, 'image')
         Geo = zio.get_image_info(fname)
         image = image * Geo['scale']
-
+        image[mask==0] = -1
+        
         sumIntens = round(np.sum(image), 8)
         
         if args.voxel != ".":
