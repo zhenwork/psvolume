@@ -175,3 +175,75 @@ def removeExtremes(_image, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vmax=No
     else:
         return None
 
+
+def angularDistri(self, arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
+    """
+    num denotes how many times you want to divide the angle
+    """
+    assert len(arr.shape)==2
+    (nx, ny) = arr.shape
+    cx = center[0];
+    cy = center[1];
+    if cx is None: cx = (nx-1.)/2.
+    if cy is None: cy = (ny-1.)/2.
+
+    xaxis = np.arange(nx)-cx + 1.0e-5; 
+    yaxis = np.arange(ny)-cy + 1.0e-5; 
+    [x,y] = np.meshgrid(xaxis, yaxis, indexing='ij')
+    r = np.sqrt(x**2+y**2)
+    sinTheta = y/r;
+    cosTheta = x/r; 
+    angle = np.arccos(cosTheta);
+    index = np.where(sinTheta<0);
+    angle[index] = 2*np.pi - angle[index]
+    if rmin is not None:
+        index = np.where(r<rmin);
+        angle[index] = -1
+    if rmax is not None:
+        index = np.where(r>rmax);
+        angle[index] = -1
+    if Arange is not None:
+        index = np.where((angle>Arange[0]*np.pi/180.)*(angle<Arange[1]*np.pi/180.)==True);
+        subData = arr[index].copy()
+        aveIntens = np.mean(subData)
+        aveAngle = (Arange[0]+Arange[1])/2.        
+        return [aveAngle, aveIntens];
+
+    rad = np.linspace(0, 2*np.pi, num+1);
+    aveIntens = np.zeros(num)
+    aveAngle = np.zeros(num)
+    for i in range(num):
+        index = np.where((angle>rad[i])*(angle<rad[i+1])==True);
+        subData = arr[index].copy()
+        aveIntens[i] = np.mean(subData)
+        aveAngle[i] = (rad[i]+rad[i+1])/2.
+    return [aveAngle, aveIntens]
+
+
+def sliceCut(self, data, axis='x', window=5, center=None, clim=None):
+    """
+    input a 3d volume, then it will output the average slice within certain range and angle
+    """
+    (nx,ny,nz) = data.shape
+    if center is None:
+        cx = (nx-1.)/2.;
+        cy = (ny-1.)/2.;
+        cz = (nz-1.)/2.;
+    else:
+        (cx,cy,cz) = center;
+    if clim is None: 
+        (vmin, vmax) = (-100, 1000);
+    else:
+        (vmin, vmax) = clim;
+        
+    nhalf = (window-1)/2
+    Vindex = ((data>=vmin)*(data<=vmax)).astype(float);
+
+    if axis == 'x':
+        return np.sum(data[cx-nhalf:cx+nhalf+1,:,:]*Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)/(np.sum(Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)+1.0e-5)
+    elif axis == 'y':
+        return np.sum(data[:,cx-nhalf:cx+nhalf+1,:]*Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)/(np.sum(Vindex[:,cx-nhalf:cx+nhalf+1,:], axis=1)+1.0e-5)        
+    elif axis == 'z':
+        return np.sum(data[:,:,cx-nhalf:cx+nhalf+1]*Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)/(np.sum(Vindex[:,:,cx-nhalf:cx+nhalf+1], axis=2)+1.0e-5)
+    else: 
+        return 0
