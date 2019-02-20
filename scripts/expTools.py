@@ -23,12 +23,12 @@ def xdsIndex2psvm(fileGXPARMS):
     content = f.readlines()
     f.close()
 
-    psvmParms['pixelSize'] = float(content[7].split()[3])/1.0e6
+    psvmParms['pixelSize'] = float(content[7].split()[3])
     psvmParms['polarization'] = -1.0
     psvmParms['waveLength'] = float(content[2].split()[0])
     psvmParms['angleStep'] = float(content[1].split()[2])
-    psvmParms['detectorDistance'] = float(content[8].split()[2])/1.0e3
-    psvmParms['detectorCenter'] = (float(content[8].split()[0]), float(content[8].split()[1]))
+    psvmParms['detectorDistance'] = float(content[8].split()[2])
+    psvmParms['detectorCenter'] = (float(content[8].split()[1]), float(content[8].split()[0]))
 
     ## calculate the Amat matrix
     ## GXPARMS saves real space vecA, vecB, vecC, which is invAmat
@@ -65,9 +65,10 @@ def cbf2psvm(fileName):
     nx = header['pixels_in_x']
     ny = header['pixels_in_y']
 
-    if not image.shape == (nx, ny):
+    ## Detector is flipped
+    if not image.shape == (ny, nx):
         image=image.T
-        if not image.shape == (nx, ny):
+        if not image.shape == (ny, nx):
             raise Exception("!! Image shape doesn't fit")
 
     psvmParms["image"] = image
