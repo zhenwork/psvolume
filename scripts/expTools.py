@@ -92,6 +92,7 @@ def ichSpecificParams():
     #mT = imageTools.MaskTools()
     #mask = mT.valueLimitMask(image, vmin=0.001, vmax=100000)
     #mask = mT.circleMask(size, rmin=40, rmax=None, center=None)
+    psvmParms = {}
     mask = np.ones((2527,2463)).astype(int)
     mask[1255:1300,1235:2463] = 0
     mask[1255:1305,1735:2000] = 0
