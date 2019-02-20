@@ -67,7 +67,6 @@ class ScalingTools:
         norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
         solidAngle = zaxis * 1.0 / norm**3
         solidAngle /= np.amax(solidAngle)
-        solidAngle.shape = (nx, ny)
         scaleMask = 1./solidAngle
         return scaleMask
 
@@ -91,7 +90,6 @@ class ScalingTools:
             detectScale = np.ones(size)
 
         detectScale /= np.amax(detectScale)
-        detectScale.shape = (nx, ny)
         scaleMask = 1. / detectScale
         return scaleMask
 
