@@ -218,7 +218,8 @@ def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,N
     return [aveAngle, aveIntens]
 
 
-def radialProfile(image, mask, center=None, vmin=None, vmax=None, stepSize=None, sampling=None, rmin=None, rmax=None):
+def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None):
+
     (nx, ny) = image.shape
     if center is None: 
         cx = (nx-1.)/2.
@@ -233,28 +234,35 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, stepSize=None,
     radius = np.sqrt(xaxis**2+yaxis**2)
 
     if rmin is None: 
-        rmin = 0
+        rmin = np.amin(radius)
     if rmax is None:
-        rmax = np.ceil(np.amax(radius))
+        rmax = np.amax(radius)
     if stepSize is not None:
-        stepSize = 1
-        radiusRange = np.arange(rmin, int(rmax)+2, stepSize) - 0.5
-    if sampling is not None:
-        sampling = int(rmax - rmin) + 2
-        radiusRange = np.linspace(rmin, rmax+1, sampling) - 0.5
+        aveRadius = np.arange(rmin, rmax+stepSize/2., stepSize)
+    elif sampling is not None:
+        aveRadius = np.linspace(rmin, rmax, sampling)
+        stepSize = (rmax - rmin)/(sampling - 1.)
+    else:
+        aveRadius = np.arange( int(round(rmin)), int(round(rmax))+1 )
+        stepSize = 1.
+        
+    notation = mask.copy()
+    notation[radius < rmin] = 0
+    notation[radius >= rmax] = 0    
     
-    length = len(radiusRange)
-    aveRadius = (radiusRange[:length-1] + radiusRange[1:])/2.
-    sumIntens = np.zeros(length-1)
-    sumCount = np.zeros(length-1)
-    aveIntens = np.zeros(length-1)
+    radius = np.around(radius / stepSize).astype(int)
+    startR = int(np.around(rmin / stepSize))
+    sumIntens = np.zeros(len(aveRadius))
+    sumCount  = np.zeros(len(aveRadius))
+    aveIntens = np.zeros(len(aveRadius))
 
-    for idx in range(len(radiusRange)-1):
-        rmin = radiusRange[idx]
-        rmax = radiusRange[idx+1]
-        index = np.where((radius >= rmin) & (radius < rmax))
-        sumIntens[idx] = np.sum(image[index])
-        sumCount[idx] = np.sum(mask[index])
+    for idx in range(nx):
+        for jdx in range(ny):
+            r = radius[idx, jdx]
+            if notation[idx, jdx] == 0:
+                continue
+            sumIntens[r-startR] = image[idx,jdx] * mask[idx,jdx]
+            sumCount[r-startR] = mask[idx,jdx]
 
     index = np.where(sumCount > 0)
     aveIntens[index] = sumIntens[index] * 1.0 / sumCount[index]
