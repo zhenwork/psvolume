@@ -124,7 +124,7 @@ class FilterTools:
         return Data * 1.0 * mask
 
 
-def removeExtremes(_image, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vmax=None, _window=(11,11)):
+def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vmax=None, _window=(11,11)):
     """
     1. Throw away {+,-}sigma*std from (image - median)
     2. Throw away {+,-}sigma*std again from (image - median)
@@ -248,7 +248,11 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rma
         
     notation = mask.copy()
     notation[radius < rmin] = 0
-    notation[radius >= rmax] = 0    
+    notation[radius >= rmax] = 0 
+    if vmax is not None:
+        notation[image >= vmax] = 0   
+    if vmin is not None:
+        notation[image < vmin] = 0
     
     radius = np.around(radius / stepSize).astype(int)
     startR = int(np.around(rmin / stepSize))
@@ -261,8 +265,8 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rma
             r = radius[idx, jdx]
             if notation[idx, jdx] == 0:
                 continue
-            sumIntens[r-startR] = image[idx,jdx] * mask[idx,jdx]
-            sumCount[r-startR] = mask[idx,jdx]
+            sumIntens[r-startR] = image[idx,jdx] * notation[idx,jdx]
+            sumCount[r-startR] = notation[idx,jdx]
 
     index = np.where(sumCount > 0)
     aveIntens[index] = sumIntens[index] * 1.0 / sumCount[index]
