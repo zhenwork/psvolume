@@ -124,7 +124,8 @@ else:
         image = zf.h5reader(fname, 'image')
         Geo = zio.get_image_info(fname)
         image = image * Geo['scale']
-        image[mask==0] = -1
+        if args.mask is not None: 
+            image[mask==0] = -1
         
         sumIntens = round(np.sum(image), 8)
         
