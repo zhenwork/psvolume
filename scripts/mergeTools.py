@@ -86,7 +86,7 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
     Npixels = np.prod(size)
     peakMask = np.zeros(Npixels).astype(int)
     voxel =  voxel.reshape((Npixels, 3)) 
-    shift = np.abs(np.around(voxel) - voxel).astype(int)
+    shift = np.abs(np.around(voxel) - voxel)
 
     for t in range(Npixels):
         
@@ -94,8 +94,10 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
         kshift = shift[t, 1]
         lshift = shift[t, 2]
 
-        if (hshift<boxSize) and (kshift<boxSize) and (lshift<boxSize):
-            peakMask[t] = 1
+        if (hshift>boxSize) or (kshift>boxSize) or (lshift>boxSize):
+            continue
+        
+        peakMask[t] = 1
 
     return peakMask.reshape(size)
 
