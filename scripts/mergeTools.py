@@ -62,7 +62,7 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
         reciprocal = xvector
 
     voxel = mapReciprocal2Voxel(Amat=None, Bmat=None, returnFormat="HKL", \
-                            reciprocal=None, voxelSize=1.0, Phi=0.)
+                            reciprocal=reciprocal, voxelSize=1.0, Phi=0.)
 
     return voxel
 
