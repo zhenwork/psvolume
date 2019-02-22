@@ -22,12 +22,19 @@ def RandomRotation():
     return None
 
 
-def phi2quaternion(phi):
+def phi2quaternion(phi, rotAxis="x"):
     """
     phi: in degree unit
     """
     angle = phi*np.pi/180.
-    return (np.cos(angle/2.), 0., np.sin(angle/2.), 0.)
+    if rotAxis.lower() == "x":
+        return (np.cos(angle/2.), np.sin(angle/2.), 0., 0.)
+    elif rotAxis.lower() == "y":
+        return (np.cos(angle/2.), 0., np.sin(angle/2.), 0.)
+    elif rotAxis.lower() == "z":
+        return (np.cos(angle/2.), 0., 0., np.sin(angle/2.))
+    else:
+        return None
 
 
 def quaternion2rotation(quaternion):

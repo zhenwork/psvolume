@@ -2,7 +2,6 @@ import numpy as np
 from numba import jit
 import mathTools
 
-
 def mapPixel2RealXYZ(size=None, center=None, pixelSize=None, detectorDistance=None):
     """
     Returns: Real space pixel position (xyz): N*N*3 numpy array
@@ -34,22 +33,22 @@ def mapRealXYZ2Reciprocal(xyz=None, waveLength=None):
 
 
 def mapReciprocal2Voxel(Amat=None, Bmat=None, returnFormat="HKL", \
-                    reciprocal=None, voxelSize=1.0, Phi=0.):
+                    reciprocal=None, voxelSize=1.0, Phi=0., rotAxis="x"):
     """
     Return: voxel (N*N*3) 
     voxelSize: 0.015 for 'cartesian' coordinate; 1.0 for "hkl" coordinate
     """
-    Phimat = mathTools.quaternion2rotation(mathTools.phi2quaternion(Phi))
+    Phimat = mathTools.quaternion2rotation(mathTools.phi2quaternion(Phi), rotAxis=rotAxis)
     if returnFormat.lower() == "hkl":
-        voxel = reciprocal.dot(Phimat.dot(Amat)) / voxelSize 
+        voxel = reciprocal.dot(np.linalg.inv(Phimat.dot(Amat)).T) / voxelSize 
     elif returnFormat.lower() == "cartesian":
-        voxel = reciprocal.dot(Phimat.dot(Amat)).dot(Bmat.T) / voxelSize 
+        voxel = reciprocal.dot(np.linalg.inv(Phimat.dot(Amat)).T).dot(Bmat.T) / voxelSize 
     return voxel
 
 
 def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Phi=0., \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
-                returnFormat=None, voxelSize=1.0):
+                returnFormat=None, voxelSize=1.0, rotAxis="x"):
 
     if image is not None:
         size = image.shape
@@ -61,7 +60,7 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
     else:
         reciprocal = xvector
 
-    voxel = mapReciprocal2Voxel(Amat=Amat, Bmat=Bmat, returnFormat="HKL", \
+    voxel = mapReciprocal2Voxel(Amat=Amat, Bmat=Bmat, returnFormat="HKL", rotAxis=rotAxis, \
                             reciprocal=reciprocal, voxelSize=1.0, Phi=Phi)
 
     return voxel
@@ -71,7 +70,7 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
 def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, \
                 KeepPeak=False, returnFormat="HKL", xvector=None, \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
-                Vsample=1, Vcenter=60, Vsize=121, voxelSize=1., Phi=0.):
+                Vsample=1, Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
     """
     Method: pixels collected to nearest voxels
     returnFormat: "HKL" or "cartesian"
@@ -79,7 +78,7 @@ def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, 
     If you select "cartesian", you may like voxelSize=0.015 nm^-1
     """
     voxel = mapImage2Voxel(image=_image, size=None, Amat=Amat, Bmat=Bmat, xvector=xvector, \
-            Phi=Phi, waveLength=waveLength, pixelSize=pixelSize, center=center, \
+            Phi=Phi, waveLength=waveLength, pixelSize=pixelSize, center=center, rotAxis=rotAxis, \
             detectorDistance=detectorDistance, returnFormat=returnFormat, voxelSize=voxelSize)
 
     ## For Loop to map one image
@@ -117,5 +116,3 @@ def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, 
         volume[inth,intk,intl] += image[t]
 
     return volume, weight
-
-
