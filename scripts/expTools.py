@@ -54,9 +54,9 @@ def cbf2psvm(fileName):
     image, header = cbfhandler.getDataHeader(fileName)
 
     psvmParms = {}
-    psvmParms["startAngle"] = header['start_angle'] 
-    psvmParms["currentAngle"] = header['phi']
-    psvmParms["Phi"] = header['phi'] - header['start_angle'] 
+    psvmParms["startAngle"] = header['phi']
+    psvmParms["currentAngle"] = header['start_angle']  
+    psvmParms["Phi"] = psvmParms["currentAngle"] - psvmParms["startAngle"]
     psvmParms["angleStep"] = header['angle_increment']
     psvmParms["exposureTime"] = header['exposure_time']
     psvmParms["waveLength"] = header['wavelength']
