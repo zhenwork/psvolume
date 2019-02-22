@@ -67,6 +67,40 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
 
 
 @jit
+def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
+            waveLength=None, pixelSize=None, center=None, detectorDistance=None, Phi=0., rotAxis="x"):
+    """
+    Method: pixels collected to nearest voxels
+    returnFormat: "HKL" or "cartesian"
+    voxelSize: unit is nm^-1 for "cartesian", NULL for "HKL" format 
+    If you select "cartesian", you may like voxelSize=0.015 nm^-1
+    """
+    voxel = mapImage2Voxel(image=_image, size=size, Amat=Amat, xvector=xvector, \
+            Phi=Phi, waveLength=waveLength, pixelSize=pixelSize, center=center, rotAxis=rotAxis, \
+            detectorDistance=detectorDistance)
+
+    ## For Loop to map one image
+    if size is None:
+        size = _image.shape
+
+    Npixels = np.prod(size)
+    peakMask = np.zeros(Npixels).astype(int)
+    voxel =  voxel.reshape((Npixels, 3)) 
+    shift = np.abs(np.around(voxel) - voxel).astype(int)
+
+    for t in range(Npixels):
+        
+        hshift = shift[t, 0]
+        kshift = shift[t, 1]
+        lshift = shift[t, 2]
+
+        if (hshift<boxSize) and (kshift<boxSize) and (lshift<boxSize):
+            peakMask[t] = 1
+
+    return peakMask.reshape(size)
+
+
+@jit
 def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, \
                 KeepPeak=False, returnFormat="HKL", xvector=None, \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
