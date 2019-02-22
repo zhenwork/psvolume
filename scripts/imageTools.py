@@ -146,6 +146,7 @@ def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vm
         ## remove values {+,-}sigma*std
         median = ft.median_filter(image=image, mask=mask, window=_window)
         submedian = image - median
+        submedian *= mask
         
         Tindex = np.where(mask==1)
         Findex = np.where(mask==0)
@@ -154,7 +155,6 @@ def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vm
         index = np.where((submedian>ave+std*sigma) | (submedian<ave-std*sigma))
         image[index] = 0
         mask[index] = 0
-
         submedian[index] = 0
         
         ## remove values {+,-}sigma*std
