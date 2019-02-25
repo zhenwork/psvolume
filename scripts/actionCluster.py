@@ -194,7 +194,7 @@ class ImageMerge:
         volume = psvmParams["volume"].copy()
         weight = psvmParams["weight"].copy()
 
-        volume, weight = Image2Volume(volume, weight, Amat=Amat, Bmat=None, _image=image, _mask=mask, \
+        volume, weight = mergeTools.Image2Volume(volume, weight, Amat=Amat, Bmat=None, _image=image, _mask=mask, \
                 keepPeak=False, returnFormat="HKL", xvector=None, \
                 waveLength=waveLength, pixelSize=pixelSize, center=detectorCenter, detectorDistance=detectorDistance, \
                 Vcenter=60, Vsize=121, voxelSize=1., Phi=Phi, rotAxis="x")
