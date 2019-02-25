@@ -17,7 +17,7 @@ def volumeSymmetrize(_volume, _threshold=(-100,1000), symmetry="P1211"):
                 
                 if symmetry.lower() == "p1211":
                     pairs = np.array([ volume[i,j,k], volume[mi,mj,mk], volume[mi,j,mk], volume[i,mj,k] ]) #P1211
-                elif symmetry.lower() == "friedel"
+                elif symmetry.lower() == "friedel":
                     # FIXME: only applicable to friedel symmetry
                     pairs = np.array([ volume[i,j,k], volume[mi,mj,mk] ]) #P1211
                 elif symmetry.lower() == "snc":
