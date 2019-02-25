@@ -76,26 +76,21 @@ def cbf2psvm(fileName):
     return psvmParms
 
 
-def DataExtraction(fileName, format="cbf"):
-    if format.lower()=="cbf":
-        psvmParms = cbf2psvm(fileName)
-        return psvmParms
-    elif format.lower()=="numpy":
-        return psvmParms
-    elif format.lower()=="h5py":
-        return psvmParms
-    else:
-        raise Exception("!! file format not supported")
-
-
-def ichSpecificParams():
+def specificParams(notation="ich"):
     #mT = imageTools.MaskTools()
     #mask = mT.valueLimitMask(image, vmin=0.001, vmax=100000)
     #mask = mT.circleMask(size, rmin=40, rmax=None, center=None)
-    psvmParms = {}
-    mask = np.ones((2527,2463)).astype(int)
-    mask[1255:1300,1235:2463] = 0
-    mask[1255:1305,1735:2000] = 0
-    mask[1255:1310,2000:2463] = 0
-    psvmParms["mask"] = mask.T
-    return psvmParms
+    if notation == "ich"
+        psvmParms = {}
+        mask = np.ones((2527,2463)).astype(int)
+        mask[1255:1300,1235:2463] = 0
+        mask[1255:1305,1735:2000] = 0
+        mask[1255:1310,2000:2463] = 0
+        psvmParms["mask"] = mask.T
+        return psvmParms
+    elif notation == "img":
+        return None
+    elif notation == "numpy":
+        return None
+    else:
+        raise Exception("!! wrong notation")
