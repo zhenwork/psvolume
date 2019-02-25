@@ -40,6 +40,3 @@ def psvmStandardBmat(Amat=None, latticceConstant=None):
         raise Exception("!! Can't make standard Bmat")
         return None
 
-
-
-

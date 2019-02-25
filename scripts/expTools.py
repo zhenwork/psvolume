@@ -67,6 +67,7 @@ def cbf2psvm(fileName):
 
     ## Detector is flipped
     if not image.shape == (nx, ny):
+        print "## flip image x/y"
         image=image.T
         if not image.shape == (nx, ny):
             raise Exception("!! Image shape doesn't fit")
@@ -74,7 +75,6 @@ def cbf2psvm(fileName):
     psvmParms["image"] = image
     cbfhandler = None
     return psvmParms
-
 
 def specificParams(notation="ich"):
     #mT = imageTools.MaskTools()

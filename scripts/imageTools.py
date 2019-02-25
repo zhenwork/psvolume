@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.ndimage.filters import median_filter
+from numba import jit
 
 class MaskTools:
     def circleMask(self, size, rmin=None, rmax=None, center=None):
@@ -94,8 +95,10 @@ class ScalingTools:
         return scaleMask
 
 class FilterTools:
-    def median_filter(self, image=None, mask=None, window=(5,5)):
-        median = median_filter(image, window) * 1.0 * mask
+    def median_filter(self, image=None, mask=None, window=(11,11)):
+        median = median_filter(image, window) * 1.0
+        if mask is not None:
+            median *= mask
         return median
 
     def mean_filter(self, image=None, mask=None, window=(5,5)):
@@ -158,8 +161,8 @@ def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vm
         submedian[index] = 0
         
         ## remove values {+,-}sigma*std
-        # tmp* Tindex = np.where(mask==1)
-        # tmp* Findex = np.where(mask==0)
+        Tindex = np.where(mask==1)
+        Findex = np.where(mask==0)
         ave = np.mean(submedian[Tindex])
         std = np.std( submedian[Tindex])
         index = np.where((submedian>ave+std*_sigma) | (submedian<ave-std*_sigma))
@@ -173,7 +176,7 @@ def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vm
     else:
         return None
 
-
+@jit
 def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
     """
     num denotes how many times you want to divide the angle
@@ -217,7 +220,7 @@ def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,N
         aveAngle[i] = (rad[i]+rad[i+1])/2.
     return [aveAngle, aveIntens]
 
-
+@jit
 def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None):
 
     (nx, ny) = image.shape

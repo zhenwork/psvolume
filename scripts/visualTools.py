@@ -29,6 +29,26 @@ class PlotTools:
         if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
             pg.QtGui.QApplication.exec_()
 
+    def imshow(self, image, clim=None, size=None, subPlot=None):
+        if not isinstance(image, list)
+            plt.figure(figsize=size)
+            plt.imshow(image, clim=clim)
+            plt.tight_layout()
+            plt.show()
+        else:
+            plt.figure(figsize=size)
+            M,N = subPlot
+            idx = 1
+            for i in range(M):
+                for j in range(N):
+                    plt.subplot(M,N,idx)
+                    plt.imshow(image[idx-1], clim=clim)
+                    plt.tight_layout()
+                    idx += 1
+            plt.tight_layout()
+            plt.show()
+
+
     def pltRing(self, arr, r = None, unit=None, center=(None,None), spacing=None, clim=None):
         (nx, ny) = arr.shape
         cx = center[0];

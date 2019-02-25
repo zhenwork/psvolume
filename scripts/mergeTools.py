@@ -104,9 +104,9 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
 
 @jit
 def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, \
-                KeepPeak=False, returnFormat="HKL", xvector=None, \
+                keepPeak=False, returnFormat="HKL", xvector=None, \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
-                Vsample=1, Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
+                Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
     """
     Method: pixels collected to nearest voxels
     returnFormat: "HKL" or "cartesian"
@@ -141,11 +141,11 @@ def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, 
         if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1):
             continue
         
-        hshift = abs(h/Vsample-round(h/Vsample))
-        kshift = abs(k/Vsample-round(k/Vsample))
-        lshift = abs(l/Vsample-round(l/Vsample))
+        hshift = abs(h-inth)
+        kshift = abs(k-intk)
+        lshift = abs(l-intl)
 
-        if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not KeepPeak:
+        if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not keepPeak:
             continue
         
         weight[inth,intk,intl] += 1
