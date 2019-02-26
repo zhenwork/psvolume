@@ -86,13 +86,26 @@ def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmet
 
 
 @jit
-def hkl2volume(idata, astar, bstar, cstar, ithreshold=(-100,1000)):
+def hkl2volume(volume, _volumeMask = None, astar, bstar, cstar, ithreshold=(-100,1000)):
+    idata = volume.copy()
     num_samp = idata.shape[0]
     icen = (num_samp-1)/2
     center = np.array([icen]*3).astype(float)
     size = num_samp
     model3d = np.zeros((num_samp, num_samp, num_samp))
     weight = np.zeros((num_samp, num_samp, num_samp))
+
+    if _volumeMask is not None:
+        volumeMask = _volumeMask.copy()
+    else:
+        volumeMask = np.ones(idata.shape)
+
+    if ithreshold is not None:
+        volumeMask[(idata<ithreshold[0]) | (idata>ithreshold[1])] = 0
+
+    volumeMask = volumeMask.astype(int)
+
+    idata[volumeMask==0] = -1024
     
     for i in range(-icen, icen+1):
         for j in range(-icen, icen+1):
@@ -158,11 +171,11 @@ def hkl2volume(idata, astar, bstar, cstar, ithreshold=(-100,1000)):
                 weight[((x+1)%size), ((y+1)%size), ((z+1)%size)] += f 
                 model3d[((x+1)%size), ((y+1)%size), ((z+1)%size)] += f * w 
 
-    index = np.where(weight>0)
+    index = np.where(weight>1.e-2)
     model3d[index] /= weight[index]
-    index = np.where(weight<=0)
-    model3d[index] = -1024
-    return model3d
+    index = np.where(weight<=1.e-2)
+    model3d[index] = 0
+    return model3d, weight
 
 @jit
 def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow=5):
