@@ -86,7 +86,7 @@ def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmet
 
 
 @jit
-def hkl2volume(volume, _volumeMask = None, astar, bstar, cstar, ithreshold=(-100,1000)):
+def hkl2volume(volume, astar, bstar, cstar, _volumeMask = None, ithreshold=(-100,1000)):
     idata = volume.copy()
     num_samp = idata.shape[0]
     icen = (num_samp-1)/2
