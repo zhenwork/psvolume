@@ -50,6 +50,8 @@ def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmet
 
     if _threshold is not None:
         volumeMask[(volume<_threshold[0]) | (volume>_threshold[1])] = 0.
+
+    volume *= volumeMask
     
     if symmetry.lower() == "p1211":
         volume2 = volume[::-1,::-1,::-1].copy()
@@ -65,7 +67,7 @@ def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmet
         index = np.where(weightSym>0.5)
         volumeSym[index] /= weightSym[index]
         return volumeSym, weightSym
-        
+
     elif symmetry.lower() == "friedel":
         volume2 = volume[::-1,::-1,::-1].copy()
         volumeMask2 = volumeMask[::-1,::-1,::-1].copy()
