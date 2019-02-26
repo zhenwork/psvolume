@@ -67,7 +67,7 @@ def cbf2psvm(fileName):
 
     ## Detector is flipped
     if not image.shape == (nx, ny):
-        print "## flip image x/y"
+        # print "## flip image x/y"
         image=image.T
         if not image.shape == (nx, ny):
             raise Exception("!! Image shape doesn't fit")
