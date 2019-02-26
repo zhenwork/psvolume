@@ -212,7 +212,7 @@ class LaueSymmetrization:
         psvmParams = self.params.copy()
         volume = psvmParams["volume"].copy()
 
-        volumeSym = volumeTools.volumeSymmetrize(volume, _threshold=(-100,1000), symmetry="P1211")
+        volumeSym, weightSym = volumeTools.volumeSymmetrize(volume, _threshold=(-100,1000), symmetry="P1211")
         
         psvmParams["volumeSym"] = volumeSym.copy()
 
@@ -226,7 +226,7 @@ class FriedelSymmetrization:
         psvmParams = self.params.copy()
         volume = psvmParams["volume"].copy()
 
-        volumeSym = volumeTools.volumeSymmetrize(volume, _threshold=(-100,1000), symmetry="friedel")
+        volumeSym, weightSym = volumeTools.volumeSymmetrize(volume, _threshold=(-100,1000), symmetry="friedel")
         
         psvmParams["volumeSym"] = volumeSym.copy()
 

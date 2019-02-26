@@ -249,8 +249,8 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rma
         aveRadius = np.arange( int(round(rmin)), int(round(rmax))+1 )
         stepSize = 1.
         
-    print "stepSize = ",np.around(stepSize,2)
-    print "rmin/rmax = ", np.around(aveRadius[0]),np.around(aveRadius[-1])
+    # print "stepSize = ",np.around(stepSize,2)
+    # print "rmin/rmax = ", np.around(aveRadius[0]),np.around(aveRadius[-1])
 
     notation = mask.copy()
     notation[radius < rmin] = 0

@@ -4,7 +4,7 @@ import mathTools
 
 
 @jit
-def volumeSymmetrize(_volume, _threshold=(-100,1000), symmetry="P1211"):
+def volumeSymmetrize_alg1(_volume, _volumeMask = None, _threshold=(-100,1000), symmetry="P1211"):
     volume = _volume.copy()
     weight = np.zeros(volume.shape)
     nx, ny, nz = volume.shape
@@ -38,6 +38,50 @@ def volumeSymmetrize(_volume, _threshold=(-100,1000), symmetry="P1211"):
                     volume[i,j,k] = np.mean(pairs)
 
     return volume, weight    
+
+
+@jit
+def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmetry="P1211"):
+    volume = _volume.copy()
+    if _volumeMask is None:
+        volumeMask = np.ones(volume.shape)
+    else:
+        volumeMask = _volumeMask.copy()
+
+    if _threshold is not None:
+        volumeMask[(volume<_threshold[0]) | (volume>_threshold[1])] = 0.
+    
+    if symmetry.lower() == "p1211":
+        volume2 = volume[::-1,::-1,::-1].copy()
+        volumeMask2 = volumeMask[::-1,::-1,::-1].copy()
+        volume3 = volume[::-1,:,::-1].copy()
+        volumeMask3 = volumeMask[::-1,:,::-1].copy()
+        volume4 = volume[:,::-1,:].copy()
+        volumeMask4 = volumeMask[:,::-1,:].copy()
+
+        volumeSym = (volume + volume2 + volume3 + volume4)
+        weightSym = (volumeMask + volumeMask2 + volumeMask3 + volumeMask4)
+
+        index = np.where(weightSym>0.5)
+        volumeSym[index] /= weightSym[index]
+        return volumeSym, weightSym
+        
+    elif symmetry.lower() == "friedel":
+        volume2 = volume[::-1,::-1,::-1].copy()
+        volumeMask2 = volumeMask[::-1,::-1,::-1].copy()
+
+        volumeSym = (volume + volume2)
+        weightSym = (volumeMask + volumeMask2)
+
+        index = np.where(weightSym>0.5)
+        volumeSym[index] /= weightSym[index]
+        return volumeSym, weightSym
+
+    elif symmetry.lower() == "snc":
+        return None
+    else:
+        return None 
+
 
 @jit
 def hkl2volume(idata, astar, bstar, cstar, ithreshold=(-100,1000)):
@@ -189,7 +233,7 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
         radius = np.around(radius).astype(int)
 
     radius1d = np.zeros(int(np.amax(radius))+1)
-    weight1d = np.zeros(radius.shape)
+    weight1d = np.zeros(radius1d.shape)
 
     for i in range(nx):
         for j in range(ny):
