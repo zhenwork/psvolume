@@ -12,7 +12,7 @@ parser.add_argument("-vSampling","--vSampling", help="num of images to process",
 # parser.add_argument("-vCenter","--vCenter", help="num of images to process", default=60, type=int)
 parser.add_argument("-nmin","--nmin", help="minimum image number", default=0, type=int)
 parser.add_argument("-nmax","--nmax", help="maximum image number", default=-1, type=int)
-parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0, type=float)
+parser.add_argument("-thrmin","--thrmin", help="minimum pixel value", default=0.0, type=float)
 parser.add_argument("-voxel","--voxel", help="voxel exist or not", default=".", type=str)
 parser.add_argument("-choice","--choice", help="select specific images", default="all", type=str)
 parser.add_argument("-list","--list", help="merge list", default=".", type=str)
@@ -140,7 +140,7 @@ else:
             [model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
         else:
             moniter = 'hkl'
-            [model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
+            [model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, thrmin=args.thrmin)
 
             # FIXME: This is specific for snc dataset:
             # [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)

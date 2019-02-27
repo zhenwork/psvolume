@@ -103,7 +103,7 @@ def Geometry(image, Geo):
     return voxel
 
 @jit
-def ImageMerge_HKL(model3d, weight, image, Geo, Volume, Kpeak=False):
+def ImageMerge_HKL(model3d, weight, image, Geo, Volume, Kpeak=False, thrmin=0.0):
     Vsize = Volume['volumeSize']
     Vcenter = Volume['volumeCenter']
     Vsample = Volume['volumeSampling']
@@ -115,7 +115,7 @@ def ImageMerge_HKL(model3d, weight, image, Geo, Volume, Kpeak=False):
 
     for t in range(len(HKL)):
 
-        if (Image[t] < 0): continue
+        if (Image[t] < thrmin): continue
         
         hkl = HKL[t] + Vcenter
         
