@@ -119,9 +119,9 @@ class iPloter:
         """
         (nx,ny,nz) = data.shape
         if center is None:
-            cx = (nx-1.)/2.;
-            cy = (ny-1.)/2.;
-            cz = (nz-1.)/2.;
+            cx = (nx-1)/2;
+            cy = (ny-1)/2;
+            cz = (nz-1)/2;
         else:
             (cx,cy,cz) = center;
         if clim is None: 
@@ -130,7 +130,10 @@ class iPloter:
             (vmin, vmax) = clim;
             
         nhalf = (window-1)/2
-        Vindex = ((data>=vmin)*(data<=vmax)).astype(float);
+        #Vindex = ((data>=vmin)*(data<=vmax)).astype(float)
+        Vindex = np.zeros(data.shape)
+        index = np.where((data>=vmin) & (data<=vmax))
+        Vindex[index] = 1.
 
         if axis == 'x':
             return np.sum(data[cx-nhalf:cx+nhalf+1,:,:]*Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)/(np.sum(Vindex[cx-nhalf:cx+nhalf+1,:,:], axis=0)+1.0e-5)
