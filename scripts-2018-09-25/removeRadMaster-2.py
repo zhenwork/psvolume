@@ -14,8 +14,6 @@ parser.add_argument("-vmin","--vmin", help="minimum value", default=0.0, type=fl
 parser.add_argument("-nmax","--nmax", help="maximum value", default=-1, type=int)
 args = parser.parse_args()
 
-zf = iFile()
-zio = IOsystem()
 
 zf = iFile()
 zio = IOsystem()
