@@ -38,6 +38,8 @@ weight  = np.zeros([Vol['volumeSize']]*3)
 volume = np.zeros([Vol['volumeSize']]*3)
 vMask  = np.zeros([Vol['volumeSize']]*3)
 
+volumeRaw = np.zeros([Vol['volumeSize']]*3)
+vMaskRaw  = np.zeros([Vol['volumeSize']]*3)
 
 if args.cc12 != 0:
     model3d_1 = np.zeros([Vol['volumeSize']]*3)
@@ -98,10 +100,13 @@ if comm_rank == 0:
         
         sumIntens = round(np.sum(image[image>0]), 8)
         
-        model3d = np.zeros([Vol['volumeSize']]*3)
-        weight  = np.zeros([Vol['volumeSize']]*3)
+        model3dRaw = np.zeros([Vol['volumeSize']]*3)
+        weightRaw  = np.zeros([Vol['volumeSize']]*3)
 
-        [model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, thrmin=args.thrmin)
+        [model3dRaw, weightRaw] = ImageMerge_HKL(model3dRaw, weightRaw, image, Geo, Vol, Kpeak=args.peak, thrmin=args.thrmin)          
+
+        model3d = model3dRaw.copy()
+        weight = weightRaw.copy()
 
         model3d = (model3d + model3d[::-1, ::-1, ::-1] + model3d[::-1, :, ::-1] + model3d[:, ::-1, :]) / 4.
         weight = (weight + weight[::-1, ::-1, ::-1] + weight[::-1, :, ::-1] + weight[:, ::-1, :]) / 4.
@@ -109,6 +114,8 @@ if comm_rank == 0:
         if idx == args.nmin:
             volume = model3d.copy() 
             vMask = weight.copy() 
+            volumeRaw = model3dRaw.copy()
+            vMaskRaw = weightRaw.copy()
             print "### adding first pattern", idx
         else:
             index = np.where( (vMask>0) & (weight>0) )
@@ -120,10 +127,13 @@ if comm_rank == 0:
             volume += scale * model3d
             vMask += weight
 
+            volumeRaw += scale * model3dRaw
+            vMaskRaw += weightRaw
+
             old = None
             new = None
 
-            print "### adding to existing volume", len(index[0]), scale, np.sum(vMask)
+            print "### adding to existing volume", len(index[0]), scale, np.sum(vMaskRaw)
 
             # FIXME: This is specific for snc dataset:
             # [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
@@ -131,8 +141,8 @@ if comm_rank == 0:
         print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(args.nmin)+'/'+str(idx)+'/'+str(args.nmax) +'  sumIntens: '+str(sumIntens).ljust(10)
 
 
-    model3d = volume.copy()
-    weight = vMask.copy()
+    model3d = volumeRaw.copy()
+    weight = vMaskRaw.copy()
 
     model3d = ModelScaling(model3d, weight)
     pathIntens = folder_o+'/merge.volume'
