@@ -128,7 +128,7 @@ if comm_rank == 0:
             # FIXME: This is specific for snc dataset:
             # [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
         
-        print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(args.nmin)+'/'+str(idx)+'/'+str(args.nmax) +'  sumIntens: '+str(sumIntens).ljust(10) + " ### "+moniter
+        print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(args.nmin)+'/'+str(idx)+'/'+str(args.nmax) +'  sumIntens: '+str(sumIntens).ljust(10)
 
 
     model3d = volume.copy()
