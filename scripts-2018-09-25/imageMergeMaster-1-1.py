@@ -35,6 +35,10 @@ Vol['volumeSize'] = 2*Vol['volumeCenter']+1
 model3d = np.zeros([Vol['volumeSize']]*3)
 weight  = np.zeros([Vol['volumeSize']]*3)
 
+volume = np.zeros([Vol['volumeSize']]*3)
+vMask  = np.zeros([Vol['volumeSize']]*3)
+
+
 if args.cc12 != 0:
     model3d_1 = np.zeros([Vol['volumeSize']]*3)
     weight_1  = np.zeros([Vol['volumeSize']]*3)
@@ -82,16 +86,53 @@ if comm_rank == 0:
     print "### Center: ", Vol['volumeCenter']
     print "### Sampling: ", Vol['volumeSampling']
 
-    countImage = 0
-    for nrank in range(comm_size-1):
-        md=mpidata()
-        md.recv()
-        model3d += md.model3d
-        weight += md.weight
-        recvRank = md.small.rank
-        countImage += md.small.num
-        md = None
-        print '### received file from ' + str(recvRank).rjust(2) + '/' + str(comm_size)
+    for idx in range(args.nmin, args.nmax):
+
+        fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
+        image = zf.h5reader(fname, 'image')
+        Geo = zio.get_image_info(fname)
+        image = image * 1. 
+
+        if args.mask is not None: 
+            image[mask==0] = -1024
+        
+        sumIntens = round(np.sum(image[image>0]), 8)
+        
+        model3d = np.zeros([Vol['volumeSize']]*3)
+        weight  = np.zeros([Vol['volumeSize']]*3)
+
+        [model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, thrmin=args.thrmin)
+
+        model3d = (model3d + model3d[::-1, ::-1, ::-1] + model3d[::-1, :, ::-1] + model3d[:, ::-1, :]) / 4.
+        weight = (weight + weight[::-1, ::-1, ::-1] + weight[::-1, :, ::-1] + weight[:, ::-1, :]) / 4.
+
+        if idx == args.nmin:
+            volume = model3d.copy() 
+            vMask = weight.copy() 
+            print "### adding first pattern", idx
+        else:
+            index = np.where( (vMask>0) & (weight>0) )
+            old = volume[index]/vMask[index]
+            new = model3d[index]/weight[index]
+
+            scale = np.dot(old, new)/np.dot(new, new)
+
+            volume += scale * model3d
+            vMask += weight
+
+            old = None
+            new = None
+
+            print "### adding to existing volume", len(index[0]), scale, np.sum(vMask)
+
+            # FIXME: This is specific for snc dataset:
+            # [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
+        
+        print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10) + " ### "+moniter
+
+
+    model3d = volume.copy()
+    weight = vMask.copy()
 
     model3d = ModelScaling(model3d, weight)
     pathIntens = folder_o+'/merge.volume'
@@ -109,52 +150,3 @@ if comm_rank == 0:
     zf.h5modify(pathIntens, 'weight', weight,  chunks=tuple(chunks), opts=7)
     zf.h5modify(pathIntens, 'Smat', Smat)
 
-else:
-    sep = np.linspace(args.nmin, args.nmax, comm_size).astype('int')
-    for idx in range(sep[comm_rank-1], sep[comm_rank]):
-
-        if args.choice=="even" and idx%2==1:
-            continue
-        if args.choice=="odd"  and idx%2==0:
-            continue
-        if idx not in mergeList:
-            continue
-
-        fname = folder_i+'/'+str(idx).zfill(5)+'.slice'
-        image = zf.h5reader(fname, 'image')
-        Geo = zio.get_image_info(fname)
-        image = image * Geo['scale']
-        if args.mask is not None: 
-            image[mask==0] = -1024
-        
-        sumIntens = round(np.sum(image), 8)
-        
-        if args.voxel != ".":
-            moniter = 'voxel'
-            [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, thrmin = args.thrmin)
-        elif args.cc12 != 0:
-            moniter = "cc1/2"
-            [model3d_1, weight_1, model3d_2, weight_2] = ImageMerge_HKL_CC12(model3d_1, weight_1, model3d_2, weight_2, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, thrmin = args.thrmin)
-        elif args.mode=='xyz':
-            moniter = 'xyz'
-            [model3d, weight] = ImageMerge_XYZ(model3d, weight, image, Geo, Vol, Kpeak=args.peak)
-        else:
-            moniter = 'hkl'
-            [model3d, weight] = ImageMerge_HKL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, thrmin=args.thrmin)
-
-            # FIXME: This is specific for snc dataset:
-            # [model3d, weight] = ImageMerge_HKL_VOXEL(model3d, weight, image, Geo, Vol, Kpeak=args.peak, voxel=voxel, idx=idx, thrmin = args.thrmin)
-        
-        print '### rank ' + str(comm_rank).rjust(3) + ' is processing file: '+str(sep[comm_rank-1])+'/'+str(idx)+'/'+str(sep[comm_rank]) +'  sumIntens: '+str(sumIntens).ljust(10) + " ### "+moniter
-
-    print '### rank ' + str(comm_rank).rjust(3) + ' is sending file ... '
-    if args.cc12 != 0:
-        model3d = np.array([model3d_1, model3d_2])
-        weight = np.array([weight_1, weight_2])
-    md=mpidata()
-    md.addarray('model3d', model3d)
-    md.addarray('weight', weight)
-    md.small.rank = comm_rank
-    md.small.num = sep[comm_rank]-sep[comm_rank-1]
-    md.send()
-    md = None
