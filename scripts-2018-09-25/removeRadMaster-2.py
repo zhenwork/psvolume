@@ -76,7 +76,7 @@ def getBack(image=None, mask=None, center=None, radius = None):
 ####################################################
 idx = 0
 fname = prefix+str(idx).zfill(5)+'.slice'
-Geo = zf.get_image_info(fname)
+Geo = zio.get_image_info(fname)
 image = zf.h5reader(fname, 'image')
 
 nx, ny = image.shape
