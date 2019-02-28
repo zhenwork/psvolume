@@ -136,10 +136,9 @@ if comm_rank == 0:
 
     model3d = ModelScaling(model3d, weight)
     pathIntens = folder_o+'/merge.volume'
-    if args.mode == 'xyz': Smat = np.eye(3)
-    else: Smat = zf.h5reader(folder_i+'/00000.slice', 'Smat')
+    Smat = zf.h5reader(folder_i+'/00000.slice', 'Smat')
 
-    print "### processed image number: ", countImage
+    
     print "### saving File: ", pathIntens
     ThisFile = zf.readtxt(os.path.realpath(__file__))
     zf.h5writer(pathIntens, 'execute', ThisFile)
