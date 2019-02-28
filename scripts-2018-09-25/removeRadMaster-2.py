@@ -76,7 +76,7 @@ def getBack(image=None, mask=None, center=None, radius = None):
 
 ####################################################
 idx = 0
-fname = prefix+str(idx).zfill(5)+'.slice'
+fname = folder_i + "/" + str(idx).zfill(5)+'.slice'
 Geo = zio.get_image_info(fname)
 image = zf.h5reader(fname, 'image')
 
@@ -94,10 +94,10 @@ radius = radius.astype(int)
 
 
 
-sep = np.linspace(0, num, comm_size+1).astype('int')
+sep = np.linspace(0, args.nmax, comm_size+1).astype('int')
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
-    fname = prefix+str(idx).zfill(5)+'.slice'
+    fname = folder_i + "/" + str(idx).zfill(5)+'.slice'
     Geo = zio.get_image_info(fname)
     
     image = zf.h5reader(fname, 'image')
