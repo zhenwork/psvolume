@@ -108,8 +108,8 @@ if comm_rank == 0:
         model3d = model3dRaw.copy()
         weight = weightRaw.copy()
 
-        model3d = (model3d + model3d[::-1, ::-1, ::-1] + model3d[::-1, :, ::-1] + model3d[:, ::-1, :]) / 4.
-        weight = (weight + weight[::-1, ::-1, ::-1] + weight[::-1, :, ::-1] + weight[:, ::-1, :]) / 4.
+        model3d = (model3d + model3d[::-1, ::-1, ::-1] + model3d[::-1, :, ::-1] + model3d[:, ::-1, :]) 
+        weight = (weight + weight[::-1, ::-1, ::-1] + weight[::-1, :, ::-1] + weight[:, ::-1, :]) 
 
         if idx == args.nmin:
             volume = model3d.copy() 
