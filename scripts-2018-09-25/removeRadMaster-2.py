@@ -11,27 +11,30 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i","--i", help="image folder", default=".", type=str)
 parser.add_argument("-o","--o", help="subImage", default="subImage", type=str)
 parser.add_argument("-vmin","--vmin", help="minimum value", default=0.0, type=float)
+parser.add_argument("-nmax","--nmax", help="maximum value", default=-1, type=int)
 args = parser.parse_args()
 
 zf = iFile()
 zio = IOsystem()
 
-if not (args.i).endswith('/'): args.i = args.i+'/'
-[num, allFile] = zio.counterFile(args.i, title='.slice')
-path = args.i[0:(len(args.i)-args.i[::-1].find('/',1))];
-prefix = allFile[0][0:(len(allFile[0])-allFile[0][::-1].find('_',1))];
+zf = iFile()
+zio = IOsystem()
+[path_i, folder_i] = zio.get_path_folder(args.i)
+[nmax, allFile] = zio.counterFile(folder_i, title='.slice')
+if args.nmax == -1: 
+    args.nmax = int(nmax)
+folder_o = path_i + "/" + args.o
 
 
 if comm_rank == 0:
-    print '### Path  : ', path
-    print '### Folder: ', args.i
-    print '### Prefix: ', prefix 
-    print '### Total number: '+str(num).rjust(5)
-    if not os.path.exists(path + '/' + args.o): 
-        os.mkdir(path + '/' + args.o)
-    print '### save folder: '+ path + '/' + args.o
+    print '### Path  : ', path_i
+    print '### Folder: ', folder_i  
+    print '### save Folder: ', folder_o  
+    if not os.path.exists(folder_o ): 
+        os.mkdir(folder_o )
+    print '### save folder: '+ folder_o 
 else:
-    while not os.path.exists(path + '/' + args.o): pass
+    while not os.path.isdir(folder_o ): pass
 
 
 @jit
@@ -110,7 +113,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
     index = np.where(mask < 0.5)
     image[index] = -1024
 
-    fsave = path + '/' + args.o + '/' + str(idx).zfill(5)+'.slice'
+    fsave = folder_o  + '/' + str(idx).zfill(5)+'.slice'
 
     copyfile(fname, fsave)
     zf.h5modify(fsave, "image", image)
