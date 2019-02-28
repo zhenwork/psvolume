@@ -55,7 +55,7 @@ for idx in range(sep[comm_rank], sep[comm_rank+1]):
         image = remove_peak_alg3(image, Rindex=Rindex)
 
     image = image + 100.
-    image[np.where(image<0)] = -1.;
+    image[np.where(image<0)] = -1.
 
     fsave = path + '/subImage/subImage_'+str(idx).zfill(5)+'.slice'
 
