@@ -97,7 +97,7 @@ sep = np.linspace(0, num, comm_size+1).astype('int')
 
 for idx in range(sep[comm_rank], sep[comm_rank+1]):
     fname = prefix+str(idx).zfill(5)+'.slice'
-    Geo = zf.get_image_info(fname)
+    Geo = zio.get_image_info(fname)
     
     image = zf.h5reader(fname, 'image')
     mask = np.zeros(image.shape)
