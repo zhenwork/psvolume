@@ -75,7 +75,15 @@ if args.mask is not None:
     print "### loading mask"
     mask = np.load(args.mask)
     
-    
+
+x = np.arange(121) - 60
+y = np.arange(121) - 60
+z = np.arange(121) - 60
+
+xaxis, yaxis, zaxis = np.meshgrid(x,y,z,indexing="ij")
+RR = np.sqrt(xaxis**2+yaxis**2+zaxis**2)
+
+
 if comm_rank == 0:
     folder_o = zio.makeFolder(path_i, title='sr')
 
@@ -95,7 +103,7 @@ if comm_rank == 0:
         Geo = zio.get_image_info(fname)
         image = image * 1. 
 
-        if args.mask is not None: 
+        if args.mask is not None:
             image[mask==0] = -1024
         
         sumIntens = round(np.sum(image[image>0]), 8)
@@ -118,7 +126,7 @@ if comm_rank == 0:
             vMaskRaw = weightRaw.copy()
             print "### adding first pattern", idx
         else:
-            index = np.where( (vMask>0) & (weight>0) )
+            index = np.where( (vMask>0) & (weight>0) & (RR<35) )
             old = volume[index]/vMask[index]
             new = model3d[index]/weight[index]
 
