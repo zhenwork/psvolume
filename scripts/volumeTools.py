@@ -270,7 +270,6 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
     return _radialBackground
 
 
-
 @jit
 def meanf(idata, _scale = 3, clim=(0,50)):
     delta = (_scale - 1)/2
