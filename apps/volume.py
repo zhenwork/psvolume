@@ -43,9 +43,9 @@ H5FileManager.h5modify(args.fname, "volumeSym", volumeSym)
 
 
 ## background
-symBack = volumeTools.radialBackground(volumeSym, _volumeMask=(weightSym>0).astype(int), threshold=(-100,1000),\
+symBack = volumeTools.radialBackground(volumeSym, _volumeMask=(weightSym>0).astype(int), threshold=(-100,1000), window=3, \
                                        Basis=Bmat/mathTools.length(Bmat[:,1]))
-rawBack = volumeTools.radialBackground(volume, _volumeMask=vMask, threshold=(-100,1000),\
+rawBack = volumeTools.radialBackground(volume, _volumeMask=vMask, threshold=(-100,1000), window=3, \
                                        Basis=Bmat/mathTools.length(Bmat[:,1]))
 volumeSymSub = volumeSym - symBack
 volumeSub = volume - rawBack

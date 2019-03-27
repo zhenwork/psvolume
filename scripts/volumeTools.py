@@ -214,7 +214,7 @@ def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow
     return [distri, Rmodel]
 
 @jit
-def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), Basis=None):
+def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), window=1, Basis=None):
     volume = _volume.copy()
 
     if _volumeMask is None:
@@ -250,12 +250,17 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
     radius1d = np.zeros(int(np.amax(radius))+1)
     weight1d = np.zeros(radius1d.shape)
 
+    hwindow = int((window-1.)/2.)
+    rmax = len(radius1d)-1
+
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
                 r = int(radius[i,j,k])
-                radius1d[r] += volume[i,j,k]
-                weight1d[r] += volumeMask[i,j,k]
+                for h in range(-hwindow, hwindow+1):
+                    if r+h >= 0 and r+h<=rmax:
+                        radius1d[r+h] += volume[i,j,k]
+                        weight1d[r+h] += volumeMask[i,j,k]
 
     index = np.where(weight1d>0)
     radius1d[index] /= weight1d[index]
