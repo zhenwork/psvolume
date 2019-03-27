@@ -48,7 +48,7 @@ class MaskTools:
         index = np.where(mask==expandValue)
         for i in range(-expandSize[0], expandSize[0]+1):
             for j in range(-expandSize[1], expandSize[1]+1):
-                newMask[((index[0]+i)%nx, (index[1]+j)%ny)] = value
+                newMask[((index[0]+i)%nx, (index[1]+j)%ny)] = expandValue
         return newMask
 
 
