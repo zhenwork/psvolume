@@ -32,7 +32,7 @@ print ">>>> %3d process [ %4d, %4d ) in %4d"%(comm_rank, assign[comm_rank], assi
 
 ## reference pattern
 refile = args.fname.replace("#####", "00001")
-imageAgent = expAgent.Diffraction()
+imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
 
@@ -49,7 +49,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     fsave = args.fsave.replace("#####", "%.5d"%idx)
     print "Loading: ", filename
     
-    imageAgent = expAgent.Diffraction()
+    imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds)
     imageAgent.mask *= refData["mask"]
