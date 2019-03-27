@@ -52,7 +52,7 @@ class MaskTools:
         return newMask
 
 
-class ScaleTools:
+class ScalingTools:
     def solid_angle_scaler(self, size=None, detectorDistance=None, pixelSize=None, center=None):
         """
         Params: detectorDistance, pixelSize must have the same unit
@@ -170,15 +170,16 @@ def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vm
         mask[index] = 0
         
         return image, mask
-    
+
+    elif algorithm == 2:
+        return None
     else:
         return None
 
 @jit
 def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,None)):
     """
-    # num denotes how many times you want to divide the full angle (360 degree)
-    # This function is slow because it applies multiple for loops
+    num denotes how many times you want to divide the angle
     """
     assert len(arr.shape)==2
     (nx, ny) = arr.shape
@@ -220,16 +221,8 @@ def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,N
     return [aveAngle, aveIntens]
 
 @jit
-def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None, window=3):
-    """
-    # mask = 0 will be ignored
-    # pixel value beyond (vmin, vmax) will be ignored
-    # radius beyong (rmin, rmax) will be ignored
-    # stepSize=1 is normally set
-    # sampling is the number of radius points to collect
-    # if stepSize is set by user, then sampling will be ignored
-    # returns: aveRadius, aveIntens, sumCount
-    """
+def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None):
+
     (nx, ny) = image.shape
     if center is None: 
         cx = (nx-1.)/2.
@@ -273,22 +266,15 @@ def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rma
     sumCount  = np.zeros(len(aveRadius))
     aveIntens = np.zeros(len(aveRadius))
 
-    hwindow = int((window-1)/2.)
-    
     for idx in range(nx):
         for jdx in range(ny):
             r = radius[idx, jdx]
             if notation[idx, jdx] == 0:
                 continue
-            #sumIntens[r-startR] += image[idx,jdx] * notation[idx,jdx]
-            #sumCount[r-startR] += notation[idx,jdx]
-            
-            for h in range(-hwindow, hwindow+1):
-                if r - startR + h <= len(sumIntens)-1 and r - startR + h >= 0:
-                    sumIntens[r-startR+h] += image[idx,jdx] * notation[idx,jdx]
-                    sumCount[r-startR+h] += notation[idx,jdx]     
-            
-    index = np.where(sumCount > 10)
+            sumIntens[r-startR] += image[idx,jdx] * notation[idx,jdx]
+            sumCount[r-startR] += notation[idx,jdx]
+
+    index = np.where(sumCount > 0)
     aveIntens[index] = sumIntens[index] * 1.0 / sumCount[index]
 
     return aveRadius, aveIntens, sumCount

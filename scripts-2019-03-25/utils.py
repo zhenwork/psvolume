@@ -18,4 +18,11 @@ def getUserName():
     out, err = process.communicate()
     return out
 
+def mergeDict(old=None, new=None):
+    if new is None:
+        return old
 
+    for item in new:
+        old[item] = new[item]
+
+    return old

@@ -19,7 +19,7 @@ def lattice2vector(a, b, c, alpha, beta, gamma):
     return (vecx, vecy, vecz, recH, recK, recL)
 
 
-def standardBmat(Amat=None, latticceConstant=None):
+def psvmStandardBmat(Amat=None, latticceConstant=None):
     if latticceConstant is not None:
         (a,b,c,alpha,beta,gamma) = latticceConstant
         (vecx, vecy, vecz, recH, recK, recL) = lattice2vector(a,b,c,alpha,beta,gamma)
@@ -35,7 +35,7 @@ def standardBmat(Amat=None, latticceConstant=None):
         alpha = mathTools.angle(vecB, vecC)
         beta = mathTools.angle(vecA, vecC)
         gamma = mathTools.angle(vecB, vecA)
-        return standardBmat(latticceConstant=(a,b,c,alpha,beta,gamma))
+        return psvmStandardBmat(latticceConstant=(a,b,c,alpha,beta,gamma))
     else:
         raise Exception("!! Can't make standard Bmat")
         return None
