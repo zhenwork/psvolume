@@ -120,3 +120,5 @@ def specialparams(notation="wtich"):
     else:
         print "!! No Special Params"
         return {}
+
+    
