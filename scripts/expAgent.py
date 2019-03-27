@@ -56,10 +56,12 @@ class ImageAgent(DataStruct):
         return psvm
     
     def preprocess(self):
-        # 2. remove bad pixels
+        # 1. remove bad pixels
         self.removeBadPixels()
+        # 2. expand mask
+        self.expandMask()
         # 3. deep remove bad pixels
-        self.deepRemoveBads()
+        self.deepRemoveBads() 
         # 4. polarization correction
         self.polarizationCorrection()
         # 5. solid angle correction
@@ -81,6 +83,10 @@ class ImageAgent(DataStruct):
         self.image *= self.mask
         return True
     
+    def expandMask(self):
+        self.mask = MaskTools.expandMask(self.mask, expandSize=(1,1), expandValue=0)
+        self.image *= self.mask 
+
     def deepRemoveBads(self):
         newImage, newMask = imageTools.removeExtremes(_image=self.image, algorithm=1, _mask=self.mask, _sigma=15, _window=(11,11))
         self.image = newImage.copy()
@@ -111,6 +117,8 @@ class ImageAgent(DataStruct):
             sca = self.radprofile[rmin:rmax]
             ref = reference["radprofile"][rmin:rmax]
             self.scale = np.dot(ref, sca)/np.dot(sca, sca)
+        else:
+            raise Exception("!! ERROR IN SCALING")
         return True
     
     def removeBragg(self):

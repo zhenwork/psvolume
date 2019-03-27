@@ -112,13 +112,12 @@ def specialparams(notation="wtich"):
     if notation == "wtich":
         psvmParms = {}
         mask = np.ones((2527,2463)).astype(int)
-        mask[1255:1300,1235:2463] = 0
-        mask[1255:1305,1735:2000] = 0
-        mask[1255:1310,2000:2463] = 0
+        mask[1255:1300+2,1235:2463] = 0
+        mask[1255:1305+2,1735:2000] = 0
+        mask[1255:1310+2,2000:2463] = 0
         psvmParms["mask"] = mask.T
         return psvmParms
     else:
         print "!! No Special Params"
         return {}
 
-    
