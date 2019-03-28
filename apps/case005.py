@@ -61,6 +61,10 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent.loadImage(args.xds) 
     back = imageAgent.readfile(filename=fileback)["image"]
     imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
+    #########
+    imageAgent.mask *= refData["mask"]
+    imageAgent.image *= refData["mask"]
+    #########
     imageAgent.preprocess()
     imageAgent.radprofile()
     imageAgent.scaling(reference = refData, mode="rad", rmin=160, rmax=400)

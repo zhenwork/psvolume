@@ -54,6 +54,10 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
+    #########
+    imageAgent.mask *= refData["mask"]
+    imageAgent.image *= refData["mask"]
+    #########
     imageAgent.preprocess()
     imageAgent.scaling(reference = refData, rmin=160, rmax=400)
     
