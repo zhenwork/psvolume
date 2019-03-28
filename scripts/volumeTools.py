@@ -292,3 +292,43 @@ def meanf(idata, _scale = 3, clim=(0,50)):
         if Temp.shape[0] == 0: continue
         newList[i] = np.nanmean(Temp)
     return newList
+
+
+@jit
+def volume2txt(volume, _vMask=None, vmin=-100, vmax=1000):
+    if _vMask is None:
+        vMask = np.ones(volume.shape).astype(int)
+    else:
+        vMask = _vMask.copy()
+
+    if vmin is None:
+        vmin = np.amin(volume)-1
+    if vmax is None:
+        vmax = np.amax(volume)+1
+
+    (nx, ny, nz) = volume.shape
+    cx = (nx-1)/2
+    cy = (ny-1)/2
+    cz = (nz-1)/2
+
+    txt = ""
+
+    for x in range(nx):
+        for y in range(ny):
+            for z in range(nz):
+                h = x-cx
+                k = y-cy
+                l = z-cz
+                val = volume[x,y,z]
+
+                if vMask[x,y,z]==0:
+                    continue
+                if val<vmin or val>vmax:
+                    continue
+
+                val = round(val, 3)
+
+                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+"\n"
+
+                txt += string
+    return txt
