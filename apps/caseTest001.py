@@ -1,6 +1,5 @@
 """
-1. Merge without subtracting blank images.
-2. Scale based on overall intensity of r=160-400
+Merge without background subtraction based on overall intensity of crystal diffraction
 """
 
 import os,sys
@@ -31,17 +30,16 @@ print ">>>> %3d process [ %4d, %4d ) in %4d"%(comm_rank, assign[comm_rank], assi
 
 
 
-## reference pattern
+## reference pattern ############################
 refile = args.fname.replace("#####", "00001")
+
 imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
-
 imageAgent.preprocess()
-
 refData = imageAgent.todict()
 imageAgent = None
-
+## reference pattern ############################
 
 
 for idx in range(assign[comm_rank], assign[comm_rank+1]):
