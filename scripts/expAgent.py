@@ -179,6 +179,14 @@ class ImageAgent(DataStruct):
             self.weight = weight
             
         return volume, weight
+
+    def convert2reciprocal(self, image=None):
+        if image is None:
+            return None
+        xyz = mergeTools.mapPixel2RealXYZ(size=image.shape, center=self.detectorCenter, pixelSize=self.pixelSize, detectorDistance=self.detectorDistance)
+        rep = mergeTools.mapRealXYZ2Reciprocal(xyz=xyz, waveLength=self.waveLength)
+        return np.sqrt(np.sum(rep**2, axis=3))
+
     
     def doAction(self, actionName=None, params={}):
         actionObject = getattr(actionCluster, actionName)(params)
