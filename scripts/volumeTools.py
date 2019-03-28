@@ -294,8 +294,7 @@ def meanf(idata, _scale = 3, clim=(0,50)):
     return newList
 
 
-@jit
-def volume2txt(volume, _vMask=None, vmin=-100, vmax=1000):
+def volume2txt(volume, fsave="tmp.txt", _vMask=None, vmin=-100, vmax=1000):
     if _vMask is None:
         vMask = np.ones(volume.shape).astype(int)
     else:
@@ -311,7 +310,7 @@ def volume2txt(volume, _vMask=None, vmin=-100, vmax=1000):
     cy = (ny-1)/2
     cz = (nz-1)/2
 
-    txt = ""
+    fw = open(fsave, "w")
 
     for x in range(nx):
         for y in range(ny):
@@ -330,5 +329,6 @@ def volume2txt(volume, _vMask=None, vmin=-100, vmax=1000):
 
                 string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+"\n"
 
-                txt += string
-    return txt
+                fw.write(string)
+
+    fw.close()
