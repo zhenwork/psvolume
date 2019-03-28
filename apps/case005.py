@@ -42,7 +42,7 @@ imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
 back = imageAgent.readfile(filename=reback)["image"]
 imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
-imageAgent.preprocess()
+imageAgent.preprocess(expMask=False)
 imageAgent.radprofile()
 refData = imageAgent.todict()
 imageAgent = None
@@ -66,7 +66,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent.mask *= refData["mask"]
     imageAgent.image *= refData["mask"]
     #########
-    imageAgent.preprocess()
+    imageAgent.preprocess(expMask=False)
     imageAgent.radprofile()
     imageAgent.scaling(reference = refData, mode="rad", rmin=160, rmax=400)
     
