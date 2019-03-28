@@ -5,6 +5,7 @@ import scripts.expAgent as expAgent
 from scripts.mpidata import *
 import scripts.fileManager as fileManager
 from numba import jit
+import scripts.mathTools as mathTools
 
 FileSystem = fileManager.FileSystem()
 H5FileManager = fileManager.H5FileManager()
@@ -51,11 +52,20 @@ else:
         md = None
         print '### received file from ' + str(recvRank).rjust(2) + '/' + str(comm_size)
     
-    psvm = PsvolumeManager.h5py2psvm(files[0])
     
+    index = np.where(weight>=4)
+    volume[index] /= weight[index]
+    index = np.where(weight<4)
+    volume[index] = 0
+    weight[index] = 0
+
+    psvm = PsvolumeManager.h5py2psvm(files[0])
+    Amat = psvm["Amat"]
+    Bmat = psvm["Bmat"]
     H5FileManager.h5writer(args.fsave, 'volume', volume, chunks=(1,121,121), opts=7)
     H5FileManager.h5modify(args.fsave, 'weight', weight,  chunks=(1,121,121), opts=7)
-    H5FileManager.h5modify(args.fsave, 'Amat', psvm["Amat"])
-    H5FileManager.h5modify(args.fsave, 'Bmat', psvm["Bmat"])
+    H5FileManager.h5modify(args.fsave, 'Amat', Amat)
+    H5FileManager.h5modify(args.fsave, 'Bmat', Bmat)
+    H5FileManager.h5modify(args.fsave, 'Smat', Bmat/mathTools.length(Bmat[:,1]))
     
 
