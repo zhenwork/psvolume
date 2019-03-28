@@ -21,18 +21,7 @@ volume = psvm["volume"]
 weight = psvm["weight"]
 Amat = psvm["Amat"]
 Bmat = psvm["Bmat"]
-
-
-## scale
-index = np.where(weight>=4)
-volume[index] /= weight[index]
-index = np.where(weight<4)
-volume[index] = -1024
-
 vMask = (weight>=4).astype(int)
-
-
-H5FileManager.h5modify(args.fname, "volumeAve", volume)
 
 
 ## symmetry
@@ -43,10 +32,10 @@ H5FileManager.h5modify(args.fname, "volumeSym", volumeSym)
 
 
 ## background
-symBack = volumeTools.radialBackground(volumeSym, _volumeMask=(weightSym>0).astype(int), threshold=(-100,1000), window=1, \
-                                       Basis=Bmat/mathTools.length(Bmat[:,1]))
-rawBack = volumeTools.radialBackground(volume, _volumeMask=vMask, threshold=(-100,1000), window=1, \
-                                       Basis=Bmat/mathTools.length(Bmat[:,1]))
+symBack = volumeTools.radialBackground(volumeSym, _volumeMask=(weightSym>0).astype(int), threshold=(-100,1000), window=5, \
+                                       Basis=Bmat/mathTools.length(Bmat[:,1]), scale=4)
+rawBack = volumeTools.radialBackground(volume, _volumeMask=vMask, threshold=(-100,1000), window=5, \
+                                       Basis=Bmat/mathTools.length(Bmat[:,1]), scale=4)
 volumeSymSub = volumeSym - symBack
 volumeSub = volume - rawBack
 volumeSymSub[weightSym==0] = -1024

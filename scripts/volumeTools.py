@@ -214,7 +214,7 @@ def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow
     return [distri, Rmodel]
 
 @jit
-def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), window=1, Basis=None):
+def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), window=1, scale=1, Basis=None):
     volume = _volume.copy()
 
     if _volumeMask is None:
@@ -241,7 +241,7 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
 
         sumArray = xaxis + yaxis + zaxis
 
-        radius = np.sqrt(np.sum(sumArray**2, axis=3))
+        radius = np.sqrt(np.sum(sumArray**2, axis=3)) * scale
         radius = np.around(radius).astype(int)
     else:
         radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
