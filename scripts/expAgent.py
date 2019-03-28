@@ -185,7 +185,8 @@ class ImageAgent(DataStruct):
             return None
         xyz = mergeTools.mapPixel2RealXYZ(size=image.shape, center=self.detectorCenter, pixelSize=self.pixelSize, detectorDistance=self.detectorDistance)
         rep = mergeTools.mapRealXYZ2Reciprocal(xyz=xyz, waveLength=self.waveLength)
-        return np.sqrt(np.sum(rep**2, axis=2))
+        endaxis = len(rep.shape)-1
+        return np.sqrt(np.sum(rep**2, axis=endaxis))
 
     
     def doAction(self, actionName=None, params={}):
