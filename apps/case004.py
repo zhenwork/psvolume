@@ -21,6 +21,7 @@ parser.add_argument("-fsave","--fsave", help="save folder", default=None, type=s
 parser.add_argument("-fname","--fname", help="input files", default=None, type=str)
 parser.add_argument("-fback","--fback", help="input files", default=None, type=str)
 parser.add_argument("-xds","--xds", help="xds file", default=".", type=str)
+parser.add_argument("-label","--label", help="xds file", default=".", type=str)
 args = parser.parse_args()
 
 files = FileSystem.listFileWithFind(args.fname.replace("#####", "*"))
