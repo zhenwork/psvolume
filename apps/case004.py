@@ -42,7 +42,7 @@ imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
 back = imageAgent.readfile(filename=reback)["image"]
 imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
-imageAgent.preprocess(expMask=False)
+imageAgent.preprocess()
 refData = imageAgent.todict()
 imageAgent = None
 ## reference pattern ############################
@@ -62,10 +62,10 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     back = imageAgent.readfile(filename=fileback)["image"]
     imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
     #########
-    imageAgent.mask *= refData["mask"]
-    imageAgent.image *= refData["mask"]
+    # imageAgent.mask *= refData["mask"]
+    # imageAgent.image *= refData["mask"]
     #########
-    imageAgent.preprocess(expMask=False)
+    imageAgent.preprocess()
     imageAgent.scaling(reference = refData, rmin=160, rmax=400)
     
 
