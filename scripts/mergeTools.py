@@ -174,17 +174,18 @@ def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _m
     return volume, weight
 
 
-def image2resolution(image=None, size=None, waveLength=None, detectorDistance=None, detectorCenter=None, pixelSize=None, format="res"):
+def mapImage2Resolution(image=None, size=None, waveLength=None, detectorDistance=None, detectorCenter=None, pixelSize=None, format="res"):
     if image is not None:
         size = image.shape
 
     xyz = mapPixel2RealXYZ(size=size, center=detectorCenter, pixelSize=pixelSize, detectorDistance=detectorDistance)
     rep = mapRealXYZ2Reciprocal(xyz=xyz, waveLength=waveLength)
+    repNorm = np.sqrt(np.sum(rep**2, axis=2))
 
     if format == "res":
         res = np.zeros(size)
-        res[rep != 0] = 1./rep[rep != 0]
-        res[rep == 0] = np.amax(res)
+        res[repNorm != 0] = 1./rep[repNorm != 0]
+        res[repNorm == 0] = np.amax(res)
         return res
     else:
-        return np.sqrt(np.sum(rep**2, axis=2))
+        return repNorm
