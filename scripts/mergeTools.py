@@ -184,8 +184,9 @@ def mapImage2Resolution(image=None, size=None, waveLength=None, detectorDistance
 
     if format == "res":
         res = np.zeros(size)
-        res[repNorm != 0] = 1./rep[repNorm != 0]
-        res[repNorm == 0] = np.amax(res)
+        index = np.where(repNorm>0)
+        res[index] = 1./repNorm[index]
+        res[repNorm==0] = np.amax(res)
         return res
     else:
         return repNorm
