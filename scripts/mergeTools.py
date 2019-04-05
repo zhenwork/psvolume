@@ -120,7 +120,7 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
 
 @jit
 def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _mask=None, \
-                keepPeak=False, returnFormat="HKL", xvector=None, \
+                keepPeak=False, returnFormat="HKL", xvector=None, window=(0.25, 0.5), \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
                 Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
     """
@@ -165,7 +165,10 @@ def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _m
         kshift = abs(k-intk)
         lshift = abs(l-intl)
 
-        if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not keepPeak:
+        ## window[0] <= box < window[1]
+        if (hshift>=window[1]) or (kshift>=window[1]) or (lshift>=window[1]):
+            continue
+        if (hshift<window[0]) and (kshift<window[0]) and (lshift<window[0]):
             continue
         
         weight[inth,intk,intl] += 1
