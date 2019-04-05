@@ -83,7 +83,7 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
 
 
 @jit
-def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), \
+def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), hRange=(-1000,1000), kRange=(-1000,1000), lRange=(-1000,1000), \
             waveLength=None, pixelSize=None, center=None, detectorDistance=None, Phi=0., rotAxis="x"):
     """
     Method: pixels collected to nearest voxels
@@ -110,9 +110,19 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), 
         kshift = shift[t, 1]
         lshift = shift[t, 2]
 
+        hh = voxel[t, 0]
+        kk = voxel[t, 1]
+        ll = voxel[t, 2]
+
         if (hshift>=window[1]) or (kshift>=window[1]) or (lshift>=window[1]):
             continue
         if (hshift<window[0]) and (kshift<window[0]) and (lshift<window[0]):
+            continue
+        if hh < hRange[0] or hh >= hRange[1]:
+            continue
+        if kk < kRange[0] or kk >= kRange[1]:
+            continue
+        if ll < lRange[0] or ll >= lRange[1]:
             continue
         
         peakMask[t] = 1
