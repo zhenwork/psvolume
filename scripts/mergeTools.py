@@ -90,6 +90,7 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), 
     returnFormat: "HKL" or "cartesian"
     voxelSize: unit is nm^-1 for "cartesian", NULL for "HKL" format 
     If you select "cartesian", you may like voxelSize=0.015 nm^-1
+    ## peakMask = 1 when pixels are in window
     """
     voxel = mapImage2Voxel(image=_image, size=size, Amat=Amat, xvector=xvector, \
             Phi=Phi, waveLength=waveLength, pixelSize=pixelSize, center=center, rotAxis=rotAxis, \

@@ -123,7 +123,7 @@ class ImageAgent(DataStruct):
         return True
     
     def removeBragg(self):
-        peakIdenty = mergeTools.PeakMask(Amat=self.Amat, _image=self.image, size=None, xvector=None, boxSize=0.25, \
+        peakIdenty = mergeTools.PeakMask(Amat=self.Amat, _image=self.image, size=None, xvector=None, \
                                 waveLength=self.waveLength, pixelSize=self.pixelSize, center=self.detectorCenter, \
                                 detectorDistance=self.detectorDistance, Phi=self.phi, rotAxis=self.rotAxis)
         self.peakMask = 1-peakIdenty
@@ -220,9 +220,6 @@ class MergeAgent:
     
     def fromdict(self, entry):
         self.__dict__.update(entry) 
-    
-    def fromobject(self, classobject):
-        self = copy.deepcopy(classobject)
         
     def readfile(self, filename=None):
         if filename is None:
@@ -267,6 +264,29 @@ class MergeAgent:
         return True
     
 
-    
-    
+class Launcher:
+    def __init__(self):
+        self.a = 1
+
+    def server(self, queue="psanaq", cpus=1, cpus_per_node=1, moniter=True, outDir="./"):
+        return 
+
+    def local(self, outDir="./"):
+        return 
+
+    def moniter(self):
+        return 
+
+    def clean(self):
+        return 
+
+class VolumeAgent:
+    def __init__(self):
+        self.volume = 1
+        self.weight = 1
+
+class expAgent:
+    def __init__(self):
+        self.Launcher = Launcher()
+        
     
