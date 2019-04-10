@@ -1,7 +1,6 @@
 import numpy as np
 import h5py
 import os
-import subprocess
 from shutil import copyfile
 
 try: import cbf
@@ -129,15 +128,12 @@ class H5FileManager:
         """
         List all dataset names in a h5py file
         """
-        global h5datasets_search_name
-        h5datasets_search_name = []
         def tmpListDataName(cxi_name):
-            h5datasets_search_name.append(cxi_name)
+            print cxi_name
         try:
             fh5list = h5py.File(filename, 'r')
             fh5list.visit(tmpListDataName)
             fh5list.close()
-            return h5datasets_search_name
         except Exception as error:
             print "!! ERROR:", error
             fh5list = None
@@ -216,14 +212,6 @@ class PsvolumeManager:
                 h5M.h5modify(fileName, item, psvmParams[item])
         h5M = None
         return True
-    
-    def h5py2psvm(self, fileName):
-        h5M = H5FileManager()
-        dnames = h5M.h5datasets(fileName)
-        psvmParams = {}
-        for each in dnames:
-            psvmParams[str(each)] = h5M.h5reader(fileName, each)
-        return psvmParams
 
 
 class CBFManager:
@@ -303,18 +291,6 @@ class FileSystem:
                 counter += 1
         return counter
 
-    def listFileWithFind(self, search):
-        """
-        Input: "find /path/*.dat"
-        Output: ['/path/00000.dat',
-                 '/path/00001.dat']
-        """
-        cmd = "find %s"%search
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        out, err = process.communicate()
-        return sorted(out.rsplit())
-    
-    
     def listFilesWith(self, path, title='.slice'):
         """
         return a list of files containing *title* in *path*

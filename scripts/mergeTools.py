@@ -4,7 +4,6 @@ import mathTools
 
 def mapPixel2RealXYZ(size=None, center=None, pixelSize=None, detectorDistance=None):
     """
-    Input: only 2D size are accepted
     Returns: Real space pixel position (xyz): N*N*3 numpy array
     xyz: unit (meter)
     """
@@ -25,28 +24,18 @@ def mapRealXYZ2Reciprocal(xyz=None, waveLength=None):
     xyz: unit (meter)
     reciprocal: N*N*3 numpy array
     """
-    if len(xyz.shape)==2:
-        norm = np.sqrt(np.sum(xyz**2, axis=1, keepdims=True))
-        ## scaled array doesn't have units
-        scaled = xyz/norm
-        scaled[:,2] -= 1.0
-        reciprocal = scaled / waveLength
-        return reciprocal
-    elif len(xyz.shape)==3:
-        norm = np.sqrt(np.sum(xyz**2, axis=2, keepdims=True))
-        ## scaled array doesn't have units
-        scaled = xyz/norm
-        scaled[:,:,2] -= 1.0
-        reciprocal = scaled / waveLength
-        return reciprocal
-    else:
-        return None
+    norm = np.sqrt(np.sum(xyz**2, axis=2, keepdims=True))
+    ## scaled array doesn't have units
+    scaled = xyz/norm
+    scaled[:,:,2] -= 1.0
+    reciprocal = scaled / waveLength
+    return reciprocal
 
 
 def mapReciprocal2Voxel(Amat=None, Bmat=None, returnFormat="HKL", \
                     reciprocal=None, voxelSize=1.0, Phi=0., rotAxis="x"):
     """
-    Return: voxel (N*N*3 or N*3) 
+    Return: voxel (N*N*3) 
     voxelSize: 0.015 for 'cartesian' coordinate; 1.0 for "hkl" coordinate
     """
     Phimat = mathTools.quaternion2rotation(mathTools.phi2quaternion(Phi, rotAxis=rotAxis))
@@ -61,11 +50,6 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
                 returnFormat=None, voxelSize=1.0, rotAxis="x"):
 
-    """
-    # This function combines mapPixel2RealXYZ, mapRealXYZ2Reciprocal and mapReciprocal2Voxel. 
-    # Input: real 2D image in N*N
-    # Output: voxel in N*N*3 shape
-    """
     if image is not None:
         size = image.shape
 
@@ -83,14 +67,13 @@ def mapImage2Voxel(image=None, size=None, Amat=None, Bmat=None, xvector=None, Ph
 
 
 @jit
-def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), hRange=(-1000,1000), kRange=(-1000,1000), lRange=(-1000,1000), \
+def PeakMask(Amat=None, _image=None, size=None, xvector=None, boxSize=0.25, \
             waveLength=None, pixelSize=None, center=None, detectorDistance=None, Phi=0., rotAxis="x"):
     """
     Method: pixels collected to nearest voxels
     returnFormat: "HKL" or "cartesian"
     voxelSize: unit is nm^-1 for "cartesian", NULL for "HKL" format 
     If you select "cartesian", you may like voxelSize=0.015 nm^-1
-    ## peakMask = 1 when pixels are in window
     """
     voxel = mapImage2Voxel(image=_image, size=size, Amat=Amat, xvector=xvector, \
             Phi=Phi, waveLength=waveLength, pixelSize=pixelSize, center=center, rotAxis=rotAxis, \
@@ -111,19 +94,7 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), 
         kshift = shift[t, 1]
         lshift = shift[t, 2]
 
-        hh = voxel[t, 0]
-        kk = voxel[t, 1]
-        ll = voxel[t, 2]
-
-        if (hshift>=window[1]) or (kshift>=window[1]) or (lshift>=window[1]):
-            continue
-        if (hshift<window[0]) and (kshift<window[0]) and (lshift<window[0]):
-            continue
-        if hh < hRange[0] or hh >= hRange[1]:
-            continue
-        if kk < kRange[0] or kk >= kRange[1]:
-            continue
-        if ll < lRange[0] or ll >= lRange[1]:
+        if (hshift>boxSize) or (kshift>boxSize) or (lshift>boxSize):
             continue
         
         peakMask[t] = 1
@@ -132,8 +103,8 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), 
 
 
 @jit
-def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _mask=None, \
-                keepPeak=False, returnFormat="HKL", xvector=None, window=(0.25, 0.5), \
+def Image2Volume(volume, weight, Amat=None, Bmat=None, _image=None, _mask=None, \
+                keepPeak=False, returnFormat="HKL", xvector=None, \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
                 Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
     """
@@ -152,10 +123,6 @@ def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _m
     mask  =  _mask.ravel()
     voxel =  voxel.reshape((Npixels, 3)) 
     
-    if volume is None:
-        volume = np.zeros((Vsize, Vsize, Vsize))
-        weight = np.zeros((Vsize, Vsize, Vsize))
-        
     for t in range(Npixels):
 
         if mask[t] == 0:
@@ -178,31 +145,10 @@ def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _m
         kshift = abs(k-intk)
         lshift = abs(l-intl)
 
-        ## window[0] <= box < window[1]
-        if (hshift>=window[1]) or (kshift>=window[1]) or (lshift>=window[1]):
-            continue
-        if (hshift<window[0]) and (kshift<window[0]) and (lshift<window[0]):
+        if (hshift<0.25) and (kshift<0.25) and (lshift<0.25) and not keepPeak:
             continue
         
         weight[inth,intk,intl] += 1
         volume[inth,intk,intl] += image[t]
 
     return volume, weight
-
-
-def mapImage2Resolution(image=None, size=None, waveLength=None, detectorDistance=None, detectorCenter=None, pixelSize=None, format="res"):
-    if image is not None:
-        size = image.shape
-
-    xyz = mapPixel2RealXYZ(size=size, center=detectorCenter, pixelSize=pixelSize, detectorDistance=detectorDistance)
-    rep = mapRealXYZ2Reciprocal(xyz=xyz, waveLength=waveLength)
-    repNorm = np.sqrt(np.sum(rep**2, axis=2))
-
-    if format == "res":
-        res = np.zeros(size)
-        index = np.where(repNorm>0)
-        res[index] = 1./repNorm[index]
-        res[repNorm==0] = np.amax(res)
-        return res
-    else:
-        return repNorm

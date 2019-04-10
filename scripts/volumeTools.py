@@ -214,7 +214,7 @@ def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow
     return [distri, Rmodel]
 
 @jit
-def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), window=1, scale=1, Basis=None):
+def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), Basis=None):
     volume = _volume.copy()
 
     if _volumeMask is None:
@@ -241,7 +241,7 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
 
         sumArray = xaxis + yaxis + zaxis
 
-        radius = np.sqrt(np.sum(sumArray**2, axis=3)) * scale
+        radius = np.sqrt(np.sum(sumArray**2, axis=3))
         radius = np.around(radius).astype(int)
     else:
         radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
@@ -250,17 +250,12 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
     radius1d = np.zeros(int(np.amax(radius))+1)
     weight1d = np.zeros(radius1d.shape)
 
-    hwindow = int((window-1.)/2.)
-    rmax = len(radius1d)-1
-
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
                 r = int(radius[i,j,k])
-                for h in range(-hwindow, hwindow+1):
-                    if r+h >= 0 and r+h<=rmax:
-                        radius1d[r+h] += volume[i,j,k]
-                        weight1d[r+h] += volumeMask[i,j,k]
+                radius1d[r] += volume[i,j,k]
+                weight1d[r] += volumeMask[i,j,k]
 
     index = np.where(weight1d>0)
     radius1d[index] /= weight1d[index]
@@ -273,7 +268,6 @@ def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-1
                 _radialBackground[i,j,k] = radius1d[r]
 
     return _radialBackground
-
 
 
 @jit
@@ -292,43 +286,3 @@ def meanf(idata, _scale = 3, clim=(0,50)):
         if Temp.shape[0] == 0: continue
         newList[i] = np.nanmean(Temp)
     return newList
-
-
-def volume2txt(volume, fsave="tmp.txt", _vMask=None, vmin=-100, vmax=1000):
-    if _vMask is None:
-        vMask = np.ones(volume.shape).astype(int)
-    else:
-        vMask = _vMask.copy()
-
-    if vmin is None:
-        vmin = np.amin(volume)-1
-    if vmax is None:
-        vmax = np.amax(volume)+1
-
-    (nx, ny, nz) = volume.shape
-    cx = (nx-1)/2
-    cy = (ny-1)/2
-    cz = (nz-1)/2
-
-    fw = open(fsave, "w")
-
-    for x in range(nx):
-        for y in range(ny):
-            for z in range(nz):
-                h = x-cx
-                k = y-cy
-                l = z-cz
-                val = volume[x,y,z]
-
-                if vMask[x,y,z]==0:
-                    continue
-                if val<vmin or val>vmax:
-                    continue
-
-                val = round(val, 3)
-
-                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+"\n"
-
-                fw.write(string)
-
-    fw.close()

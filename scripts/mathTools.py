@@ -98,28 +98,3 @@ def make3DRadius(size, center=None):
     xaxis, yaxis, zaxis = meshgrid2D(size, center=center)
     radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
     return radius, xaxis, yaxis, zaxis
-
-
-def eulerAngles2rotation(_theta, mode="rad"):
-    """
-    _theta = (angle 1, angle 2, angle 3)
-    """
-    if mode == "rad":
-        theta = _theta
-    else:
-        theta = np.array(_theta)/180.0*np.pi
-
-    Rx = np.array([[1,         0,                  0               ],
-                   [0,         np.cos(theta[0]), -np.sin(theta[0]) ],
-                   [0,         np.sin(theta[0]),  np.cos(theta[0]) ]])
-         
-    Ry = np.array([[np.cos(theta[1]),    0,      np.sin(theta[1])  ],
-                   [0,                   1,                    0   ],
-                   [-np.sin(theta[1]),   0,      np.cos(theta[1])  ]])
-                 
-    Rz = np.array([[np.cos(theta[2]),    -np.sin(theta[2]),       0],
-                   [np.sin(theta[2]),     np.cos(theta[2]),       0],
-                   [0,                   0,                       1]])
-                     
-    R = np.dot(Rz, np.dot( Ry, Rx ))
-    return R
