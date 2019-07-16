@@ -5,15 +5,13 @@ import imageTools
 import volumeTools
 import mergeTools
 from numba import jit
-from fileManager import H5FileManager
-h5M = H5FileManager()
 MaskTools   = imageTools.MaskTools()
 ScaleTools  = imageTools.ScaleTools()
 FilterTools = imageTools.FilterTools()
 
 
 ## data structure
-class DataStruct(object):
+class DataBase(object):
     def __init__(self):
         self.image = None
         self.mask = 1
@@ -282,30 +280,13 @@ class Launcher:
     def clean(self):
         return 
 
+class VolumeAgent:
+    def __init__(self):
+        self.volume = 1
+        self.weight = 1
 
-class VolumeBase(object):
-    def __init__(self, volume=None, weight=None, fname=None):
-        self.volume = volume
-        self.weight = weight
-        self.fname = fname
-    def Data(self, dname=None):
-        if dname is None:
-            return None
-        if hasattr(self, dname):
-            return getattr(self, dname)
-        if self.fname is not None:
-            return h5M.h5reader(self.fname, keys=dname)
-        else:
-            return None
-
-class VolumeAgent(VolumeBase):
-    def __init__(self, **kwargs):
-        VolumeBase.__init__(self, **kwargs)
-    def correlation(self):
-        return 
-    def symmetrize(self,):
-        return
-    def dataviewer(self,):
-        return
-    def radial_background(self,):
-        return 
+class expAgent:
+    def __init__(self):
+        self.Launcher = Launcher()
+        
+    
