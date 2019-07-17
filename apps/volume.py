@@ -21,8 +21,8 @@ volume = psvm["volume"]
 weight = psvm["weight"]
 Amat = psvm["Amat"]
 Bmat = psvm["Bmat"]
-vMask = (weight>=4).astype(int)
-
+vMask = (weight>=1).astype(int)
+volume = volume * vMask
 
 ## symmetry
 volumeSym, weightSym = volumeTools.volumeSymmetrize(volume, _volumeMask=vMask, _threshold=(-100,1000), symmetry="P1211")
