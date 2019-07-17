@@ -168,14 +168,14 @@ class ImageAgent(DataStruct):
         self.HKLIW[:,4] = weight[index]
         return True
     
-    def merge2volume(self, keep=False):
-        volume = np.zeros((121,121,121))
-        weight = np.zeros((121,121,121))
+    def merge2volume(self, keep=False, Vcenter=60, Vsize=121, voxelSize=1.0):
+        volume = np.zeros((Vsize,Vsize,Vsize))
+        weight = np.zeros((Vsize,Vsize,Vsize))
 
         volume, weight = mergeTools.Image2Volume(volume=volume, weight=weight, Amat=self.Amat, Bmat=None, _image=self.image, \
                         _mask=self.mask * self.peakMask, keepPeak=False, returnFormat="HKL", xvector=None, waveLength=self.waveLength, \
                         pixelSize=self.pixelSize, center=self.detectorCenter, detectorDistance=self.detectorDistance, \
-                        Vcenter=60, Vsize=121, voxelSize=1., Phi=self.phi, rotAxis=self.rotAxis)
+                        Vcenter=Vcenter, Vsize=Vsize, voxelSize=voxelSize, Phi=self.phi, rotAxis=self.rotAxis)
         
         if keep==True:
             self.volume = volume
@@ -245,9 +245,9 @@ class MergeAgent:
             self.cluster[key].update(params)
         return True
     
-    def merge(self):
-        volume = np.zeros((121,121,121))
-        weight = np.zeros((121,121,121))
+    def merge(self, Vcenter=60, Vsize=121, voxelSize=1.0):
+        volume = np.zeros((Vsize,Vsize,Vsize))
+        weight = np.zeros((Vsize,Vsize,Vsize))
         
         for each in sorted(self.cluster):
             filename = self.cluster[each]["filename"]
@@ -255,7 +255,7 @@ class MergeAgent:
             imageAgent = ImageAgent()
             imageAgent.loadImage(filename, fileType="h5")
             imageAgent.image *= imageAgent.scale
-            v,w = imageAgent.merge2volume(keep=False)
+            v,w = imageAgent.merge2volume(keep=False, Vcenter=Vcenter, Vsize=Vsize, voxelSize=voxelSize)
             volume += v
             weight += w
             imageAgent = None
