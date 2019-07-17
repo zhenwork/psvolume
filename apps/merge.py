@@ -46,6 +46,7 @@ if comm_rank!=0:
     md = None
     
 else:
+    print args.Vcenter, args.Vsize, args.voxelSize
     for nrank in range(comm_size-1):
         md=mpidata()
         md.recv()
