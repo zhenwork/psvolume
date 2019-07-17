@@ -470,24 +470,63 @@ def volume2txt(volume, fsave="tmp.txt", _vMask=None, vmin=-100, vmax=1000):
 
 
 
-    
 @jit
-def pViewer(volume, vector, center=None, thr=None, depth=None, stretch=1.0):
+def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
+        vmin=None, vmax=None, rmax=None, rmin=None, depth=1, stretch=1.0, standardCut=True):
     """
     volume is a 3D matrix, whose three directions are x,y,z respectively; 
     vector is the viewing direction like (1,2,1), it doesn't have to be an unit vector; 
     center is the origin of volume, if not set, it will be the center of volume matrix;
     thr is the low/high threshold like thr=(0,10), other values are transparent; 
     depth indicates the viewing transparency.
+    columnMatrix: meaning the real directions of x,y,z, for example, three columns are vh, vk, vl. The position of each voxel (h,k,l)
+            should be h*vh + k*vk + l*vl
     """
+    volume = _volume.copy()
     (nx, ny, nz) = volume.shape
-    if center is not None: (cx, cy, cz) = center
-    else: (cx, cy, cz) = np.array(volume.shape)*0.5-0.5
-    x = np.arange(nx)-cx*1.0
-    y = np.arange(ny)-cy*1.0
-    z = np.arange(nz)-cz*1.0
-    (xaxis, yaxis, zaxis) = np.meshgrid(x,y,z,indexing='ij')
+    if center is not None:
+        (cx, cy, cz) = center
+    else:
+        (cx, cy, cz) = np.array(volume.shape)*0.5-0.5
 
+    h = np.arange(nx)-cx*1.0
+    k = np.arange(ny)-cy*1.0
+    l = np.arange(nz)-cz*1.0
+    (haxis, kaxis, laxis) = np.meshgrid(h,k,l,indexing='ij')
+
+    ## convert raw 3D matrix (h,k,l) to real directions vx,vy,vz
+    if directions is not None:
+        Hreal = directions[:,0]
+        Kreal = directions[:,1]
+        Lreal = directions[:,2]
+    else:
+        Hreal = np.array([1., 0, 0])
+        Kreal = np.array([0, 1., 0])
+        Lreal = np.array([0, 0, 1.])
+
+    xaxis = haxis * Hreal[0] + kaxis * Kreal[0] + laxis * Lreal[0]
+    yaxis = haxis * Hreal[1] + kaxis * Kreal[1] + laxis * Lreal[1]
+    zaxis = haxis * Hreal[2] + kaxis * Kreal[2] + laxis * Lreal[2]
+    radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+    
+    minval = np.amin(volume)
+    maxval = np.amax(volume)
+    if vmin is None: vmin=minval-1
+    if vmax is None: vmax=maxval+1
+    
+    if rmin is None: rmin=np.amin(radius)-1
+    if rmax is None: rmax=np.amax(radius)+1
+    volume[(radius<rmin)|(radius>=rmax)] = vmin-1
+    
+    if standardCut is True:
+        volume[(xaxis>0)&(zaxis>0)] = vmin-1
+        volume[(xaxis<=0)&(yaxis>0)&(zaxis>0)] = vmin-1
+        
+    xaxis /= voxelsize
+    yaxis /= voxelsize
+    zaxis /= voxelsize
+
+    ## get projection direction (unit vectors)
     vec = np.array(vector)
     if vec[0]==0 and vec[1]==0:
         px = np.array((1.,0.,0.))
@@ -500,46 +539,66 @@ def pViewer(volume, vector, center=None, thr=None, depth=None, stretch=1.0):
         py = -pz[2]*pzh/lpzh + lpzh*np.array((0.,0.,1.))
         px = np.cross(py, pz)*stretch
         py = py*stretch
-    
+
+    ## monitor the projection axis
+    proj = np.zeros((3, 2))
+    proj[0,0] = np.array([1.,0,0]).dot(px)
+    proj[0,1] = np.array([1.,0,0]).dot(py)
+    proj[1,0] = np.array([0,1.,0]).dot(px)
+    proj[1,1] = np.array([0,1.,0]).dot(py)
+    proj[2,0] = np.array([0,0,1.]).dot(px)
+    proj[2,1] = np.array([0,0,1.]).dot(py)
+
+
+    # project to new x,y,z axis
     volx = xaxis*px[0] + yaxis*px[1] + zaxis*px[2]
     voly = xaxis*py[0] + yaxis*py[1] + zaxis*py[2]
     volz = xaxis*pz[0] + yaxis*pz[1] + zaxis*pz[2]
 
     volx = np.around(volx).astype(int)
     voly = np.around(voly).astype(int)
-    if depth is not None: volz = np.around(volz/depth).astype(int)
+    volz = np.around(volz)
 
     xmin = np.amin(volx)
     xmax = np.amax(volx)
     ymin = np.amin(voly)
     ymax = np.amax(voly)
 
-    vmin = np.amin(volume)
-    vmax = np.amax(volume)
-    
-    detvalue = np.ones((xmax-xmin+1, ymax-ymin+1))*(vmin-10)
-    detpolar = np.ones((xmax-xmin+1, ymax-ymin+1))*(np.amin(volz)-1)
-    detcount = np.zeros((xmax-xmin+1, ymax-ymin+1))
+    detvalue =   np.zeros((xmax-xmin+1, ymax-ymin+1))
+    detpolar =   np.zeros((xmax-xmin+1, ymax-ymin+1)) + np.amin(volz) - 1024
+    detcount =   np.zeros((xmax-xmin+1, ymax-ymin+1))
+    resolution = np.zeros((xmax-xmin+1, ymax-ymin+1))
 
-    if thr[0] is None: thr[0]=vmin-1
-    if thr[1] is None: thr[1]=vmax+1
+    cenX = 0 - xmin
+    cenY = 0 - ymin
 
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
                 value = volume[i,j,k]
-                if value<thr[0] or value>thr[1]:
+                if value<vmin or value>=vmax:
                     continue
                 dx = volx[i,j,k]-xmin
-                dy = voly[i,j,k]-ymin
-                if volz[i,j,k]<detpolar[dx,dy]: 
-                    continue
-                elif volz[i,j,k]>detpolar[dx,dy]:
-                    detvalue[dx,dy] = value
+                dy = voly[i,j,k]-ymin 
+                
+                if volz[i,j,k]>detpolar[dx,dy]:
                     detpolar[dx,dy] = volz[i,j,k]
-                    detcount[dx,dy] = 1
-                else:
+                    resolution[dx,dy] = radius[i,j,k]
+
+    for i in range(nx):
+        for j in range(ny):
+            for k in range(nz):
+                value = volume[i,j,k]
+                if value<vmin or value>=vmax:
+                    continue
+                dx = volx[i,j,k]-xmin
+                dy = voly[i,j,k]-ymin 
+                
+                if volz[i,j,k]>=detpolar[dx,dy]-depth:
                     detvalue[dx,dy]  = value+detvalue[dx,dy]*detcount[dx,dy]
                     detvalue[dx,dy] /= detcount[dx,dy]+1
                     detcount[dx,dy] += 1
-    return detvalue
+    index = np.where(detcount==0)
+    detvalue[index] = -1024
+    return detvalue, detcount, resolution, cenX, cenY, proj
+
