@@ -475,6 +475,53 @@ def volume2txt(volume, fsave="tmp.txt", _vMask=None, vmin=-100, vmax=1000, heade
     fw.close()
 
 
+def volume2Phenix(volume, fsave="tmp.txt", _vMask=None, vmin=-50, vmax=1000, headers=None):
+    if _vMask is None:
+        vMask = np.ones(volume.shape).astype(int)
+    else:
+        vMask = _vMask.copy()
+
+    if vmin is None:
+        vmin = np.amin(volume)-1
+    if vmax is None:
+        vmax = np.amax(volume)+1
+
+    (nx, ny, nz) = volume.shape
+    cx = (nx-1)/2
+    cy = (ny-1)/2
+    cz = (nz-1)/2
+
+    fw = open(fsave, "w")
+    if headers is not None:
+        for line in headers:
+            if line.endswith("\n"):
+                fw.write(line)
+            else:
+                fw.write(line+"\n")
+
+    for x in range(nx):
+        for y in range(ny):
+            for z in range(nz):
+                h = x-cx
+                k = y-cy
+                l = z-cz
+                val = volume[x,y,z]
+
+                if vMask[x,y,z]==0:
+                    continue
+                if val<vmin or val>vmax:
+                    continue
+
+                val = round(val-vmin, 3)
+                sqr = round(np.sqrt(val), 3)
+
+                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+str(sqr).rjust(10)+"\n"
+
+                fw.write(string)
+
+    fw.close()
+
+
 
 @jit
 def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
