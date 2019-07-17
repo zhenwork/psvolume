@@ -63,11 +63,9 @@ volumeSubXYZ, _ = volumeTools.hkl2volume(volumeSub, astar, bstar, cstar, _volume
 
 volumeSymSubXYZ, _ = volumeTools.hkl2volume(volumeSymSub, astar, bstar, cstar, _volumeMask = (weightSym>0).astype(int), ithreshold=(-100,1000))
 
-volumeXYZ[vMask==0] = -1024
-volumeSubXYZ[vMask==0] = -1024
-volumeSymSubXYZ[weightSym==0] = -1024
 
 H5FileManager.h5modify(args.fname, "volumeSymSubXYZ", volumeSymSubXYZ)
 H5FileManager.h5modify(args.fname, "volumeSubXYZ", volumeSubXYZ)
 H5FileManager.h5modify(args.fname, "volumeXYZ", volumeXYZ)
+H5FileManager.h5modify(args.fname, "weightSym", weightSym)
 
