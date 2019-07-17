@@ -57,9 +57,9 @@ else:
         print '### received file from ' + str(recvRank).rjust(2) + '/' + str(comm_size)
     
     
-    index = np.where(weight>=1)
+    index = np.where(weight>0)
     volume[index] /= weight[index]
-    index = np.where(weight<1)
+    index = np.where(weight==0)
     volume[index] = 0
     weight[index] = 0
 

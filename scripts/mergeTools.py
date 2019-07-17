@@ -133,7 +133,7 @@ def PeakMask(Amat=None, _image=None, size=None, xvector=None, window=(0, 0.25), 
 
 @jit
 def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _mask=None, \
-                keepPeak=False, returnFormat="HKL", xvector=None, window=(0.25, 0.5), \
+                keepPeak=False, returnFormat="HKL", xvector=None, window=(-1, 1), \
                 waveLength=None, pixelSize=None, center=None, detectorDistance=None, \
                 Vcenter=60, Vsize=121, voxelSize=1., Phi=0., rotAxis="x"):
     """
