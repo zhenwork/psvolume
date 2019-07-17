@@ -515,7 +515,7 @@ def volume2Phenix(volume, fsave="tmp.txt", _vMask=None, vmin=-50, vmax=1000, hea
                 val = round(val-vmin, 3)
                 sqr = round(np.sqrt(val), 3)
 
-                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+str(sqr).rjust(10)+"\n"
+                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(8)+str(sqr).rjust(8)+"\n"
 
                 fw.write(string)
 
