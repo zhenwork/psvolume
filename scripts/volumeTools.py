@@ -313,7 +313,7 @@ def uniform_sampling_ref(lattice_constant_A_deg, res_cut_off_low_Ainv, res_cut_o
     shell_V_Ainv3 = tot_V_Ainv3 * 1.0 / num_res_shell
     linspace_Ainv = [(res_cut_off_low_Ainv**3 + idx * shell_V_Ainv3)**(1./3.) for idx in range(num_res_shell)]
     linspace_Ainv.append(res_cut_off_high_Ainv)
-    assert len(linspace) == (num_res_shell+1)
+    assert len(linspace_Ainv) == (num_res_shell+1)
     return np.array(linspace_Ainv)
 
 
