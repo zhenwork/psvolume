@@ -347,7 +347,7 @@ def completeness(HKLI_1, lattice_constant_A_deg=None, res_shell_step_Ainv=None, 
 
 def correlation(HKLI_1, HKLI_2, lattice_constant_A_deg=None, res_shell_step_Ainv=None, \
                 num_res_shell=20, res_cut_off_high_A=1.5, res_cut_off_low_A=50, num_ref_uniform=True, \
-                vmin = -1020, vmax=1020):
+                vmin = -1000, vmax=1020):
     ## num_res_shell > res_shell_step_Ainv
     ## res_cut_off_low_A has larger nunber
     ## res_cut_off_high_A has smaller number
@@ -382,8 +382,8 @@ def correlation(HKLI_1, HKLI_2, lattice_constant_A_deg=None, res_shell_step_Ainv
 
     h = np.arange(nx)-cx
     k = np.arange(ny)-cy
-    l = np.arange(nz)-cz 
-
+    l = np.arange(nz)-cz  
+    
     H, K, L = np.meshgrid(h,k,l,indexing="ij")
     
     R_Ainv = np.sqrt((H*recH_Ainv[0] + K*recK_Ainv[0] + L*recL_Ainv[0])**2 + \
@@ -393,7 +393,7 @@ def correlation(HKLI_1, HKLI_2, lattice_constant_A_deg=None, res_shell_step_Ainv
     real_num_shell = len(linspace_Ainv)-1
     floor_res_Ainv = linspace_Ainv[:real_num_shell]
     upper_res_Ainv = linspace_Ainv[1:]
-    center_Ainv = (upper_res_Ainv+bottom_res_Ainv)/2.
+    center_Ainv = (upper_res_Ainv+floor_res_Ainv)/2.
     number_value = []
     corr = []
     for idx in range(real_num_shell):
@@ -407,7 +407,20 @@ def correlation(HKLI_1, HKLI_2, lattice_constant_A_deg=None, res_shell_step_Ainv
         else:
             corr.append(0)
             
-    return np.array(center_Ainv), np.array(corr), np.array(number_value)
+    floor_res_Ainv = np.append(floor_res_Ainv, floor_res_Ainv[0])
+    upper_res_Ainv = np.append(upper_res_Ainv, upper_res_Ainv[-1])
+    
+    r1 = floor_res_Ainv[-1]
+    r2 = upper_res_Ainv[-1]
+    index = np.where( (R_Ainv>=r1) & (R_Ainv<r2) & (HKLI_1>=vmin) & (HKLI_1<vmax) & (HKLI_2>=vmin) & (HKLI_2<vmax) )
+    number_value.append(len(index[0]))
+
+    if len(index[0]) > 8:
+        corr.append(np.corrcoef(HKLI_1[index], HKLI_2[index])[0,1])
+    else:
+        corr.append(0)
+
+    return 1./np.array(upper_res_Ainv), 1./np.array(floor_res_Ainv), np.array(corr), np.array(number_value)
 
 
 
