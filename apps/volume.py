@@ -12,6 +12,7 @@ PsvolumeManager = fileManager.PsvolumeManager()
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-fname","--fname", help="input files", default=None, type=str) 
+parser.add_argument("-cutoff","--cutoff", help="input files", default=4, type=int) 
 args = parser.parse_args()
 
 
@@ -21,8 +22,14 @@ volume = psvm["volume"]
 weight = psvm["weight"]
 Amat = psvm["Amat"]
 Bmat = psvm["Bmat"]
-vMask = (weight>=1).astype(int)
-volume = volume * vMask
+vMask = (weight>=args.cutoff).astype(int)
+
+index = np.where(weight<args.cutoff)
+volume[index] = -1024
+weight[index] = 0
+vMask[index] = 0
+
+
 
 ## symmetry
 volumeSym, weightSym = volumeTools.volumeSymmetrize(volume, _volumeMask=vMask, _threshold=(-100,1000), symmetry="P1211")
