@@ -59,8 +59,8 @@ else:
     
     index = np.where(weight>0)
     volume[index] /= weight[index]
-    index = np.where(weight==0)
-    volume[index] = 0
+    index = np.where(weight<0.001)
+    volume[index] = -1024
     weight[index] = 0
 
     psvm = PsvolumeManager.h5py2psvm(files[0])
