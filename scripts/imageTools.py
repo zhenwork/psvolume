@@ -127,7 +127,7 @@ class FilterTools:
         return Data * 1.0 * mask
 
 
-def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=0, _vmax=None, _window=(11,11)):
+def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=None, _vmax=None, _window=(11,11)):
     """
     1. Throw away {+,-}sigma*std from (image - median)
     2. Throw away {+,-}sigma*std again from (image - median)

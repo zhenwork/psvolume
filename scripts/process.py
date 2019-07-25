@@ -69,14 +69,16 @@ refile = args.fname.replace("#####", "00001")
 imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
-
+imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
 
 if args.fback is not None:
     reback = args.fback.replace("#####", "00001")
-    back = imageAgent.readfile(filename=reback)["image"]
-    imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
+    backAgent = expAgent.ImageAgent()
+    backAgent.loadImage(reback)
+    backAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+    imageAgent.image = (imageAgent.image - 0.3*backAgent.image) * imageAgent.mask * backAgent.mask
 
-imageAgent.preprocess(expMask=args.expMask, notation=args.special)
+imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
 refData = imageAgent.todict()
 imageAgent = None
@@ -90,12 +92,15 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
+    imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
     print "Loading: ", filename
 
     if args.fback is not None:
         fileback = args.fback.replace("#####", "%.5d"%idx)
-        back = imageAgent.readfile(filename=fileback)["image"]
-        imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
+        backAgent = expAgent.ImageAgent()
+        backAgent.loadImage(fileback)
+        backAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+        imageAgent.image = (imageAgent.image - 0.3*backAgent.image) * imageAgent.mask * backAgent.mask
 
 
     if args.firMask:
@@ -103,7 +108,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         imageAgent.image *= refData["specMask"]
 
 
-    imageAgent.preprocess(expMask=args.expMask, notation=args.special)
+    imageAgent.preprocess(expMask=args.expMask)
     imageAgent.radprofile()
 
 
