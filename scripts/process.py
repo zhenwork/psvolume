@@ -69,15 +69,16 @@ refile = args.fname.replace("#####", "00001")
 imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
-imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+imageAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
 
 if args.fback is not None:
     reback = args.fback.replace("#####", "00001")
     backAgent = expAgent.ImageAgent()
     backAgent.loadImage(reback)
-    backAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+    backAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
     imageAgent.image = (imageAgent.image - 0.3*backAgent.image) * imageAgent.mask * backAgent.mask
-
+    imageAgent.mask *= backAgent.mask
+    
 imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
 refData = imageAgent.todict()
@@ -92,15 +93,16 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
-    imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+    imageAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
     print "Loading: ", filename
 
     if args.fback is not None:
         fileback = args.fback.replace("#####", "%.5d"%idx)
         backAgent = expAgent.ImageAgent()
         backAgent.loadImage(fileback)
-        backAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+        backAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
         imageAgent.image = (imageAgent.image - 0.3*backAgent.image) * imageAgent.mask * backAgent.mask
+        imageAgent.mask *= backAgent.mask
 
 
     if args.firMask:
@@ -124,6 +126,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         raise Exception("!! ERROR")
 
     ## save file
+    print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
     fsave = args.fsave.replace("#####", "%.5d"%idx)
     PsvolumeManager.psvm2h5py(imageAgent.todict(), fsave)
     imageAgent = None
