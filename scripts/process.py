@@ -99,8 +99,8 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
 
 
     if args.firMask:
-        imageAgent.mask *= refData["firMask"]
-        imageAgent.image *= refData["firMask"]
+        imageAgent.mask *= refData["specMask"]
+        imageAgent.image *= refData["specMask"]
 
 
     imageAgent.preprocess(expMask=args.expMask, notation=args.special)
