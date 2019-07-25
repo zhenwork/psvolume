@@ -57,9 +57,9 @@ class ImageAgent(DataStruct):
         psvm = dataExtract.loadfile(filename, fileType=fileType)
         return psvm
     
-    def preprocess(self, expMask=True, notation="wtich"):
+    def preprocess(self, expMask=True):
         # 1. remove bad pixels
-        self.removeBadPixels(notation=notation)
+        # self.removeBadPixels(notation=notation)
         # 2. expand mask (True is default)
         if expMask is True or int(expMask) == 1:
             self.expandMask()
@@ -79,12 +79,12 @@ class ImageAgent(DataStruct):
         self.fromdict(psvm)
         return True
     
-    def removeBadPixels(self, notation="wtich"):
-        self.specMask = dataExtract.specialparams(notation=notation)["mask"]
-        self.mask *= self.specMask
-        self.mask *= MaskTools.circleMask(self.image.shape, rmin=40, rmax=None, center=self.detectorCenter)
-        self.mask *= MaskTools.valueLimitMask(self.image, vmin=0.001, vmax=100000)
+    def removeBadPixels(self, notation="wtich", vmin=0.001, vmax=100000, rmin=40, rmax=None):
+        self.mask *= dataExtract.specialparams(notation=notation)["mask"]
+        self.mask *= MaskTools.circleMask(self.image.shape, rmin=rmin, rmax=rmax, center=self.detectorCenter)
+        self.mask *= MaskTools.valueLimitMask(self.image, vmin=vmin, vmax=vmax)
         self.image *= self.mask
+        self.specMask = self.mask.copy()
         return True
     
     def expandMask(self):
