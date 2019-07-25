@@ -101,14 +101,14 @@ class ImageAgent(DataStruct):
         pscaler = ScaleTools.polarization_scaler(size=self.image.shape, polarization=self.polarization, \
                     detectorDistance=self.detectorDistance, pixelSize=self.pixelSize, center=self.detectorCenter)
         self.image *= pscaler
-        print np.amax(pscaler)
+        # print np.amax(pscaler) = 2.27259170391
         return True
     
     def solidAngleCorrection(self):
         sascaler = ScaleTools.solid_angle_scaler(size=self.image.shape, detectorDistance=self.detectorDistance, \
                                           pixelSize=self.pixelSize, center=self.detectorCenter)
         self.image *= sascaler
-        print np.amax(sascaler)
+        # print np.amax(sascaler) = 6.88204200754
         return True
     
     def scaling(self, reference=None, mode="sum", rmin=160, rmax=400, keepMask=None):
