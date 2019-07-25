@@ -111,7 +111,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         imageAgent.image *= refData["specMask"]
 
 
-    imageAgent.mask *= (imageAgent.image > -10)
+    imageAgent.mask *= (imageAgent.image > 0)
     imageAgent.image *= imageAgent.mask
 
     imageAgent.preprocess(expMask=args.expMask)
