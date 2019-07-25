@@ -80,7 +80,8 @@ class ImageAgent(DataStruct):
         return True
     
     def removeBadPixels(self, notation="wtich"):
-        self.mask *= dataExtract.specialparams(notation=notation)["mask"]
+        self.specMask = dataExtract.specialparams(notation=notation)["mask"]
+        self.mask *= self.specMask
         self.mask *= MaskTools.circleMask(self.image.shape, rmin=40, rmax=None, center=self.detectorCenter)
         self.mask *= MaskTools.valueLimitMask(self.image, vmin=0.001, vmax=100000)
         self.image *= self.mask
