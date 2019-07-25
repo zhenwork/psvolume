@@ -69,7 +69,7 @@ refile = args.fname.replace("#####", "00001")
 imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
-imageAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
+imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
 
 if args.fback is not None:
     reback = args.fback.replace("#####", "00001")
@@ -78,7 +78,7 @@ if args.fback is not None:
     backAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
     imageAgent.image = (imageAgent.image - 0.3*backAgent.image) * imageAgent.mask * backAgent.mask
     imageAgent.mask *= backAgent.mask
-    
+
 imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
 refData = imageAgent.todict()
@@ -88,12 +88,11 @@ imageAgent = None
 
 for idx in range(assign[comm_rank], assign[comm_rank+1]):
     
-
     filename = args.fname.replace("#####", "%.5d"%idx)
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
-    imageAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
+    imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
     print "Loading: ", filename
 
     if args.fback is not None:
@@ -109,6 +108,9 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         imageAgent.mask *= refData["specMask"]
         imageAgent.image *= refData["specMask"]
 
+
+    imageAgent.mask *= (imageAgent.image > -100)
+    imageAgent.image *= imageAgent.mask
 
     imageAgent.preprocess(expMask=args.expMask)
     imageAgent.radprofile()
