@@ -110,7 +110,13 @@ class ImageAgent(DataStruct):
     
     def scaling(self, reference=None, mode="sum", rmin=160, rmax=400, keepMask=None):
         ## reference is also a Diffraction Object
-        if mode == "sum":
+        if mode == "ave":
+            if keepMask is None:
+                keepMask = MaskTools.circleMask(self.image.shape, rmin=rmin, rmax=rmax, center=self.detectorCenter)
+            sca = np.sum(self.image * self.mask * self.peakMask * keepMask) / np.sum(self.mask * self.peakMask * keepMask)
+            ref = np.sum(reference["image"] * reference["mask"] * reference["peakMask"] * keepMask) / np.sum(reference["mask"] * reference["peakMask"] * keepMask)
+            self.scale = ref * 1.0 / sca
+        elif mode == "sum":
             if keepMask is None:
                 keepMask = MaskTools.circleMask(self.image.shape, rmin=rmin, rmax=rmax, center=self.detectorCenter)
             sca = self.image * self.mask * self.peakMask * keepMask

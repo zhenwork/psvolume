@@ -97,10 +97,11 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         back = imageAgent.readfile(filename=fileback)["image"]
         imageAgent.image = (imageAgent.image - 0.3*back) * imageAgent.mask
 
+
     if args.firMask:
-        imageAgent.mask *= refData["mask"]
-        imageAgent.image *= refData["mask"]
-    
+        imageAgent.mask *= refData["firMask"]
+        imageAgent.image *= refData["firMask"]
+
 
     imageAgent.preprocess(expMask=args.expMask, notation=args.special)
     imageAgent.radprofile()
@@ -108,6 +109,8 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
 
     if args.scaling.lower() == "sum":
         imageAgent.scaling(reference = refData, rmin=160, rmax=400)
+    elif args.scaling.lower() == "ave":
+        imageAgent.scaling(reference = refData, mode="ave", rmin=160, rmax=400)
     elif args.scaling.lower() == "rad":
         imageAgent.scaling(reference = refData, mode="rad", rmin=160, rmax=400)
     elif args.scaling.lower() == "overall":
