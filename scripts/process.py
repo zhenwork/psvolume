@@ -80,6 +80,10 @@ if args.fback is not None:
     imageAgent.mask *= backAgent.mask
     backAgent = None
 
+    imageAgent.mask *= (imageAgent.image > 0)
+    imageAgent.image *= imageAgent.mask
+    print "Loading backg: ", fileback
+
 imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
 refData = imageAgent.todict()
@@ -94,7 +98,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
     imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
-    print "Loading: ", filename
+    print "Loading image: ", filename
 
     if args.fback is not None:
         fileback = args.fback.replace("#####", "%.5d"%idx)
@@ -105,14 +109,15 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
         imageAgent.mask *= backAgent.mask
         backAgent = None
 
+        imageAgent.mask *= (imageAgent.image > 0)
+        imageAgent.image *= imageAgent.mask
+
+        print "Loading backg: ", fileback
+
 
     if args.firMask:
         imageAgent.mask *= refData["specMask"]
         imageAgent.image *= refData["specMask"]
-
-
-    imageAgent.mask *= (imageAgent.image > 0)
-    imageAgent.image *= imageAgent.mask
 
     imageAgent.preprocess(expMask=args.expMask)
     imageAgent.radprofile()
