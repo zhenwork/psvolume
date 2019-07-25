@@ -82,7 +82,7 @@ if args.fback is not None:
 
     imageAgent.mask *= (imageAgent.image > 0)
     imageAgent.image *= imageAgent.mask
-    print "Loading backg: ", fileback
+    print "Loading backg: ", reback
 
 imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
