@@ -130,7 +130,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     elif args.scaling.lower() == "rad":
         imageAgent.scaling(reference = refData, mode="rad", rmin=160, rmax=400)
     elif args.scaling.lower() == "overall":
-        imageAgent.scaling(reference = refData, rmin=0, rmax=100000)
+        imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
     else:
         raise Exception("!! ERROR")
 
@@ -142,6 +142,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
 
 
 ## Finish: 
+"""
 if comm_rank != 0:
     md=mpidata()
     md.small.rank = comm_rank
@@ -158,4 +159,4 @@ else:
     flock = os.path.dirname(args.fsave) + "/.lock"
     with open(flock, "w") as f:
         f.write("finish")
-
+"""
