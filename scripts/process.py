@@ -23,7 +23,7 @@ parser.add_argument("-fback","--fback", help="input files", default=None, type=s
 parser.add_argument("-xds","--xds", help="xds file", default=None, type=str)
 parser.add_argument("-label","--label", help="xds file", default=None, type=str)
 
-
+parser.add_argument("-startidx","--startidx", help="1+startidx, can be -1 if you start from 0", default=0, type=int)
 parser.add_argument("-special","--special", help="special params", default="wtich", type=str)
 parser.add_argument("-firMask","--firMask", help="first mask?", default=0, type=int)
 parser.add_argument("-expMask","--expMask", help="expand mask?", default=1, type=int)
@@ -60,19 +60,20 @@ nmax = len(files)
 
 assign = np.linspace(1, nmax+1, comm_size+1).astype(int)
 print ">>>> %3d process [ %4d, %4d ) in %4d"%(comm_rank, assign[comm_rank], assign[comm_rank+1], nmax)
-
+print ">>>> start from image: %.5d"%(1+args.startidx)
 
 
 
 ## reference pattern ############################
-refile = args.fname.replace("#####", "00001")
+refile = args.fname.replace("#####", "%.5d"%(1+args.startidx))
 imageAgent = expAgent.ImageAgent()
 imageAgent.loadImage(refile)
 imageAgent.loadImage(args.xds)
 imageAgent.removeBadPixels(notation=args.special, vmin=0.001, vmax=100000, rmin=40, rmax=None)
+print "Loading ref image: ", refile
 
 if args.fback is not None:
-    reback = args.fback.replace("#####", "00001")
+    reback = args.fback.replace("#####", "%.5d"%(1+args.startidx))
     backAgent = expAgent.ImageAgent()
     backAgent.loadImage(reback)
     backAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
@@ -82,7 +83,7 @@ if args.fback is not None:
 
     imageAgent.mask *= (imageAgent.image > 0)
     imageAgent.image *= imageAgent.mask
-    print "Loading backg: ", reback
+    print "Loading ref backg: ", reback
 
 imageAgent.preprocess(expMask=args.expMask)
 imageAgent.radprofile()
@@ -93,7 +94,7 @@ imageAgent = None
 
 for idx in range(assign[comm_rank], assign[comm_rank+1]):
     
-    filename = args.fname.replace("#####", "%.5d"%idx)
+    filename = args.fname.replace("#####", "%.5d"%(idx+args.startidx) )
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
@@ -101,7 +102,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     print "Loading image: ", filename
 
     if args.fback is not None:
-        fileback = args.fback.replace("#####", "%.5d"%idx)
+        fileback = args.fback.replace("#####", "%.5d"%(idx+args.startidx) ) 
         backAgent = expAgent.ImageAgent()
         backAgent.loadImage(fileback)
         backAgent.removeBadPixels(notation=args.special, vmin=-0.001, vmax=100000, rmin=40, rmax=None)
