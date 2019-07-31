@@ -28,6 +28,9 @@ parser.add_argument("-special","--special", help="special params", default="wtic
 parser.add_argument("-firMask","--firMask", help="first mask?", default=0, type=int)
 parser.add_argument("-expMask","--expMask", help="expand mask?", default=1, type=int)
 parser.add_argument("-scaling","--scaling", help="scaling method", default="rad", type=str)
+
+parser.add_argument("-rmin","--rmin", help="scaling rmin", default=160, type=int)
+parser.add_argument("-rmax","--rmax", help="scaling rmax", default=400, type=int)
 args = parser.parse_args()
 
 
@@ -125,11 +128,11 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
 
 
     if args.scaling.lower() == "sum":
-        imageAgent.scaling(reference = refData, rmin=160, rmax=400)
+        imageAgent.scaling(reference = refData, rmin=args.rmin, rmax=args.rmax)
     elif args.scaling.lower() == "ave":
-        imageAgent.scaling(reference = refData, mode="ave", rmin=160, rmax=400)
+        imageAgent.scaling(reference = refData, mode="ave", rmin=args.rmin, rmax=args.rmax)
     elif args.scaling.lower() == "rad":
-        imageAgent.scaling(reference = refData, mode="rad", rmin=160, rmax=400)
+        imageAgent.scaling(reference = refData, mode="rad", rmin=args.rmin, rmax=args.rmax)
     elif args.scaling.lower() == "overall":
         imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
     else:
