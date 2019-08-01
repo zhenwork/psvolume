@@ -146,6 +146,7 @@ class ImageAgent(DataStruct):
                                 waveLength=self.waveLength, pixelSize=self.pixelSize, center=self.detectorCenter, \
                                 detectorDistance=self.detectorDistance, Phi=self.phi, rotAxis=self.rotAxis)
         peakMask = 1-peakIdenty
+        print type(peakMask)
         return peakMask
 
     def medianBack(self, window=(11,11)):
