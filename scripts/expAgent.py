@@ -10,7 +10,7 @@ h5M = H5FileManager()
 MaskTools   = imageTools.MaskTools()
 ScaleTools  = imageTools.ScaleTools()
 FilterTools = imageTools.FilterTools()
-
+from scipy.ndimage.filters import median_filter
 
 ## data structure
 class DataStruct(object):
@@ -141,6 +141,19 @@ class ImageAgent(DataStruct):
         self.image *= self.peakMask
         return True
     
+    def peakMask(self, bmin=0, bmax=0.25):
+        peakIdenty = mergeTools.PeakMask(Amat=self.Amat, _image=self.image, size=None, xvector=None, window=(bmin, bmax), \
+                                waveLength=self.waveLength, pixelSize=self.pixelSize, center=self.detectorCenter, \
+                                detectorDistance=self.detectorDistance, Phi=self.phi, rotAxis=self.rotAxis)
+        peakMask = 1-peakIdenty
+        return peakMask
+
+    def medianBack(self, window=(11,11)):
+        return median_filter(self.image, window)
+
+    def circleMask(self, rmin=100, rmax=1000):
+        return MaskTools.circleMask(self.image.shape, rmin=rmin, rmax=rmax, center=self.detectorCenter)
+
     def radprofile(self):
         aveRadius, aveIntens, sumCount = imageTools.radialProfile(self.image, self.mask * self.peakMask, center=self.detectorCenter, \
                                             vmin=None, vmax=None, rmin=None, rmax=None, stepSize=1, sampling=None, window=3)
