@@ -59,8 +59,8 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     
     refidx = idx - startidx
 
-    print "Loading image: ", refidx, filename
     filename = args.fname.replace("#####", "%.5d"%idx )
+    print "Loading image: ", refidx, filename
     imageAgent = expAgent.ImageAgent()
     imageAgent.loadImage(filename)
     imageAgent.loadImage(args.xds) 
@@ -86,7 +86,8 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     mask *= ((imageAgent.image - median_backg)>args.vmin)
     mask *= imageAgent.circleMask(rmin=args.rmin, rmax=args.rmax)
 
-    sumPeak[refidx] = np.sum(image * mask)
+
+    sumPeak[refidx] = np.sum((image-median_backg) * mask)
     cntPeak[refidx] = np.sum(mask)
     avePeak[refidx] = sumPeak[refidx] * 1.0 / cntPeak[refidx]
 
@@ -94,6 +95,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     ## save original image, overall mask
     print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
     zf.h5writer(fsave, "image", image)
+    zf.h5modify(fsave, "median", median_backg)
     zf.h5modify(fsave, "mask", mask)
     imageAgent = None
     median_backg = None
