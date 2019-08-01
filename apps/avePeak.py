@@ -72,6 +72,7 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     if args.expMask is True or int(args.expMask) == 1:
         imageAgent.expandMask()
 
+    print type(imageAgent)
     ## corrections
     imageAgent.polarizationCorrection()
     imageAgent.solidAngleCorrection()
@@ -81,8 +82,9 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     ## peak, radial Mask
     mask = imageAgent.mask.copy()
 
+    print type(imageAgent)
     tmp = imageAgent.peakMask(bmin=args.bmin, bmax=args.bmax)
-    print type(mask), type(tmp)
+    print type(image), type(mask), type(tmp)
 
     mask *= 1 - imageAgent.peakMask(bmin=args.bmin, bmax=args.bmax)
     median_backg = imageAgent.medianBack(window=(11,11))
