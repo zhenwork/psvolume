@@ -14,7 +14,7 @@ import scripts.mergeTools as mergeTools
 
 PsvolumeManager = fileManager.PsvolumeManager()
 FileSystem = fileManager.FileSystem()
-
+h5m = fileManager.H5FileManager()
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -96,9 +96,9 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     fsave = args.fsave.replace("#####", "%.5d"%idx)
     ## save original image, overall mask
     print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
-    zf.h5writer(fsave, "image", image)
-    zf.h5modify(fsave, "median", median_backg)
-    zf.h5modify(fsave, "mask", mask)
+    h5m.h5writer(fsave, "image", image)
+    h5m.h5modify(fsave, "median", median_backg)
+    h5m.h5modify(fsave, "mask", mask)
     imageAgent = None
     median_backg = None
     image = None
@@ -119,9 +119,9 @@ if comm_rank == 0:
         print '### received file from ' + str(recvRank).rjust(3)
 
     fsave = args.fsave.replace("#####", "final")
-    zf.h5writer(fsave, "sumPeak", sumPeak)
-    zf.h5modify(fsave, "avePeak", avePeak)
-    zf.h5modify(fsave, "cntPeak", cntPeak)
+    h5m.h5writer(fsave, "sumPeak", sumPeak)
+    h5m.h5modify(fsave, "avePeak", avePeak)
+    h5m.h5modify(fsave, "cntPeak", cntPeak)
 else:
     md=mpidata()
     md.addarray('sumPeak', sumPeak)
