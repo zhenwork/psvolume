@@ -81,8 +81,9 @@ for idx in range(assign[comm_rank], assign[comm_rank+1]):
     ## peak, radial Mask
     mask = imageAgent.mask.copy()
 
-    print type(mask), type(imageAgent.peakMask(bmin=args.bmin, bmax=args.bmax))
-    
+    tmp = imageAgent.peakMask(bmin=args.bmin, bmax=args.bmax)
+    print type(mask), type(tmp)
+
     mask *= 1 - imageAgent.peakMask(bmin=args.bmin, bmax=args.bmax)
     median_backg = imageAgent.medianBack(window=(11,11))
     mask *= ((imageAgent.image - median_backg)>args.vmin)
