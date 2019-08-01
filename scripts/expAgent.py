@@ -141,12 +141,12 @@ class ImageAgent(DataStruct):
         self.image *= self.peakMask
         return True
     
-    def peakMask(self, bmin=0, bmax=0.25):
+    def buildPeakMask(self, bmin=0, bmax=0.25):
         peakIdenty = mergeTools.PeakMask(Amat=self.Amat, _image=self.image, size=None, xvector=None, window=(bmin, bmax), \
                                 waveLength=self.waveLength, pixelSize=self.pixelSize, center=self.detectorCenter, \
                                 detectorDistance=self.detectorDistance, Phi=self.phi, rotAxis=self.rotAxis)
         peakMask = 1-peakIdenty
-        print type(peakMask)
+        # print type(peakMask)
         return peakMask
 
     def medianBack(self, window=(11,11)):
