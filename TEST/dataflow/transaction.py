@@ -9,8 +9,44 @@ import datetime
 import subprocess
 import numpy as np
 
+"""
+class action1:
+    def __init__(self,params=None):
+        self.params = params
+    def run(self):
+        number = random.randint(0,10)
+        print("I am in action1, generate a random number", number)
+        return {"number":number}
+class action2:
+    def __init__(self,params=None):
+        self.params = params
+    def run(self):
+        number = self.params["number"]
+        print("action2 get number from params",number)
+        print("action2 is adding 1 to number")
+        number += 1
+        return {"number":number}
+class action3:
+    def __init__(self,params={"number":100}):
+        self.params = params
+    def run(self):
+        number = self.params["number"]
+        print("action3 ge number",number)
+        print("action3 is saving file test.npy")
+        np.save("test.npy",np.array(number))
+        return True
+"""
+
 print("import transaction:",datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
+class ActionObj:
+    def __init__(self,actionobj=None,params=None):
+        self.actionobj = actionobj
+        self.params = params
+    def run(self,queue=None):
+        returns = self.actionobj(self.params).run()
+        if queue is not None and :
+        queue.put({"actionid":returns})
 
 class ActionManager:
     """
@@ -26,6 +62,8 @@ class ActionManager:
         self.status = []
         self.struct = struct
         self.receipt = None
+        self.suffix = []
+        self.process = []
     def append(self,data):
         ## data is dict/ActionMangaer
         ## data key or value length may not fit
@@ -105,6 +143,26 @@ class ActionManager:
             if alldone:
                 nextAction.append(actionidx)
         return nextAction
+    def affect(self,actionidx):
+        if self.struct is None:
+            return None
+        elif len(self.struct) == 0:
+            return None
+        affect_list = []
+        for something in self.struct:
+            (start,to) = something
+            if isinstance(start,int) and start==actionidx:
+                if isinstance(to,int):
+                    affect_list.append(to)
+                elif isinstance(to,(list,tuple)):
+                    for each in to: affect_list.append(each)
+            elif isinstance(start,(list,tuple)) and actionidx in start:
+                affect_list.append(to)
+                if isinstance(to,int):
+                    affect_list.append(to)
+                elif isinstance(to,(list,tuple)):
+                    for each in to: affect_list.append(each)
+        return affect_list
     def update(self):
         ## get job commuication, update which one is done
         if (self.status) == 0:
