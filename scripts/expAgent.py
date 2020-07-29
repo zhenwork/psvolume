@@ -57,12 +57,10 @@ class ImageAgent(DataStruct):
         psvm = dataExtract.loadfile(filename, fileType=fileType)
         return psvm
     
-    def preprocess(self, expMask=True):
+    def preprocess(self):
         # 1. remove bad pixels
         # self.removeBadPixels(notation=notation)
-        # 2. expand mask (True is default)
-        if expMask is True or int(expMask) == 1:
-            self.expandMask()
+        # 2. expand mask (True is default) 
         # 3. deep remove bad pixels
         self.deepRemoveBads() 
         # 4. polarization correction
@@ -87,8 +85,8 @@ class ImageAgent(DataStruct):
         self.specMask = self.mask.copy()
         return True
     
-    def expandMask(self):
-        self.mask = MaskTools.expandMask(self.mask, expandSize=(1,1), expandValue=0)
+    def expandMask(self,expMask=1):
+        self.mask = MaskTools.expandMask(self.mask, expandSize=(expMask,expMask), expandValue=0)
         self.image *= self.mask 
 
     def deepRemoveBads(self):
@@ -155,9 +153,9 @@ class ImageAgent(DataStruct):
     def circleMask(self, rmin=100, rmax=1000):
         return MaskTools.circleMask(self.image.shape, rmin=rmin, rmax=rmax, center=self.detectorCenter)
 
-    def radprofile(self):
+    def radprofile(self,window=5):
         aveRadius, aveIntens, sumCount = imageTools.radialProfile(self.image, self.mask * self.peakMask, center=self.detectorCenter, \
-                                            vmin=None, vmax=None, rmin=None, rmax=None, stepSize=1, sampling=None, window=3)
+                                            vmin=None, vmax=None, rmin=None, rmax=None, stepSize=1, sampling=None, window=window)
         self.radprofile = aveIntens
         return True
     

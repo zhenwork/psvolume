@@ -23,7 +23,7 @@ class PlotTools:
 
         else:
             minmin = clim[0]
-            maxmax = clim[1]  
+            maxmax = clim[1]
 
         pg.image(dataff, title="crystal rotation series",levels=(minmin, maxmax))
         if sys.flags.interactive != 1 or not hasattr(QtCore, 'PYQT_VERSION'):
