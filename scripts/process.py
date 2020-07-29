@@ -68,17 +68,6 @@ def process(event, args):
     imageAgent.preprocess()
     imageAgent.radprofile()
 
-    if args.scaling.lower() == "sum":
-        imageAgent.scaling(reference = refData, mode="sum", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "ave":
-        imageAgent.scaling(reference = refData, mode="ave", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "rad":
-        imageAgent.scaling(reference = refData, mode="rad", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "overall":
-        imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
-    elif args.scaling.lower() == "dials":
-        imageAgent.scaling(reference = refData, mode="dials", fdials=args.dials)
-
     return imageAgent
 
 
@@ -110,6 +99,16 @@ for idx,event in enumerate(evtidx):
         continue
 
     imageAgent = process(event, args)
+    if args.scaling.lower() == "sum":
+        imageAgent.scaling(reference = refData, mode="sum", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "ave":
+        imageAgent.scaling(reference = refData, mode="ave", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "rad":
+        imageAgent.scaling(reference = refData, mode="rad", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "overall":
+        imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
+    elif args.scaling.lower() == "dials":
+        imageAgent.scaling(reference = refData, mode="dials", fdials=args.dials)
     print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
     
     ## save file
