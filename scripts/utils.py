@@ -27,7 +27,7 @@ def getevents(runs):
         if each == "":
             continue
         elif ":" in each:
-            start,end = each.split(":")
+            start,end = each.split("-")
             rlist.extend(range(int(start),int(end)+1))
         else:
             rlist.append(int(each))
