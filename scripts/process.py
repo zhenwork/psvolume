@@ -45,7 +45,7 @@ def process(event, args):
     imageAgent = expAgent.ImageAgent()  
     imageAgent.loadImage(filename)   
     imageAgent.loadImage(args.fxds)   
-    imageAgent.loadImage(args.fdials) 
+    # imageAgent.loadImage(args.fdials) 
     imageAgent.removeBadPixels(notation=args.special, vmin=None, vmax=100000, rmin=40, rmax=None)
     imageAgent.expandMask(1)
 
