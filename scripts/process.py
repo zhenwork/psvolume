@@ -26,7 +26,7 @@ parser.add_argument("-fxds","--fxds",        help="xds file",    default=None, t
 parser.add_argument("-fdials","--fdials",    help="dials file",  default=None, type=str)
 
 parser.add_argument("-event","--event",      help="1-20,30,40", default=None, type=str) 
-parser.add_argument("-refidx","--refidx",    help="reference idx", default=0, type=int) 
+parser.add_argument("-refidx","--refidx",    help="reference idx", default=1, type=int) 
 
 parser.add_argument("-scaling","--scaling",  help="overall/sum/ave/rad/dials",default="rad",type=str) 
 parser.add_argument("-expmask","--expmask",  help="expand mask?",default=0,   type=int) 
