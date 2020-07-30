@@ -8,6 +8,48 @@ import fileManager
 import imageTools
 PsvolumeManager = fileManager.PsvolumeManager()
 
+
+# "../DIALS/G150T-2/dials.report.html"
+def dials_report(fname):
+    import codecs
+    f=codecs.open(fname, 'r')
+    content = f.readlines()
+
+    counter = 0
+    for line in content:
+        if "smoothly-varying scaling term" in line:
+            counter += 1
+            if counter == 2:
+                break
+    content = None
+    startx = line.index('"x": [')
+    stopx = line.index('], "xaxis"')
+
+    xvalue = []
+    for data in line[startx+6:stopx].split(","):
+        xvalue.append(float(data))
+
+    starty = line.index('"y": [')
+    stopy = line.index('], "yaxis"')
+
+    yvalue = []
+    for data in line[starty+6:stopy].split(","):
+        yvalue.append(float(data))    
+    
+    return xvalue,yvalue
+
+
+def getscale(x,y,theta):
+    if x[0] > theta:
+        return y[0]
+    if x[-1] < theta:
+        return y[-1]
+    a = np.where(np.array(x)-theta>0)[0][0] - 1
+    b = a+1 
+    return (y[b] - y[a]) / (x[b] - x[a]) * (theta - x[a]) + y[a]
+
+
+
 def xds2psvm(fileGXPARMS):
     """
     The unit of lattice constant, invAmat is A
