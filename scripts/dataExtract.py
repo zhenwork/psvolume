@@ -1,7 +1,7 @@
 """
 Angstrom (A): wavelength, crystal lattice
 """
-
+import json
 import numpy as np  
 import crystalTools
 import fileManager
