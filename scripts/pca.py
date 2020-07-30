@@ -95,7 +95,7 @@ xaxis, yaxis = np.meshgrid(x, y, indexing="ij")
 r = np.around(np.sqrt(xaxis**2 + yaxis**2)).astype(int)
 
 for idx,fname in enumerate(files):
-    if idx % comm_rank != 0:
+    if idx % comm_size != comm_rank:
         continue 
         
     with h5py.File(fname, "r") as f:
