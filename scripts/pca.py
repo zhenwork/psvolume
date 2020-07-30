@@ -11,6 +11,11 @@ comm_size = comm.Get_size()
 
 from sys import argv
 path_h5py = argv[1]
+show_plot = argv[2]
+if show_plot.lower() in ["0","false","no"]:
+    show_plot = False 
+else:
+    show_plot = True
 
 
 ### load the radial background
@@ -55,7 +60,7 @@ for idx in range(len(files)):
     
 print"stage 1 done"
 
-show_plot = False
+
 if show_plot:
     # first 4 PCA components
     import matplotlib.pyplot as plt
