@@ -61,7 +61,7 @@ for idx in range(len(files)):
 print"stage 1 done"
 
 
-if show_plot:
+if show_plot and comm_rank==0:
     # first 4 PCA components
     import matplotlib.pyplot as plt
     plt.figure(figsize=(15,3))
@@ -109,8 +109,8 @@ for idx,fname in enumerate(files):
     
     mask *= (image>0) 
     
-    backg = radpr[idx][r]
-    image -= backg 
+    sub = backg[idx][r]
+    image -= sub  
 
     index = np.where(mask==0)
     image[index] = 0
