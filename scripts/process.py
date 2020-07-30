@@ -109,7 +109,7 @@ for idx,event in enumerate(evtidx):
     elif args.scaling.lower() == "overall":
         imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
     elif args.scaling.lower() == "dials":
-        imageAgent.scaling(reference = refData, mode="dials", fdials=args.dials)
+        imageAgent.scaling(reference = refData, mode="dials", fdials=args.fdials)
     print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
     
     ## save file
