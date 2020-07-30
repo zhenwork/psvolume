@@ -53,7 +53,7 @@ class ImageAgent(DataStruct):
     def readfile(self, filename=None, fileType=None):
         ## return data in psvm format 
         if filename is None:
-            return
+            return {}
         psvm = dataExtract.loadfile(filename, fileType=fileType)
         return psvm
     
