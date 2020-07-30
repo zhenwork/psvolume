@@ -129,7 +129,7 @@ class ImageAgent(DataStruct):
             self.scale = np.dot(ref, sca)/np.dot(sca, sca)
         elif mode == "dials":
             x,y = dataExtract.dials_report(fdials)
-            self.scale = dataExtract.getscale(x,y,self.phi + reference["startAngle"])
+            self.scale = 1. / dataExtract.getscale(x,y,self.phi + reference["startAngle"])
         else:
             raise Exception("!! ERROR IN SCALING")
         return True
