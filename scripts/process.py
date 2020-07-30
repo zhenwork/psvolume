@@ -23,6 +23,7 @@ parser.add_argument("-fback","--fback",      help="backg files", default=None, t
 parser.add_argument("-fsave","--fsave",      help="save folder", default=None, type=str)
 
 parser.add_argument("-fxds","--fxds",        help="xds file",    default=None, type=str)
+parser.add_argument("-fexpt","--fexpt",      help="dials file",  default=None, type=str)
 parser.add_argument("-fdials","--fdials",    help="dials file",  default=None, type=str)
 
 parser.add_argument("-event","--event",      help="1-20,30,40", default=None, type=str) 
@@ -45,7 +46,7 @@ def process(event, args):
     imageAgent = expAgent.ImageAgent()  
     imageAgent.loadImage(filename)   
     imageAgent.loadImage(args.fxds)   
-    # imageAgent.loadImage(args.fdials) 
+    imageAgent.loadImage(args.fexpt) 
     imageAgent.removeBadPixels(notation=args.special, vmin=None, vmax=100000, rmin=40, rmax=None)
     imageAgent.expandMask(1)
 
