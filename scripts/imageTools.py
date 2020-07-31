@@ -94,6 +94,20 @@ class ScaleTools:
         scaleMask = 1. / detectScale
         return scaleMask
 
+    def detector_absorption_scaler(self, size, detectorDistance, pixelSize, center):
+        (nx, ny) = size
+        x = np.arange(nx) - center[0]
+        y = np.arange(ny) - center[1]
+        [xaxis, yaxis] = np.meshgrid(x, y, indexing="ij") 
+        zaxis = np.ones((nx,ny))*detectorDistance/pixelSize
+        norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+
+        delta = 1.99528
+        thickness_mm = 0.32
+        cos_angle = zaxis / norm
+        E = 1. - np.exp( - thickness_mm * delta / cos_angle)
+        return 1. / E / np.amin(1./E)
+
 class FilterTools:
     def median_filter(self, image=None, mask=None, window=(11,11)):
         median = median_filter(image, window) * 1.0
