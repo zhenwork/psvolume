@@ -174,9 +174,10 @@ def Image2Volume(volume=None, weight=None, Amat=None, Bmat=None, _image=None, _m
         if (inth<0) or inth>(Vsize-1) or (intk<0) or intk>(Vsize-1) or (intl<0) or intl>(Vsize-1):
             continue
         
-        hshift = abs( (h*voxelSize) - int(round(h*voxelSize)) )
-        kshift = abs( (k*voxelSize) - int(round(k*voxelSize)) )
-        lshift = abs( (l*voxelSize) - int(round(l*voxelSize)) )
+        hklraw = voxel[t] * voxelSize
+        hshift = abs( hklraw[0] - int(round(hklraw[0])) )
+        kshift = abs( hklraw[1] - int(round(hklraw[1])) )
+        lshift = abs( hklraw[2] - int(round(hklraw[2])) )
 
         ## window[0] <= box < window[1]
         if (hshift>=window[1]) or (kshift>=window[1]) or (lshift>=window[1]):
