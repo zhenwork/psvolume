@@ -641,6 +641,8 @@ def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
+                if radius[i,j,k] < rmin:
+                    continue 
                 value = volume[i,j,k]
                 if value<vmin or value>=vmax:
                     continue
