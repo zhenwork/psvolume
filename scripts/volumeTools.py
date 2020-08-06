@@ -583,6 +583,7 @@ def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
     if rmin is None: rmin=np.amin(radius)-1
     if rmax is None: rmax=np.amax(radius)+1
     volume[(radius<rmin)|(radius>=rmax)] = vmin-1
+    volume[(radius<rmin)] = vmax-1                ## pending 
     
     if standardCut is True:
         volume[(xaxis>0)&(zaxis>0)] = vmin-1
@@ -641,8 +642,6 @@ def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
-                if radius[i,j,k] < rmin:
-                    continue 
                 value = volume[i,j,k]
                 if value<vmin or value>=vmax:
                     continue
@@ -668,5 +667,5 @@ def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
                     detcount[dx,dy] += 1
     index = np.where(detcount==0)
     detvalue[index] = -1024
-    return detvalue, detcount, resolution, cenX, cenY, proj
+    return detvalue, detcount, detpolar, resolution, cenX, cenY, proj
 
