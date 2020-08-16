@@ -23,10 +23,11 @@ parser.add_argument("-fback","--fback",      help="backg files", default=None, t
 parser.add_argument("-fsave","--fsave",      help="save folder", default=None, type=str)
 
 parser.add_argument("-fxds","--fxds",        help="xds file",    default=None, type=str)
+parser.add_argument("-fexpt","--fexpt",      help="dials file",  default=None, type=str)
 parser.add_argument("-fdials","--fdials",    help="dials file",  default=None, type=str)
 
 parser.add_argument("-event","--event",      help="1-20,30,40", default=None, type=str) 
-parser.add_argument("-refidx","--refidx",    help="reference idx", default=0, type=int) 
+parser.add_argument("-refidx","--refidx",    help="reference idx", default=1, type=int) 
 
 parser.add_argument("-scaling","--scaling",  help="overall/sum/ave/rad/dials",default="rad",type=str) 
 parser.add_argument("-expmask","--expmask",  help="expand mask?",default=0,   type=int) 
@@ -44,8 +45,8 @@ def process(event, args):
 
     imageAgent = expAgent.ImageAgent()  
     imageAgent.loadImage(filename)   
-    imageAgent.loadImage(args.xds)   
-    imageAgent.loadImage(args.dials) 
+    imageAgent.loadImage(args.fxds)   
+    imageAgent.loadImage(args.fexpt) 
     imageAgent.removeBadPixels(notation=args.special, vmin=None, vmax=100000, rmin=40, rmax=None)
     imageAgent.expandMask(1)
 
@@ -67,17 +68,6 @@ def process(event, args):
 
     imageAgent.preprocess()
     imageAgent.radprofile()
-
-    if args.scaling.lower() == "sum":
-        imageAgent.scaling(reference = refData, mode="sum", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "ave":
-        imageAgent.scaling(reference = refData, mode="ave", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "rad":
-        imageAgent.scaling(reference = refData, mode="rad", rmin=args.rmin, rmax=args.rmax)
-    elif args.scaling.lower() == "overall":
-        imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
-    elif args.scaling.lower() == "dials":
-        imageAgent.scaling(reference = refData, mode="dials", fdials=args.dials)
 
     return imageAgent
 
@@ -110,6 +100,16 @@ for idx,event in enumerate(evtidx):
         continue
 
     imageAgent = process(event, args)
+    if args.scaling.lower() == "sum":
+        imageAgent.scaling(reference = refData, mode="sum", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "ave":
+        imageAgent.scaling(reference = refData, mode="ave", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "rad":
+        imageAgent.scaling(reference = refData, mode="rad", rmin=args.rmin, rmax=args.rmax)
+    elif args.scaling.lower() == "overall":
+        imageAgent.scaling(reference = refData, mode="ave", rmin=0, rmax=100000)
+    elif args.scaling.lower() == "dials":
+        imageAgent.scaling(reference = refData, mode="dials", fdials=args.fdials)
     print "## Image %.5d ==> min=%5.1f, max=%5.1f"%(idx, np.amin(imageAgent.image), np.amax(imageAgent.image))
     
     ## save file

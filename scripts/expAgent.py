@@ -53,7 +53,7 @@ class ImageAgent(DataStruct):
     def readfile(self, filename=None, fileType=None):
         ## return data in psvm format 
         if filename is None:
-            return
+            return {}
         psvm = dataExtract.loadfile(filename, fileType=fileType)
         return psvm
     
@@ -109,7 +109,7 @@ class ImageAgent(DataStruct):
         # print np.amax(sascaler) = 6.88204200754
         return True
     
-    def scaling(self, reference=None, mode="sum", rmin=160, rmax=400, keepMask=None):
+    def scaling(self, reference=None, mode="sum", rmin=160, rmax=400, keepMask=None, fdials=None):
         ## reference is also a Diffraction Object
         if mode == "ave":
             if keepMask is None:
@@ -127,6 +127,9 @@ class ImageAgent(DataStruct):
             sca = self.radprofile[rmin:rmax]
             ref = reference["radprofile"][rmin:rmax]
             self.scale = np.dot(ref, sca)/np.dot(sca, sca)
+        elif mode == "dials":
+            x,y = dataExtract.dials_report(fdials)
+            self.scale = 1. / dataExtract.getscale(x,y,self.phi + reference["startAngle"])
         else:
             raise Exception("!! ERROR IN SCALING")
         return True
