@@ -54,4 +54,4 @@ class mpidata(object):
                 arr = getattr(self,arrinfo.name)
                 comm.Recv(arr,source=recvRank,tag=MPI.ANY_TAG)
 
-             
+                
