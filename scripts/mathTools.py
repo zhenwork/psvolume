@@ -1,12 +1,32 @@
 import math
 import numpy as np 
 
+def dotproduct(x, y):
+    return sum((a*b) for a, b in zip(x, y))
 
-def phi_to_quaternion(phi_deg, rotAxis="x"):
+def length(x):
+    return math.sqrt(dotproduct(x, x))
+
+def angle(x, y):
+    """
+    Returns value in degree.
+    """
+    return math.acos(dotproduct(x, y) / (length(x) * length(y))) * 180. / np.pi
+
+
+def Euler2Rotation(alpha, beta, gamma):
+    return None
+
+
+def RandomRotation():
+    return None
+
+
+def phi2quaternion(phi, rotAxis="x"):
     """
     phi: in degree unit
     """
-    angle = phi_deg*np.pi/180.
+    angle = phi*np.pi/180.
     if rotAxis.lower() == "x":
         return (np.cos(angle/2.), np.sin(angle/2.), 0., 0.)
     elif rotAxis.lower() == "y":
@@ -17,7 +37,7 @@ def phi_to_quaternion(phi_deg, rotAxis="x"):
         return None
 
 
-def quaternion_to_rotation(quaternion):
+def quaternion2rotation(quaternion):
     rot = np.zeros([3,3])
     (q0, q1, q2, q3) = quaternion
     q01 = q0*q1 
@@ -41,12 +61,53 @@ def quaternion_to_rotation(quaternion):
     rot[2, 2] = (1. - 2.*(q11 + q22)) 
     return rot
 
+def meshgrid2D(size, center=None):
+    (nx, ny) = size
+    if center is None:
+        cx = (nx-1.)/2.
+        cy = (ny-1.)/2.
+    else:
+        (cx,cy) = center
 
-def euler_angle_to_rotation(theta_deg):
+    x = np.arange(nx) - cx
+    y = np.arange(ny) - cy
+    xaxis, yaxis = np.meshgrid(x, y, indexing='ij')
+    return xaxis, yaxis
+
+def meshgrid3D(size, center=None):
+    (nx, ny, nz) = size
+    if center is None:
+        cx = (nx-1.)/2.
+        cy = (ny-1.)/2.
+        cz = (nz-1.)/2.
+    else:
+        (cx,cy,cz) = center
+
+    x = np.arange(nx)-cx
+    y = np.arange(ny)-cy
+    z = np.arange(nz)-cz
+    xaxis, yaxis, zaxis = np.meshgrid(x,y,z, indexing='ij')
+    return xaxis, yaxis, zaxis
+
+def make2DRadius(size, center=None):
+    xaxis, yaxis = meshgrid2D(size, center=center)
+    radius = np.sqrt(xaxis**2 + yaxis**2)
+    return radius, xaxis, yaxis
+
+def make3DRadius(size, center=None):
+    xaxis, yaxis, zaxis = meshgrid2D(size, center=center)
+    radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+    return radius, xaxis, yaxis, zaxis
+
+
+def eulerAngles2rotation(_theta, mode="rad"):
     """
     _theta = (angle 1, angle 2, angle 3)
     """
-    theta = np.array(theta_deg)/180.0*np.pi
+    if mode == "rad":
+        theta = _theta
+    else:
+        theta = np.array(_theta)/180.0*np.pi
 
     Rx = np.array([[1,         0,                  0               ],
                    [0,         np.cos(theta[0]), -np.sin(theta[0]) ],

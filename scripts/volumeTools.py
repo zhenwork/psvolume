@@ -1,86 +1,132 @@
 from numba import jit
 import numpy as np 
-import diffuse.utils as dutils
-import diffuse.crystal as crystaltbx
+import mathTools
+import crystalTools
+
+@jit
+def volumeSymmetrize_alg1(_volume, _volumeMask = None, _threshold=(-100,1000), symmetry="P1211"):
+    volume = _volume.copy()
+    weight = np.zeros(volume.shape)
+    nx, ny, nz = volume.shape
+    for i in range(nx):
+        for j in range(ny):
+            for k in range(nz):
+                mi = nx-1-i
+                mj = ny-1-j
+                mk = nz-1-k
+                
+                if symmetry.lower() == "p1211":
+                    pairs = np.array([ volume[i,j,k], volume[mi,mj,mk], volume[mi,j,mk], volume[i,mj,k] ]) #P1211
+                elif symmetry.lower() == "friedel":
+                    # FIXME: only applicable to friedel symmetry
+                    pairs = np.array([ volume[i,j,k], volume[mi,mj,mk] ]) #P1211
+                elif symmetry.lower() == "snc":
+                    # FIXME: only applicable for snc data
+                    pairs = np.array([ volume[i,j,k], volume[mi,mj,k], volume[mj,i,k], volume[j,mi,k], \
+                                       volume[mi,mj,mk], volume[i,j,mk], volume[j,mi,mk], volume[mj,i,mk]])
+                else:
+                    pairs = None
+                
+                ori = pairs.copy()
+                pairs = pairs[np.where(pairs>_threshold[0])].copy()
+                pairs = pairs[np.where(pairs<_threshold[1])].copy()
+                weight[i,j,k] = len(pairs)
+
+                if len(pairs) == 0: 
+                    volume[i,j,k] = np.amin(ori)
+                else: 
+                    volume[i,j,k] = np.mean(pairs)
+
+    return volume, weight    
 
 
 @jit
-def volume_symmetrize(volume_3d, volume_mask_3d=None, threshold_keep=(-100,1000), symmetry="P1211"):
-    volume = volume_3d.copy()
-    if volume_mask_3d is None:
-        volumeMask = np.ones(volume_3d.shape)
+def volumeSymmetrize(_volume, _volumeMask = None, _threshold=(-100,1000), symmetry="P1211"):
+    volume = _volume.copy()
+    if _volumeMask is None:
+        volumeMask = np.ones(volume.shape)
     else:
-        volumeMask = volume_mask_3d.copy()
+        volumeMask = _volumeMask.copy()
 
-    if threshold_keep is not None:
-        volumeMask[(volume<threshold_keep[0]) | (volume>threshold_keep[1])] = 0.
+    if _threshold is not None:
+        volumeMask[(volume<_threshold[0]) | (volume>_threshold[1])] = 0.
 
     volume *= volumeMask
     
-    volumeSym = volume.copy()
-    weightSym = volumeMask.copy()
-    if symmetry in ["P1211","p1211"]:
-        volumeSym +=     volume[::-1,::-1,::-1]
-        weightSym += volumeMask[::-1,::-1,::-1]
+    if symmetry.lower() == "p1211":
+        volume2 = volume[::-1,::-1,::-1].copy()
+        volumeMask2 = volumeMask[::-1,::-1,::-1].copy()
+        volume3 = volume[::-1,:,::-1].copy()
+        volumeMask3 = volumeMask[::-1,:,::-1].copy()
+        volume4 = volume[:,::-1,:].copy()
+        volumeMask4 = volumeMask[:,::-1,:].copy()
 
-        volumeSym +=     volume[::-1,:,::-1]
-        weightSym += volumeMask[::-1,:,::-1]
-
-        volumeSym +=     volume[:,::-1,:]
-        weightSym += volumeMask[:,::-1,:]
+        volumeSym = (volume + volume2 + volume3 + volume4)
+        weightSym = (volumeMask + volumeMask2 + volumeMask3 + volumeMask4)
 
         index = np.where(weightSym>0.5)
         volumeSym[index] /= weightSym[index]
         return volumeSym, weightSym
 
     elif symmetry.lower() == "friedel":
-        volumeSym +=     volume[::-1,::-1,::-1]
-        weightSym += volumeMask[::-1,::-1,::-1]
+        volume2 = volume[::-1,::-1,::-1].copy()
+        volumeMask2 = volumeMask[::-1,::-1,::-1].copy()
+
+        volumeSym = (volume + volume2)
+        weightSym = (volumeMask + volumeMask2)
 
         index = np.where(weightSym>0.5)
         volumeSym[index] /= weightSym[index]
         return volumeSym, weightSym
+
+    elif symmetry.lower() == "snc":
+        return None
     else:
         return None 
 
 
 @jit
-def volume_hkl_reshape(volume,center,astar,bstar,cstar,volnew_size,volnew_center,\
-                volume_mask=None,voxel_new_size=1.,threshold_keep=(-100,1000)):
-    cx,cy,cz = center
-    nx,ny,nz = volume.shape
-    
-    if volume_mask is not None:
-        mask = volume_mask.copy().astype(int)
+def hkl2volume(volume, astar, bstar, cstar, _volumeMask = None, ithreshold=(-100,1000)):
+    idata = volume.copy()
+    num_samp = idata.shape[0]
+    icen = (num_samp-1)/2
+    center = np.array([icen]*3).astype(float)
+    size = num_samp
+    model3d = np.zeros((num_samp, num_samp, num_samp))
+    weight = np.zeros((num_samp, num_samp, num_samp))
+
+    if _volumeMask is not None:
+        volumeMask = _volumeMask.copy()
     else:
-        mask = np.ones(volume.shape).astype(int)
+        volumeMask = np.ones(idata.shape)
 
-    volnew  = np.zeros(volnew_size)
-    weight  = np.zeros(volnew_size)
+    if ithreshold is not None:
+        volumeMask[(idata<ithreshold[0]) | (idata>ithreshold[1])] = 0
 
-    for i in range(nx):
-        for j in range(ny):
-            for k in range(nz):
-                if mask[i,j,k] == 0:
-                    continue
-                if volume[i,j,k] < threshold_keep[0]:
-                    continue
-                if volume[i,j,k] > threshold_keep[1]:
-                    continue
+    volumeMask = volumeMask.astype(int)
 
-                hkl = float(i-cx)*astar+float(j-cy)*bstar+float(k-cz)*cstar 
+    idata[volumeMask==0] = -1024
+    
+    for i in range(-icen, icen+1):
+        for j in range(-icen, icen+1):
+            for k in range(-icen, icen+1):
 
-                tx = hkl[0] + volnew_center[0]
-                ty = hkl[1] + volnew_center[1]
-                tz = hkl[2] + volnew_center[2]
+                if idata[i+icen, j+icen, k+icen] < ithreshold[0]: continue
+                if idata[i+icen, j+icen, k+icen] > ithreshold[1]: continue
+
+                hkl = float(i)*astar+float(j)*bstar+float(k)*cstar
+                pos = hkl+center
+
+                tx = pos[0]
+                ty = pos[1]
+                tz = pos[2]
 
                 x = int(tx)
                 y = int(ty)
                 z = int(tz)
 
                 # throw one line more
-                if (tx < 0) or x > (nx-1) or (ty < 0) or y > (ny-1) or (tz < 0) or z > (nz-1): 
-                    continue
+                if (tx < 0) or x > (num_samp-1) or (ty < 0) or y > (num_samp-1) or (tz < 0) or z > (num_samp-1): continue
 
                 fx = tx - x
                 fy = ty - y
@@ -90,114 +136,154 @@ def volume_hkl_reshape(volume,center,astar,bstar,cstar,volnew_size,volnew_center
                 cz = 1. - fz
 
                 # Correct for solid angle and polarization
-                w = volume[i,j,k]
+                w = idata[i+icen,j+icen,k+icen]
 
                 # save to the 3D volume
                 f = cx*cy*cz 
                 weight[x, y, z] += f 
-                volnew[x, y, z] += f * w 
+                model3d[x, y, z] += f * w 
 
                 f = cx*cy*fz 
-                weight[x, y, z+1] += f 
-                volnew[x, y, z+1] += f * w 
+                weight[x, y, ((z+1)%size)] += f 
+                model3d[x, y, ((z+1)%size)] += f * w 
 
                 f = cx*fy*cz 
-                weight[x, y+1, z] += f 
-                volnew[x, y+1, z] += f * w 
+                weight[x, ((y+1)%size), z] += f 
+                model3d[x, ((y+1)%size), z] += f * w 
 
                 f = cx*fy*fz 
-                weight[x, y+1, z+1] += f 
-                volnew[x, y+1, z+1] += f * w 
+                weight[x, ((y+1)%size), ((z+1)%size)] += f 
+                model3d[x, ((y+1)%size), ((z+1)%size)] += f * w 
 
                 f = fx*cy*cz 
-                weight[x+1, y, z] += f 
-                volnew[x+1, y, z] += f * w
+                weight[((x+1)%size), y, z] += f 
+                model3d[((x+1)%size), y, z] += f * w
 
                 f = fx*cy*fz 
-                weight[x+1, y, z+1] += f 
-                volnew[x+1, y, z+1] += f * w 
+                weight[((x+1)%size), y, ((z+1)%size)] += f 
+                model3d[((x+1)%size), y, ((z+1)%size)] += f * w 
 
                 f = fx*fy*cz 
-                weight[x+1, y+1, z] += f
-                volnew[x+1, y+1, z] += f * w 
+                weight[((x+1)%size), ((y+1)%size), z] += f
+                model3d[((x+1)%size), ((y+1)%size), z] += f * w 
 
                 f = fx*fy*fz 
-                weight[x+1, y+1, z+1] += f 
-                volnew[x+1, y+1, z+1] += f * w 
+                weight[((x+1)%size), ((y+1)%size), ((z+1)%size)] += f 
+                model3d[((x+1)%size), ((y+1)%size), ((z+1)%size)] += f * w 
 
-    index = np.where(weight>0.5)
-    volnew[index] /= weight[index]
-    index = np.where(weight<=0.5)
-    volnew[index] = -1024
-    return volnew, weight
-
+    index = np.where(weight>1.e-2)
+    model3d[index] /= weight[index]
+    index = np.where(weight<=1.e-2)
+    model3d[index] = -1024
+    return model3d, weight
 
 @jit
-def volume_radial_profile(volume_3d, volume_center, volume_mask_3d=None, volume_center=None, threshold_keep=(-100,1000),\
-                    contribute_window=1, expand_scale=1, basis_by_column=None):
+def distri(idata, astar, bstar, cstar, ithreshold=(-100,1000), iscale=1, iwindow=5):
+
+    la = mathTools.length(astar)
+    lb = mathTools.length(bstar)
+    lc = mathTools.length(cstar)
+    num_samp = idata.shape[0]
+    center = (num_samp - 1.)/2.
+    ir = (int(center*np.sqrt(3.)*max(la/lb, lc/lb))+20)*iscale
+    #print 'ir='+str(ir)
+    distri = np.zeros(ir)
+    weight = np.zeros(ir)
+    Rmodel = np.zeros((num_samp, num_samp, num_samp)).astype(int)
     
-    volume = volume_3d.copy()
-    if volume_mask_3d is None:
+    for i in range(num_samp):
+        for j in range(num_samp):
+            for k in range(num_samp):
+                if idata[i,j,k]<ithreshold[0] or idata[i,j,k]>ithreshold[1]: continue
+                ii = i-center
+                jj = j-center
+                kk = k-center
+                r = float(ii)*astar+float(jj)*bstar+float(kk)*cstar
+                r = np.sqrt(np.sum(r**2))*float(iscale)
+                intr = int(round(r))
+                Rmodel[i,j,k] = intr
+                
+                isize = (iwindow-1)/2
+                for delta in range(-isize, isize+1):
+                    if (intr+delta)>=0 and (intr+delta)<len(distri):
+                        distri[intr+delta] += idata[i,j,k]
+                        weight[intr+delta] += 1.
+
+    index = np.where(weight>0)
+    distri[index] = distri[index]/weight[index]
+    return [distri, Rmodel]
+
+@jit
+def radialBackground(_volume, _volumeMask=None, volumeCenter=None, threshold=(-100,1000), window=1, scale=1, Basis=None):
+    volume = _volume.copy()
+
+    if _volumeMask is None:
         volumeMask = np.ones(volume.shape).astype(int)
     else:
-        volumeMask = volume_mask_3d.copy()
+        volumeMask = _volumeMask.copy()
 
-    if threshold_keep is not None:
-        volumeMask *= (volume>=threshold_keep[0]) * (volume<=threshold_keep[1])
+    if threshold is not None:
+        volumeMask[(volume<threshold[0]) | (volume>threshold[1])] = 0
 
     volume *= volumeMask
-    nx, ny, nz = volume.shape
-    x = np.arange(nx) - volume_center[0]
-    y = np.arange(ny) - volume_center[1]
-    z = np.arange(nz) - volume_center[2]
-    xaxis,yaxis,zaxis = np.meshgrid(x,y,z,indexing="ij")
 
-    if basis_by_column is not None:
-        vecA = basis_by_column[:,0].reshape((1,3))
-        vecB = basis_by_column[:,1].reshape((1,3))
-        vecC = basis_by_column[:,2].reshape((1,3))
+    nx, ny, nz = volume.shape
+    xaxis, yaxis, zaxis = mathTools.meshgrid3D(volume.shape, center=volumeCenter)
+
+    if Basis is not None:
+        vecA = Basis[:,0].reshape((1,3))
+        vecB = Basis[:,1].reshape((1,3))
+        vecC = Basis[:,2].reshape((1,3))
 
         xaxis = xaxis.reshape((nx,ny,nz,1)) * vecA
         yaxis = yaxis.reshape((nx,ny,nz,1)) * vecB
         zaxis = zaxis.reshape((nx,ny,nz,1)) * vecC
 
         sumArray = xaxis + yaxis + zaxis
-        radius = np.sqrt(np.sum(sumArray**2, axis=3)) * expand_scale
-    else:
-        radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2) * expand_scale
 
-    radius_assign = np.around(radius).astype(int)   # integers
-    max_radius = int(np.amax(radius_assign))
-    radius_1d = np.zeros(max_radius+1)
-    weight_1d = np.zeros(radius1d.shape)
-    half_window = int((contribute_window-1.)/2.)
+        radius = np.sqrt(np.sum(sumArray**2, axis=3)) * scale
+        radius = np.around(radius).astype(int)
+    else:
+        radius = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+        radius = np.around(radius).astype(int)
+
+    radius1d = np.zeros(int(np.amax(radius))+1)
+    weight1d = np.zeros(radius1d.shape)
+
+    hwindow = int((window-1.)/2.)
+    rmax = len(radius1d)-1
 
     for i in range(nx):
         for j in range(ny):
             for k in range(nz):
-                r = radius[i,j,k]
-                min_ridx = int(math.ceil( r-half_window))
-                max_ridx = int(math.floor(r+half_window))
-                for ridx in range(min_ridx, max_ridx+1):
-                    if ridx >= 0 and ridx<=max_radius:
-                        radius_1d[ridx] += volume[i,j,k]
-                        weight_1d[ridx] += volumeMask[i,j,k]
+                r = int(radius[i,j,k])
+                for h in range(-hwindow, hwindow+1):
+                    if r+h >= 0 and r+h<=rmax:
+                        radius1d[r+h] += volume[i,j,k]
+                        weight1d[r+h] += volumeMask[i,j,k]
 
-    index = np.where(weight_1d > 0)
-    radius_1d[index] /= weight_1d[index]
-    _radialBackground = radius_1d[radius_assign]
+    index = np.where(weight1d>0)
+    radius1d[index] /= weight1d[index]
+
+    _radialBackground = np.zeros(volume.shape)
+    for i in range(nx):
+        for j in range(ny):
+            for k in range(nz):
+                r = int(radius[i,j,k])
+                _radialBackground[i,j,k] = radius1d[r]
+
     return _radialBackground
 
 
 
-def datalist_resolution(HKLI_1, lattice_constant_A_deg):
+def stats(HKLI_1, lattice_constant_A_deg):
     if len(HKLI_1) < 10 or HKLI_1.shape[1] != 4:
         print "Bad data"
         return None 
 
     a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg = lattice_constant_A_deg
     (vecx_A, vecy_A, vecz_A, recH_Ainv, recK_Ainv, recL_Ainv) = \
-            crystaltbx.lattice_to_vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
+            crystalTools.lattice2vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
 
     Amat_Ainv = np.array([recH_Ainv, recK_Ainv, recL_Ainv]).T
 
@@ -220,7 +306,7 @@ def uniform_sampling_ref(lattice_constant_A_deg, res_cut_off_low_Ainv, res_cut_o
 
     a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg = lattice_constant_A_deg
     (vecx_A, vecy_A, vecz_A, recH_Ainv, recK_Ainv, recL_Ainv) = \
-            crystaltbx.lattice_to_vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
+            crystalTools.lattice2vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
     
     unit_volume_Ainv3 = np.cross(recH_Ainv, recK_Ainv).dot(recL_Ainv)
     tot_V_Ainv3 = res_cut_off_high_Ainv**3 - res_cut_off_low_Ainv**3
@@ -235,13 +321,17 @@ def uniform_sampling_ref(lattice_constant_A_deg, res_cut_off_low_Ainv, res_cut_o
 def completeness(HKLI_1, lattice_constant_A_deg=None, res_shell_step_Ainv=None, \
                 num_res_shell=20, num_ref_uniform=True, res_cut_off_high_A=0, res_cut_off_low_A=1e9):
     assert lattice_constant_A_deg is not None
+
     radius_Ainv, res_high_A, res_low_A = resolution(HKLI_1, lattice_constant_A_deg)
+
     res_cut_off_high_A = max(res_cut_off_high_A, res_high_A)  # high_A = 1.0A
     res_cut_off_low_A = min(res_cut_off_low_A, res_low_A)     # low_A  = 100A
+
     res_cut_off_high_Ainv = 1.0 / res_cut_off_high_A
     res_cut_off_low_Ainv = 1.0 / res_cut_off_low_A
     if res_cut_off_low_Ainv < 1e-8:
         res_cut_off_low_Ainv = 0.0
+
     if res_shell_step_Ainv is not None:
         linspace_Ainv = np.arange(res_cut_off_low_Ainv, res_cut_off_high_Ainv, res_shell_step_Ainv)
         if linspace_Ainv[-1] < res_cut_off_high_Ainv:
@@ -251,12 +341,13 @@ def completeness(HKLI_1, lattice_constant_A_deg=None, res_shell_step_Ainv=None, 
     else:
         ## uniform sampling of number of reflection
         linspace_Ainv = uniform_sampling_ref(lattice_constant_A_deg, res_cut_off_low_Ainv, res_cut_off_high_Ainv, num_res_shell)
+
     return 
 """
 
-def correlation(HKLI_1, HKLI_2, center, lattice_constant_A_deg=None, res_shell_step_Ainv=None, \
+def correlation(HKLI_1, HKLI_2, lattice_constant_A_deg=None, res_shell_step_Ainv=None, \
                 num_res_shell=20, res_cut_off_high_A=1.5, res_cut_off_low_A=50, num_ref_uniform=True, \
-                vmin=-100, vmax=1000):
+                vmin = -1000, vmax=1020):
     ## num_res_shell > res_shell_step_Ainv
     ## res_cut_off_low_A has larger nunber
     ## res_cut_off_high_A has smaller number
@@ -266,7 +357,7 @@ def correlation(HKLI_1, HKLI_2, center, lattice_constant_A_deg=None, res_shell_s
 
     a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg = lattice_constant_A_deg
     (vecx_A, vecy_A, vecz_A, recH_Ainv, recK_Ainv, recL_Ainv) = \
-            crystaltbx.lattice_to_vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
+            crystalTools.lattice2vector(a_A, b_A, c_A, alpha_deg, beta_deg, gamma_deg)
 
     res_cut_off_high_Ainv = 1.0 / res_cut_off_high_A
     res_cut_off_low_Ainv = 1.0 / res_cut_off_low_A
@@ -285,11 +376,13 @@ def correlation(HKLI_1, HKLI_2, center, lattice_constant_A_deg=None, res_shell_s
 
     #nx,ny,nz = HKLI_1.shape
     nx,ny,nz = HKLI_1.shape
-    cx,cy,cz = center
+    cx = int((nx-1.0)/2.0)
+    cy = int((ny-1.0)/2.0)
+    cz = int((nz-1.0)/2.0)
 
     h = np.arange(nx)-cx
     k = np.arange(ny)-cy
-    l = np.arange(nz)-cz 
+    l = np.arange(nz)-cz  
     
     H, K, L = np.meshgrid(h,k,l,indexing="ij")
     
@@ -331,80 +424,115 @@ def correlation(HKLI_1, HKLI_2, center, lattice_constant_A_deg=None, res_shell_s
 
 
 
-def volume_to_txt(volume,volume_center,fsave="tmp.txt", vmask=None, \
-                    threshold_keep=(-100,1000), lift=0, headers=None):
-    if vmask is None:
+@jit
+def meanf(idata, _scale = 3, clim=(0,50)):
+    delta = (_scale - 1)/2
+    idata = idata.astype(float)
+    newList = idata.copy()
+    for i in range(len(idata)):
+        istart = i-delta
+        iend = i+delta
+        if istart < 0: istart = 0
+        if iend > len(idata)-1: iend = len(idata)+1
+        Temp = idata[istart: iend+1].copy()
+        Temp = Temp[np.where(Temp>clim[0])].copy()
+        Temp = Temp[np.where(Temp<clim[1])].copy()
+        if Temp.shape[0] == 0: continue
+        newList[i] = np.nanmean(Temp)
+    return newList
+
+
+def volume2txt(volume, fsave="tmp.txt", _vMask=None, vmin=-100, vmax=1000, headers=None):
+    if _vMask is None:
         vMask = np.ones(volume.shape).astype(int)
     else:
-        vMask = vmask.copy()
+        vMask = _vMask.copy()
 
-    if threshold_keep is not None:
-        vMask *= (volume>=threshold_keep[0]) * (volume<=threshold_keep[1])
+    if vmin is None:
+        vmin = np.amin(volume)-1
+    if vmax is None:
+        vmax = np.amax(volume)+1
 
-    lift = max(0,lift)
     (nx, ny, nz) = volume.shape
-    (cx, cy, cz) = volume_center
+    cx = (nx-1)/2
+    cy = (ny-1)/2
+    cz = (nz-1)/2
 
-    with open(fsave, "w") as fw:
-        if headers is not None:
-            for line in headers:
-                if line.endswith("\n"):
-                    fw.write(line)
-                else:
-                    fw.write(line+"\n")
+    fw = open(fsave, "w")
+    if headers is not None:
+        for line in headers:
+            if line.endswith("\n"):
+                fw.write(line)
+            else:
+                fw.write(line+"\n")
 
-        for x in range(nx):
-            for y in range(ny):
-                for z in range(nz):
-                    if vMask[x,y,z]==0:
-                        continue
+    for x in range(nx):
+        for y in range(ny):
+            for z in range(nz):
+                h = x-cx
+                k = y-cy
+                l = z-cz
+                val = volume[x,y,z]
 
-                    h = x-cx
-                    k = y-cy
-                    l = z-cz 
-                    val = round(volume[x,y,z]+lift, 3)
-                    string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+"\n"
-                    fw.write(string)
+                if vMask[x,y,z]==0:
+                    continue
+                if val<vmin or val>vmax:
+                    continue
+
+                val = round(val, 3)
+
+                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(10)+"\n"
+
+                fw.write(string)
+
+    fw.close()
 
 
-def volume_to_phenix(volume,volume_center,fsave="tmp.txt", vmask=None, \
-                    threshold_keep=(-50,1000), lift=10, headers=None):
-    if vmask is None:
+def volume2Phenix(volume, fsave="tmp.txt", _vMask=None, vmin=-50, vmax=1000, headers=None):
+    if _vMask is None:
         vMask = np.ones(volume.shape).astype(int)
     else:
-        vMask = vmask.copy()
+        vMask = _vMask.copy()
 
-    if threshold_keep is not None:
-        vMask *= (volume>=threshold_keep[0]) * (volume<=threshold_keep[1])
+    if vmin is None:
+        vmin = np.amin(volume)-1
+    if vmax is None:
+        vmax = np.amax(volume)+1
 
-    lift = max(0,lift)
-    vmin = np.amin(volume * vMask)
     (nx, ny, nz) = volume.shape
-    (cx, cy, cz) = volume_center
+    cx = (nx-1)/2
+    cy = (ny-1)/2
+    cz = (nz-1)/2
 
-    with open(fsave, "w") as fw:
-        if headers is not None:
-            for line in headers:
-                if line.endswith("\n"):
-                    fw.write(line)
-                else:
-                    fw.write(line+"\n")
+    fw = open(fsave, "w")
+    if headers is not None:
+        for line in headers:
+            if line.endswith("\n"):
+                fw.write(line)
+            else:
+                fw.write(line+"\n")
 
-        for x in range(nx):
-            for y in range(ny):
-                for z in range(nz):
-                    if vMask[x,y,z]==0:
-                        continue
+    for x in range(nx):
+        for y in range(ny):
+            for z in range(nz):
+                h = x-cx
+                k = y-cy
+                l = z-cz
+                val = volume[x,y,z]
 
-                    h = x-cx
-                    k = y-cy
-                    l = z-cz 
-                    val = round(volume[x,y,z]-vmin+lift, 3)
-                    sqr = round(np.sqrt(val), 3)
+                if vMask[x,y,z]==0:
+                    continue
+                if val<vmin or val>vmax:
+                    continue
 
-                    string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(8)+str(sqr).rjust(8)+"\n"
+                val = round(val-vmin, 3)
+                sqr = round(np.sqrt(val), 3)
 
-                    fw.write(string)
+                string = str(h).rjust(4)+str(k).rjust(4)+str(l).rjust(4)+str(val).rjust(8)+str(sqr).rjust(8)+"\n"
+
+                fw.write(string)
+
+    fw.close()
 
 
 
@@ -540,3 +668,4 @@ def pViewer(_volume, vector, center=None, directions=None, voxelsize=1, \
     index = np.where(detcount==0)
     detvalue[index] = -1024
     return detvalue, detcount, detpolar, resolution, cenX, cenY, proj
+

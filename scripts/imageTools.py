@@ -1,9 +1,9 @@
 import numpy as np
+from scipy.ndimage.filters import median_filter
 from numba import jit
 
-class Masktbk:
-    @staticmethod
-    def circle_mask_keep(size,rmin=None,rmax=None, center=None):
+class MaskTools:
+    def circleMask(self, size, rmin=None, rmax=None, center=None):
         """
         size = (nx,ny), tuple
         """
@@ -13,62 +13,65 @@ class Masktbk:
             cy=(ny-1.)/2.
         else:
             (cx,cy) = center
+        if rmin is None:
+            rmin = -1
+        if rmax is None:
+            rmax = max(size)*2.
 
         x = np.arange(nx) - cx
         y = np.arange(ny) - cy
-        xaxis, yaxis = np.meshgrid(x,y, indexing="ij")
+        [xaxis, yaxis] = np.meshgrid(x,y, indexing="ij")
         r = np.sqrt(xaxis**2+yaxis**2)
 
-        mask = np.ones(size).astype(int)
-        if rmin is not None:
-            mask *= (r >= rmin).astype(int)
-        if rmax is not None:
-            mask *= (r <= rmax).astype(int)
+        mask = np.zeros(size).astype(int)
+        index = np.where((r <= rmax) & (r >= rmin))
+        mask[index] = 1
         return mask
 
-    @staticmethod
-    def value_mask_keep(image, vmin=None, vmax=None):
-        mask = np.ones(image.shape).astype(int) 
-        if vmin is not None:
-            mask *= (image>=vmin).astype(int)
-        if vmax is not None:
-            mask *= (image<=vmax).astype(int)
+    def valueLimitMask(self, image, vmin=None, vmax=None):
+        mask = np.zeros(image.shape).astype(int)
+        (_vmin, _vmax) = (np.amin(image), np.amax(image))
+        if vmin is None:
+            vmin = _vmin - 1
+        if vmax is None:
+            vmax = _vmax + 1
+        index = np.where((image>=vmin) & (image<=vmax))
+        mask[index] = 1
         return mask
 
-    @staticmethod
-    def expand_mask_reject(mask, expand_size=(1,1)):
+    def expandMask(self, mask, expandSize=(1,1), expandValue=0):
         """
         expandSize is the half size of window
         """
-        assert len(mask.shape) == len(expand_size)
-        import scipy.ndimage
-        kernel = np.ones([x*2+1 for x in expand_size]).astype(int)
-        return (scipy.ndimage.convolve(mask, kernel, mode="mirror")==np.sum(kernel)).astype(int)
+        (nx,ny) = mask.shape
+        newMask = mask.copy()
+        index = np.where(mask==expandValue)
+        for i in range(-expandSize[0], expandSize[0]+1):
+            for j in range(-expandSize[1], expandSize[1]+1):
+                newMask[((index[0]+i)%nx, (index[1]+j)%ny)] = expandValue
+        return newMask
 
 
-class Correctiontbx:
-
-    @staticmethod
-    def solid_angle_multiplier(size=None, detector_distance_mm=None, pixel_size_mm=None, detector_center_px=None):
+class ScaleTools:
+    def solid_angle_scaler(self, size=None, detectorDistance=None, pixelSize=None, center=None):
         """
         Params: detectorDistance, pixelSize must have the same unit
         Returns: scaleMask -> image *= scaleMask
         Note: scaleMask -> min=1 (at center), value increases to the detector edge
         """
         (nx, ny) = size
-        (cx, cy) = detector_center_px
+        (cx, cy) = center
         x = np.arange(nx) - cx
         y = np.arange(ny) - cy
-        xaxis, yaxis = np.meshgrid(x, y, indexing="ij") 
-        zaxis = np.ones((nx,ny))*detector_distance_mm/pixel_size_mm
+        [xaxis, yaxis] = np.meshgrid(x, y, indexing="ij") 
+        zaxis = np.ones((nx,ny))*detectorDistance/pixelSize
         norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
         solidAngle = zaxis * 1.0 / norm**3
         solidAngle /= np.amax(solidAngle)
         scaleMask = 1./solidAngle
         return scaleMask
 
-    @staticmethod
-    def polarization_multiplier(size=None, polarization_fr=-1, detector_distance_mm=None, pixel_size_mm=None, detector_center_px=None):
+    def polarization_scaler(self, size=None, polarization=-1, detectorDistance=None, pixelSize=None, center=None):
         """
         p =1 means y polarization
         p=-1 means x polarization
@@ -78,12 +81,12 @@ class Correctiontbx:
         (nx, ny) = size
         x = np.arange(nx) - center[0]
         y = np.arange(ny) - center[1]
-        xaxis, yaxis = np.meshgrid(x, y, indexing="ij") 
-        zaxis = np.ones((nx,ny))*detector_distance_mm/pixel_size_mm
-        norm  = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
+        [xaxis, yaxis] = np.meshgrid(x, y, indexing="ij") 
+        zaxis = np.ones((nx,ny))*detectorDistance/pixelSize
+        norm = np.sqrt(xaxis**2 + yaxis**2 + zaxis**2)
         
-        if polarization_fr is not None:
-            detectScale = (2.*zaxis**2 + (1+polarization_fr)*xaxis**2 + (1-polarization_fr)*yaxis**2 )/(2.*norm**2)
+        if polarization is not None:
+            detectScale = (2.*zaxis**2 + (1+polarization)*xaxis**2 + (1-polarization)*yaxis**2 )/(2.*norm**2)
         else: 
             detectScale = np.ones(size)
 
@@ -91,8 +94,7 @@ class Correctiontbx:
         scaleMask = 1. / detectScale
         return scaleMask
 
-    @staticmethod
-    def detector_absorption_multiplier(size, detector_distance_mm=None, pixel_size_mm=None, detector_center_px=None):
+    def detector_absorption_scaler(self, size, detectorDistance, pixelSize, center):
         (nx, ny) = size
         x = np.arange(nx) - center[0]
         y = np.arange(ny) - center[1]
@@ -106,75 +108,83 @@ class Correctiontbx:
         E = 1. - np.exp( - thickness_mm * delta / cos_angle)
         return 1. / E / np.amin(1./E)
 
-    @staticmethod
-    def detector_parabox_multiplier(size, detector_distance_mm=None, pixel_size_mm=None, detector_center_px=None):
-        return 
-
-
-class Filtertbx:
-    @staticmethod
-    def median_filter(image=None,mask=None,window=(11,11)):
-        ## currently the mask doesn't work
-        from scipy.ndimage.filters import median_filter
-        median = median_filter(image, window, mode="mirror") * 1.0
+class FilterTools:
+    def median_filter(self, image=None, mask=None, window=(11,11)):
+        median = median_filter(image, window) * 1.0
+        if mask is not None:
+            median *= mask
         return median
 
-    @staticmethod
-    def mean_filter(image=None,mask=None,window=(5,5)):
-        assert len(window)==len(image.shape)
-        import scipy.ndimage
-        kernel = np.ones(window)
-        if mask is not None:
-            sum_image = scipy.ndimage.convolve(image * mask, kernel, mode="mirror")
-            sum_mask = scipy.ndimage.convolve(mask, kernel, mode="mirror")
-            index = np.where(sum_mask>0)
-            sum_image[index] /= 1.0 * sum_mask[index]
-            return sum_image * mask 
-        else:
-            sum_image = scipy.ndimage.convolve(image, kernel, mode="mirror")
-            return sum_image * 1.0 / np.prod(window)
+    def mean_filter(self, image=None, mask=None, window=(5,5)):
+        (nx,ny) = image.shape
+        if mask is None: 
+            mask = np.ones(image.shape).astyep(int)
+        ex = (window[0]-1)/2
+        ey = (window[1]-1)/2
+        sx = ex*2+1
+        sy = ey*2+1
+        Data = np.zeros((sx*sy, nx+ex*2, ny+ey*2));
+        Mask = np.zeros(data.shape);
 
-    @staticmethod
-    def std_filter(image=None,mask=None,window=(5,5)):
-        # sigma = sqrt( E(x^2) - E(x)^2 )
-        assert len(window)==len(image.shape)
-        import scipy.ndimage
-        kernel = np.ones(window)
-        if mask is not None:
-            sum_image  = scipy.ndimage.convolve(image * mask,    kernel, mode="mirror")
-            sum_square = scipy.ndimage.convolve(image**2 * mask, kernel, mode="mirror") 
-            sum_mask   = scipy.ndimage.convolve(mask,            kernel, mode="mirror")
-            index = np.where(sum_mask>0)
-            sum_image[index] /= 1.0 * sum_mask[index]
-            sum_square[index] /= 1.0 * sum_mask[index]
-            return np.sqrt( sum_square*mask - (sum_image*mask)**2)
-        else:
-            sum_image  = scipy.ndimage.convolve(image ,    kernel, mode="mirror")
-            sum_square = scipy.ndimage.convolve(image**2,  kernel, mode="mirror")
-            return np.sqrt( sum_square - sum_image**2 )
+        for i in range(sx):
+            for j in range(sy):
+                Data[i*sy+j, i:(i+nx), j:(j+ny)] = image * mask
+                Mask[i*sy+j, i:(i+nx), j:(j+ny)] = mask.copy()
+
+        Mask = np.sum(Mask, axis=0);
+        Data = np.sum(Data, axis=0);
+        index = np.where(Mask>0);
+        Data[index] /= 1.0 * Mask[index]
+
+        Mask = None
+        index = None
+        return Data * 1.0 * mask
 
 
-def remove_extreme(image=None,algorithm=2,mask=None,sigma=15,vmin=None,vmax=None,window=(11,11)):
+def removeExtremes(_image=None, algorithm=1, _mask=None, _sigma=15, _vmin=None, _vmax=None, _window=(11,11)):
     """
     1. Throw away {+,-}sigma*std from (image - median)
     2. Throw away {+,-}sigma*std again from (image - median)
     """
     if algorithm == 1:
-        raise Exception("## old method, not using now")
-    if algorithm == 2:
-        # _image=None, algorithm=1, _mask=None, _sigma=15, _vmin=None, _vmax=None, _window=(11,11)
-        # without using the median background
-        if mask is not None:
-            imask = mask.copy() * Masktbk.value_mask_keep(image, vmin=None, vmax=None)
-        else:
-            imask = np.ones(image.shape).astype(int) * Masktbk.value_mask_keep(image, vmin=None, vmax=None)
+        if _mask is None: 
+            mask=np.ones(_image.shape).astype(int)
+        else: 
+            mask = _mask.astype(int)
         
-        idata = image * imask
-        mean_idata = Filtertbx.mean_filter(image=idata,mask=imask,window=window)
-        std_idata  = Filtertbx.std_filter(image=idata,mask=imask,window=window)
-        imask *= (idata >= mean_idata - sigma*std_idata)
-        imask *= (idata <= mean_idata + sigma*std_idata)
-        return idata * imask, imask
+        image = _image * mask
+        mt = MaskTools()
+        ft = FilterTools()
+
+        ## remove value >vmax or <vmin
+        mask  *= mt.valueLimitMask(image, vmin=_vmin, vmax=_vmax)
+        image *= mask
+        
+        ## remove values {+,-}sigma*std
+        median = ft.median_filter(image=image, mask=mask, window=_window)
+        submedian = image - median
+        # tmp* submedian *= mask
+        
+        Tindex = np.where(mask==1)
+        Findex = np.where(mask==0)
+        ave = np.mean(submedian[Tindex])
+        std = np.std( submedian[Tindex])
+        index = np.where((submedian>ave+std*_sigma) | (submedian<ave-std*_sigma))
+        image[index] = 0
+        mask[index] = 0
+        submedian[index] = 0
+        
+        ## remove values {+,-}sigma*std
+        Tindex = np.where(mask==1)
+        Findex = np.where(mask==0)
+        ave = np.mean(submedian[Tindex])
+        std = np.std( submedian[Tindex])
+        index = np.where((submedian>ave+std*_sigma) | (submedian<ave-std*_sigma))
+        image[index] = 0
+        mask[index] = 0
+        
+        return image, mask
+    
     else:
         return None
 
@@ -224,7 +234,7 @@ def angularDistri(arr, Arange=None, num=30, rmax=None, rmin=None, center=(None,N
     return [aveAngle, aveIntens]
 
 @jit
-def radial_profile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None, window=3):
+def radialProfile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rmax=None, stepSize=None, sampling=None, window=3):
     """
     # mask = 0 will be ignored
     # pixel value beyond (vmin, vmax) will be ignored
@@ -296,3 +306,8 @@ def radial_profile(image, mask, center=None, vmin=None, vmax=None, rmin=None, rm
     aveIntens[index] = sumIntens[index] * 1.0 / sumCount[index]
 
     return aveRadius, aveIntens, sumCount
+
+
+
+
+
