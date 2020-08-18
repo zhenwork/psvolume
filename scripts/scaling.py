@@ -5,10 +5,7 @@
 
 import os,sys
 import numpy as np
-PATH=os.path.dirname(__file__)
-PATH=os.path.abspath(PATH+"./../")
-if PATH not in sys.path:
-    sys.path.append(PATH)
+sys.path.append('/reg/neh/home5/zhensu/Develop/psvolume')
 import scripts.expAgent as expAgent
 from scripts.mpidata import *
 import scripts.fileManager as fileManager
@@ -22,7 +19,7 @@ FileSystem = fileManager.FileSystem()
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-fname","--fname",      help="input files", default=None, type=str)
-parser.add_argument("-fback","--fback",      help="backg files", default=None, type=str)
+parser.add_argument("-fback","--fback",      help="backg files", default=None, type=str) 
 parser.add_argument("-fsave","--fsave",      help="save folder", default=None, type=str)
 
 parser.add_argument("-fxds","--fxds",        help="xds file",    default=None, type=str)
@@ -82,7 +79,7 @@ def process(event, args):
 evtidx = utils.getevents(args.event)
 idx = np.linspace(0,len(evtidx)+1,comm_size+1).astype(int)
 assign = evtidx[idx[comm_rank]:idx[comm_rank+1]]
-print "rank %d process [%d , %d], total=%d"%(comm_rank, assign[0], assign[-1], len(assign))
+print "rank %d process [%d , %d], total=%d"%(comm_rank, assign[0], assign[-1], len(assign))   
 
 #### create folder
 if comm_rank == 0:
