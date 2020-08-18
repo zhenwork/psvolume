@@ -5,17 +5,13 @@
 
 import os,sys
 import numpy as np
-PATH=os.path.dirname(__file__)
-PATH=os.path.abspath(PATH+"./../")
-if PATH not in sys.path:
-    sys.path.append(PATH)
-import scripts.dataExtract 
-import scripts.fileManager 
-import scripts.utils
+import dataExtract 
+import fileManager 
+import utils
 
-PsvolumeManager = scripts.fileManager.PsvolumeManager()
-FileSystem = scripts.fileManager.FileSystem()
-H5Manager = scripts.fileManager.H5FileManager()
+PsvolumeManager = fileManager.PsvolumeManager()
+FileSystem = fileManager.FileSystem()
+H5Manager = fileManager.H5FileManager()
 
 
 import argparse
@@ -49,13 +45,13 @@ if args.backg_file:
 
 #### process the pipeline
 if args.gxparms:
-    scripts.utils.dict_merge(data_save, scripts.dataExtract.xds2psvm(args.gxparms))
+    utils.dict_merge(data_save, dataExtract.xds2psvm(args.gxparms))
 if args.dials_expt:
-    scripts.utils.dict_merge(data_save, scripts.dataExtract.expt2psvm(args.dials_expt))
+    utils.dict_merge(data_save, dataExtract.expt2psvm(args.dials_expt))
 if args.dials_report:
-    scripts.utils.dict_merge(data_save, scripts.dataExtract.dials_report(args.dials_report))
+    utils.dict_merge(data_save, dataExtract.dials_report(args.dials_report))
 if args.exp_mask:
-    scripts.utils.dict_merge(data_save, np.load(args.exp_mask))
+    utils.dict_merge(data_save, np.load(args.exp_mask))
 
 if os.path.isfile(args.fsave):
     history = H5Manager.h5reader(args.fsave, "history")
