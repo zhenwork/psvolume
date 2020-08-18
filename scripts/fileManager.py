@@ -211,9 +211,9 @@ class PsvolumeManager:
         h5M = H5FileManager()
         for idx, item in enumerate(psvmParams):
             if idx == 0:
-                h5M.h5writer(fileName, item, psvmParams[item])
-            else:
-                h5M.h5modify(fileName, item, psvmParams[item])
+                if not os.path.isfile(fileName):
+                    h5M.h5writer(fileName, item, psvmParams[item])
+            h5M.h5modify(fileName, item, psvmParams[item])
         h5M = None
         return True
     

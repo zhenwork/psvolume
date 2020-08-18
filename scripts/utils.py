@@ -6,20 +6,20 @@ import shlex
 import datetime
 import subprocess
 
-def getTime():
+def get_time():
     """ 
     return accurate time point in format: Year-Month-Day-Hour:Minute:Second.unique_labels
     """ 
     return datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H:%M:%S.%f')
 
-def getUserName(): 
+def get_user_name(): 
     cmd = "whoami" 
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out, err = process.communicate()
     return out
 
 
-def getevents(runs):
+def get_events(runs):
     rlist = []
     if not isinstance(runs,str):
         return rlist
