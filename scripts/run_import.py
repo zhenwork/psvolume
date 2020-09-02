@@ -10,7 +10,7 @@ PATH=os.path.abspath(PATH+"./../")
 if PATH not in sys.path:
     sys.path.append(PATH)
 
-import script.fsystem
+import scripts.fsystem
 import scripts.utils
 
 
