@@ -431,22 +431,44 @@ class MergeManager:
                                  "Amat_0_invA", "Amat_invA", "Bmat_invA", "rotation_angle_deg",\
                                  "per_image_multiply_scaler","lattice_constant_A_deg"]
 
-    def map_to_reciprocal_space(self,image_data):
-        return 
+    def prepare_input_params(self):
+        # get required files
+        self.ipm = workflow.manager.ImageProcessMaster(args=self.args)
+        self.ipm.accept_variables = self.accept_variables
+        self.ipm.prepare_required_params() 
 
-    def merge_with_averaging(self):
-        return 
+    def merge_with_averaging(self,**kwargs):
+        volume = None 
+        weight = None 
+        if kwargs.get("select_pattern_idx") is None:
+            kwargs["select_pattern_idx"] = np.arange(self.ipm.num_images)
+        else:
+            kwargs["select_pattern_idx"] = workflow.utils.get_idx_list(kwargs["select_pattern_idx"])
 
-    def merge_with_gaussian(self):
-        return 
+        for image_idx in kwargs["select_pattern_idx"]:
+            image_obj = ipm.request_image_data(idx=image_idx).__dict__
+            core.utils.merge_dict(image_obj, kwargs)
+            volume, weight = diffuse.mapper.image_2d_to_volume_3d(**image_obj)
+
+        self.volume = volume
+        self.weight = weight
 
 
 class ScalerManager:
     def __init__(self,args):
-        pass 
+        self.args = args.copy()
+        self.accept_variables = ["image_file","image","mask", "dials_", "dials_", \
+                                 "per_image_multiply_scaler","average_intensity","overall_intensity"]
+
+    def prepare_required_params(self):
+        self.ipm = workflow.manager.ImageProcessMaster(args=self.args)
+        self.ipm.accept_variables = self.accept_variables
+        self.ipm.prepare_required_params() 
 
     def calculate_per_image_multiply_scaler(self):
-        return 
+        # 
+        if imp.calculate_per_image_multiply_scaler.status:
+            
 
 
 class PCAManager:

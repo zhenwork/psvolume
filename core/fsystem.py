@@ -1,23 +1,12 @@
 import h5py
 import os,sys
+import filelock
 import numpy as np
 
-class DFobject:
-    def __init__(self,file_name,file_type=None,**kwargs):
-        self.file_name = file_name
-        self.file_type = file_type 
-    def __unicode__(self):
-        return "data_file_object"
-    def __cmp__(self,another):
-        if isinstance(another,dict):
-            return self.__cmp__(Fobject(**another))
-        if unicode(another)!=self.__unicode__():
-            return False
-        if os.path.realpath(self.file_name) != os.path.realpath(another.file_name):
-            return False
-        return True
+from datetime import datetime
+print datetime.now().strftime('%m/%d/%Y %H:%M:%S')
 
-        
+
 class H5manager:
 
     @staticmethod
@@ -28,19 +17,20 @@ class H5manager:
         # compression = "gzip"
         """
         try:
-            with h5py.File(fname, 'w') as f:
-                if keys is not None:
-                    if chunks is None:
-                        if compression is None:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with h5py.File(fname, 'w') as f:
+                    if keys is not None:
+                        if chunks is None:
+                            if compression is None:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+                            else:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, compression=compression, compression_opts=compression_opts)
                         else:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, compression=compression, compression_opts=compression_opts)
-                    else:
-                        if compression is None:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks)
-                        else:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression=compression, compression_opts=compression_opts)
-                    datawr[...] = np.array(data)
+                            if compression is None:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks)
+                            else:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression=compression, compression_opts=compression_opts)
+                        datawr[...] = np.array(data)
         except Exception as error:
             print "!! ERROR:", error 
     
@@ -51,10 +41,11 @@ class H5manager:
         The file must exist
         """
         try:
-            with h5py.File(fname, 'r') as f:
-                if keys is None: 
-                    keys = f.keys()[0]
-                data = f[keys].value 
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with h5py.File(fname, 'r') as f:
+                    if keys is None: 
+                        keys = f.keys()[0]
+                    data = f[keys].value 
             return data
         except Exception as error:
             print "!! ERROR:", error
@@ -69,21 +60,22 @@ class H5manager:
             if not os.path.isfile(fname):
                 H5manager.writer(fname)
             if keys is not None:
-                with h5py.File(fname, 'r+') as f:
-                    try: f.__delitem__(keys)
-                    except: pass
-                    
-                    if chunks is None:
-                        if compression is None:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+                with filelock.FileLock(fname+".lock",timeout=5):
+                    with h5py.File(fname, 'r+') as f:
+                        try: f.__delitem__(keys)
+                        except: pass
+
+                        if chunks is None:
+                            if compression is None:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype)
+                            else:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, compression=compression, compression_opts=compression_opts)
                         else:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, compression=compression, compression_opts=compression_opts)
-                    else:
-                        if compression is None:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks)
-                        else:
-                            datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression=compression, compression_opts=compression_opts)
-                    datawr[...] = np.array(data) 
+                            if compression is None:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks)
+                            else:
+                                datawr = f.create_dataset(keys, np.array(data).shape, dtype=np.array(data).dtype, chunks=chunks, compression=compression, compression_opts=compression_opts)
+                        datawr[...] = np.array(data) 
         except Exception as error:
             print "!! ERROR:", error
 
@@ -98,13 +90,14 @@ class H5manager:
             if cxi_name.endswith(h5finder_search_name):
                 return cxi_name
         try:
-            fh5finder = h5py.File(filename, 'r')
-            cxiName = fh5finder.visit(tmpGetFullName)
-            fh5finder.close()
-            if cxiName is None:
-                print "## No such dataset"
-            else:
-                print "## Fit name: ", cxiName
+            with filelock.FileLock(filename+".lock",timeout=5):
+                fh5finder = h5py.File(filename, 'r')
+                cxiName = fh5finder.visit(tmpGetFullName)
+                fh5finder.close()
+                if cxiName is None:
+                    print "## No such dataset"
+                else:
+                    print "## Fit name: ", cxiName
             return cxiName
         except Exception as error:
             print "!! ERROR:", error
@@ -121,9 +114,10 @@ class H5manager:
         def tmpListDataName(cxi_name):
             h5datasets_search_name.append(cxi_name)
         try:
-            fh5list = h5py.File(filename, 'r')
-            fh5list.visit(tmpListDataName)
-            fh5list.close()
+            with filelock.FileLock(filename+".lock",timeout=5):
+                fh5list = h5py.File(filename, 'r')
+                fh5list.visit(tmpListDataName)
+                fh5list.close()
             return h5datasets_search_name
         except Exception as error:
             print "!! ERROR:", error
@@ -143,16 +137,18 @@ class PKLmanager:
     @staticmethod
     def writer(fname, params):
         try:
-            with open(fname, 'wb') as f:
-                pickle.dump(params, f) 
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with open(fname, 'wb') as f:
+                    pickle.dump(params, f) 
         except Exception as err:
             print "!!! err", err
 
     @staticmethod
     def reader(fname):
         try:
-            with open(fname, 'rb') as f:
-                params = pickle.load(f) 
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with open(fname, 'rb') as f:
+                    params = pickle.load(f) 
             return params
         except Exception as err:
             print "!!! err", err
@@ -161,8 +157,9 @@ class JSmanager:
     @staticmethod
     def reader(fname):
         try:
-            with open(fname, 'r') as f:
-                params = json.load(f)
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with open(fname, 'r') as f:
+                    params = json.load(f)
             return params
         except Exception as err:
             print "!!! err", err
@@ -170,11 +167,12 @@ class JSmanager:
     @staticmethod
     def writer(fname, params, indent=4):
         try:
-            with open(fname, 'w') as f:
-                if isinstance(indent,int):
-                    json.dump(params, f, indent=indent)
-                else:
-                    json.dump(params, f)
+            with filelock.FileLock(fname+".lock",timeout=5):
+                with open(fname, 'w') as f:
+                    if isinstance(indent,int):
+                        json.dump(params, f, indent=indent)
+                    else:
+                        json.dump(params, f)
         except Exception as err:
             print "!!! err", err
             
