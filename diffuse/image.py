@@ -1,9 +1,14 @@
 import numpy as np
 from numba import jit
+PATH=os.path.dirname(__file__)
+PATH=os.path.abspath(PATH+"./../")
+if PATH not in sys.path:
+    sys.path.append(PATH)
 
+    
 class Masktbk:
     @staticmethod
-    def circle_mask_keep(size,rmin=None,rmax=None, center=None):
+    def circle_mask_keep(size,rmin=None,rmax=None,center=None):
         """
         size = (nx,ny), tuple
         """

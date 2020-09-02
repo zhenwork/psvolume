@@ -1,6 +1,9 @@
 import math
 import numpy as np 
-
+PATH=os.path.dirname(__file__)
+PATH=os.path.abspath(PATH+"./../")
+if PATH not in sys.path:
+    sys.path.append(PATH)
 
 def phi_to_quaternion(phi_deg, rotAxis="x"):
     """

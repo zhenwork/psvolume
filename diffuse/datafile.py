@@ -5,9 +5,9 @@ PATH=os.path.dirname(__file__)
 PATH=os.path.abspath(PATH+"./../")
 if PATH not in sys.path:
     sys.path.append(PATH)
-import diffuse.image as imagetbx
-import diffuse.crystal as crystaltbx
-import core.filesystem as fsystemtbx
+
+import diffuse.crystal
+import core.fsystem
 
 
 def dials_report_to_psvm(fname):
@@ -36,10 +36,12 @@ def dials_report_to_psvm(fname):
     for data in line[starty+6:stopy].split(","):
         yvalue.append(float(data))    
     
-    return {"dials_scaling":(np.array(xvalue), np.array(yvalue))}
+    return {"dials_scaling_angle_deg":np.array(xvalue), "dials_scaling_multiply_scaler":np.array(yvalue)}
 
 
-def getscale(x,y,theta):
+def get_scale(angle_deg,scaler,theta):
+    x = angle_deg
+    y = scaler
     if x[0] > theta:
         return y[0]
     if x[-1] < theta:
@@ -82,8 +84,8 @@ def gxparms_to_psvm(fileGXPARMS):
     return psvmParms
 
 
-def cbf_to_psvm(fileName):
-    image, header = fsystemtbx.CBFmanager.reader(fileName)
+def cbf_to_psvm(file_name):
+    image, header = core.fsystem.CBFmanager.reader(file_name)
     psvmParms = {}
     psvmParms["phi_angle_deg"] = header['phi']
     psvmParms["start_angle_deg"] = header['start_angle']  
@@ -105,7 +107,7 @@ def cbf_to_psvm(fileName):
     return psvmParms
 
 
-def expt_to_psvm(fexpt):
+def dials_expt_to_psvm(fexpt):
     """
     The unit of lattice constant, invAmat is A
     The unit of angles is degree
@@ -143,34 +145,96 @@ def expt_to_psvm(fexpt):
     return psvmParms
 
 
-def h5py_to_psvm(fileName):
-    return fsystemtbx.PVmanager.reader(fileName)
+def h5py_to_psvm(file_name):
+    return core.fsystem.PVmanager.reader(file_name)
+
+def numpy_to_psvm(file_name,key="data"):
+    return {key:np.load(file_name)}
 
 
-def loadfile(filename, fileType=None):
-    if filename is None:
-        print "!! Only Support .xds, .cbf, .h5, .npy"
+def load_file_single(file_name, file_type=None, keep_keys=None, reject_keys=None):
+    if file_name is None:
         return {}
-    if fileType is None:
-        fileType = fsystemtbx.Fsystem.filetype(filename)
-    if not isinstance(fileType, str):
+    if file_type is None:
+        file_type = core.fsystem.Fsystem.filetype(file_name)
+    if not isinstance(file_type, str):
         return {}
 
-    if fileType.lower() == "xds":
-        return gxparms_to_psvm(filename)
-    elif fileType.lower() == "cbf":
-        return cbf_to_psvm(filename)
-    elif fileType.lower() in ["h5", "h5py"]:
-        return h5py_to_psvm(filename)
-    elif fileType.lower() in ["numpy", "npy"]:
-        return np.load(filename)
-    elif fileType.lower() in ["expt"]:
-        return expt_to_psvm(filename)
+    if file_type.lower() in ["xds","gxparms"]:
+        data = gxparms_to_psvm(file_name)
+    elif file_type.lower() in ["cbf"]:
+        data = cbf_to_psvm(file_name)
+    elif file_type.lower() in ["h5", "h5py"]:
+        data = h5py_to_psvm(file_name)
+    elif file_type.lower() in ["numpy", "npy"]:
+        data = numpy_to_psvm(file_name)
+    elif file_type.lower() in ["dials_expt","expt"]:
+        data = dials_expt_to_psvm(file_name)
+    elif file_type.lower() in ["dials_report","report"]:
+        data = dials_report_to_psvm(file_name)
     else:
         return {}
+
+    if reject_keys is not None:
+        for reject_key in reject_keys:
+            if reject_key in data:
+                data.pop(reject_key)
+    if keep_keys is not None:
+        for key in data:
+            if key not in keep_keys:
+                data.pop(key)
+    return data
+
+def file_keys_single(file_name, file_type=None):
+    if file_name is None:
+        return []
+    if file_type is None:
+        file_type = core.fsystem.Fsystem.filetype(file_name)
+    if not isinstance(file_type, str):
+        return []
+
+    if file_type.lower() in ["xds","gxparms"]:
+        return []
+    elif file_type.lower() in ["cbf"]:
+        return []
+    elif file_type.lower() in ["h5", "h5py"]:
+        return core.fsystem.H5manager.dnames(file_name)
+    elif file_type.lower() in ["numpy", "npy"]:
+        return ["npy_data"]
+    elif file_type.lower() in ["dials_expt","expt"]:
+        return []
+    elif file_type.lower() in ["dials_report","report"]:
+        return []
+    else:
+        return []
+
+class Fmanager:
+    @staticmethod
+    def load_file(file_name, file_type=None, keep_keys=None, reject_keys=None):
+        data = {}
+        if "*" in file_name:
+            file_name_list = core.fsystem.Fsystem.file_with_pattern(path=None, pattern=file_name)
+        else:
+            file_name_list = [file_name]
+
+        for idx, file_name_single in enumerate(file_name_list):
+            if idx == 0:
+                data = load_file_single(file_name_single, file_type, keep_keys, reject_keys)
+                continue
+            data = dict_append(data, load_file_single(file_name_single, file_type, keep_keys, reject_keys))
+        return data
+    @staticmethod
+    def file_keys(file_name, file_type=None):
+        file_name_single = file_name
+        if "*" in file_name:
+            file_name_pattern = core.fsystem.Fsystem.file_with_pattern(path=None, pattern=file_name)
+            if file_name_pattern in [None,[]]:
+                return []
+            file_name_single = file_name_pattern[0]
+        return file_keys_single(file_name_single,file_type=file_type)
+
     
-    
-def specialparams(notation="wtich"):
+def special_params(notation="wtich"):
     #mT = imageTools.MaskTools()
     #mask = mT.valueLimitMask(image, vmin=0.001, vmax=100000)
     #mask = mT.circleMask(size, rmin=40, rmax=None, center=None)

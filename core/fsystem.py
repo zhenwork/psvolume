@@ -2,6 +2,22 @@ import h5py
 import os,sys
 import numpy as np
 
+class DFobject:
+    def __init__(self,file_name,file_type=None,**kwargs):
+        self.file_name = file_name
+        self.file_type = file_type 
+    def __unicode__(self):
+        return "data_file_object"
+    def __cmp__(self,another):
+        if isinstance(another,dict):
+            return self.__cmp__(Fobject(**another))
+        if unicode(another)!=self.__unicode__():
+            return False
+        if os.path.realpath(self.file_name) != os.path.realpath(another.file_name):
+            return False
+        return True
+
+        
 class H5manager:
 
     @staticmethod

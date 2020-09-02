@@ -1,5 +1,11 @@
-from numba import jit
+import os,sys
 import numpy as np 
+from numba import jit
+PATH=os.path.dirname(__file__)
+PATH=os.path.abspath(PATH+"./../")
+if PATH not in sys.path:
+    sys.path.append(PATH)
+
 import diffuse.utils as dutils
 import diffuse.crystal as crystaltbx
 

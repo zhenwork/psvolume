@@ -1,7 +1,12 @@
 import numpy as np 
 from numba import jit
-import mathTools
 
+PATH=os.path.dirname(__file__)
+PATH=os.path.abspath(PATH+"./../")
+if PATH not in sys.path:
+    sys.path.append(PATH)
+
+import diffuse.utils
 
 
 def image_2d_to_pixel_px(size=None, center=None):
