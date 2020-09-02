@@ -28,7 +28,7 @@ args = parser.parse_args()
 
 
 #### create folder
-folder = os.path.dirname(args.fsave)
+folder = os.path.dirname(os.path.realpath(args.fsave))
 if not os.path.isdir(folder):
     os.makedirs(folder)
 
