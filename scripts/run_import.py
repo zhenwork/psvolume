@@ -39,7 +39,7 @@ if args.image_file:
     data_save["image_file"] = args.image_file 
 if args.backg_file:
     data_save["backg_file"] = args.backg_file 
-    assert len(args.image_file)==len(backg_file)
+    assert len(args.image_file)==len(args.backg_file)
 
 
 #### process the pipeline
