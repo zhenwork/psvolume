@@ -57,21 +57,6 @@ class ImageAgent(DataStruct):
         psvm = dataExtract.loadfile(filename, fileType=fileType)
         return psvm
     
-    def preprocess(self):
-        # 1. remove bad pixels
-        # self.removeBadPixels(notation=notation)
-        # 2. expand mask (True is default) 
-        # 3. deep remove bad pixels
-        self.deepRemoveBads() 
-        # 4. polarization correction
-        self.polarizationCorrection()
-        # 5. solid angle correction
-        self.solidAngleCorrection()
-        # 6. remove Bragg peaks
-        self.removeBragg()
-        return True
-    
-    
     def loadImage(self, filename, fileType=None):
         psvm = self.readfile(filename, fileType=fileType)
         self.fromdict(psvm)

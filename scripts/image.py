@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.ndimage.filters import median_filter
 from numba import jit
+from scipy.ndimage.filters import median_filter
 
 class MaskTools:
     def circleMask(self, size, rmin=None, rmax=None, center=None):

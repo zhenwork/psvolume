@@ -1,5 +1,5 @@
 import numpy as np 
-import mathTools 
+import scripts.utils 
 
 def lattice2vector(a, b, c, alpha, beta, gamma):
     """
@@ -28,13 +28,13 @@ def standardBmat(Amat=None, latticceConstant=None):
     elif Amat is not None:
         invAmat = np.linalg.inv(Amat)
         (vecA,vecB,vecC) = invAmat 
-        a = mathTools.length(vecA)
-        b = mathTools.length(vecB)
-        c = mathTools.length(vecC)
-        ## mathTools.angle return degree unit
-        alpha = mathTools.angle(vecB, vecC)
-        beta = mathTools.angle(vecA, vecC)
-        gamma = mathTools.angle(vecB, vecA)
+        a = scripts.utils.length(vecA)
+        b = scripts.utils.length(vecB)
+        c = scripts.utils.length(vecC)
+        ## scripts.utils.angle return degree unit
+        alpha = scripts.utils.angle(vecB, vecC)
+        beta = scripts.utils.angle(vecA, vecC)
+        gamma = scripts.utils.angle(vecB, vecA)
         return standardBmat(latticceConstant=(a,b,c,alpha,beta,gamma))
     else:
         raise Exception("!! Can't make standard Bmat")

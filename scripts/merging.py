@@ -1,6 +1,6 @@
 import numpy as np 
 from numba import jit
-import mathTools
+import scripts.utils
 
 def mapPixel2RealXYZ(size=None, center=None, pixelSize=None, detectorDistance=None):
     """
@@ -49,7 +49,7 @@ def mapReciprocal2Voxel(Amat=None, Bmat=None, returnFormat="HKL", \
     Return: voxel (N*N*3 or N*3) 
     voxelSize: 0.015 for 'cartesian' coordinate; 1.0 for "hkl" coordinate
     """
-    Phimat = mathTools.quaternion2rotation(mathTools.phi2quaternion(Phi, rotAxis=rotAxis))
+    Phimat = scripts.utils.quaternion2rotation(scripts.utils.phi2quaternion(Phi, rotAxis=rotAxis))
     if returnFormat.lower() == "hkl":
         voxel = reciprocal.dot(np.linalg.inv(Phimat.dot(Amat)).T) / voxelSize 
     elif returnFormat.lower() == "cartesian":

@@ -2,11 +2,15 @@
 Angstrom (A): wavelength, crystal lattice
 """
 import json
-import numpy as np  
-import crystalTools
-import fileManager
-import imageTools
-PsvolumeManager = fileManager.PsvolumeManager()
+import numpy as np 
+PATH=os.path.dirname(__file__)
+PATH=os.path.abspath(PATH+"./../")
+if PATH not in sys.path:
+    sys.path.append(PATH)
+
+import scripts.crystal
+import scripts.fsystem
+import scripts.image
 
 
 # "../DIALS/G150T-2/dials.report.html"
@@ -93,20 +97,16 @@ def xds2psvm(fileGXPARMS):
 
 
 def cbf2psvm(fileName):
-    cbfhandler = fileManager.CBFManager()
-    image, header = cbfhandler.getDataHeader(fileName)
-
-    number = float(fileName.split("/")[-1].split(".")[0].split("_")[-1])
+    image, header = scripts.fsystem.CBFmanager.reader(fileName)
 
     psvmParms = {}
     psvmParms["startAngle"] = header['phi']
-    psvmParms["currentAngle"] = header['start_angle']  
-    psvmParms["angleStep"] = header['angle_increment']
-    psvmParms["phi"] = psvmParms["angleStep"] * (number-1.)  # psvmParms["currentAngle"] - psvmParms["startAngle"]
-    psvmParms["exposureTime"] = header['exposure_time']
-    psvmParms["waveLength"] = header['wavelength']
-    psvmParms["pixelSizeX"] = header['x_pixel_size']
-    psvmParms["pixelSizeY"] = header['y_pixel_size']
+    psvmParms["currentAngle"] = header['start_angle']   
+    psvmParms["angleStep"] = header['angle_increment'] 
+    psvmParms["exposureTime"] = header['exposure_time'] 
+    psvmParms["waveLength"] = header['wavelength'] 
+    psvmParms["pixelSizeX"] = header['x_pixel_size'] 
+    psvmParms["pixelSizeY"] = header['y_pixel_size'] 
     nx = header['pixels_in_x']
     ny = header['pixels_in_y']
 
@@ -117,8 +117,7 @@ def cbf2psvm(fileName):
         if not image.shape == (nx, ny):
             raise Exception("!! Image shape doesn't fit")
 
-    psvmParms["image"] = image
-    cbfhandler = None
+    psvmParms["image"] = image 
     return psvmParms
 
 
@@ -166,7 +165,7 @@ def expt2psvm(fexpt):
 
 
 def h5py2psvm(fileName):
-    psvmParams = PsvolumeManager.h5py2psvm(fileName)
+    psvmParams = scripts.fsystem.PVmanager.reader(fileName)
     return psvmParams
 
 
@@ -176,7 +175,6 @@ def loadfile(filename, fileType=None):
         return {}
     if fileType is None:
         fileType = filename.split(".")[-1]
-
         
     if fileType.lower() == "xds":
         return xds2psvm(filename)
@@ -191,9 +189,9 @@ def loadfile(filename, fileType=None):
     else:
         print "!! Only Support .xds, .cbf, .h5, .npy"
         return {}
+
     
-    
-def specialparams(notation="wtich"):
+def special_params(notation="wtich"):
     #mT = imageTools.MaskTools()
     #mask = mT.valueLimitMask(image, vmin=0.001, vmax=100000)
     #mask = mT.circleMask(size, rmin=40, rmax=None, center=None)
